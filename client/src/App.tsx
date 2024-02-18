@@ -23,6 +23,7 @@ import ResetPasswordPage from './Authentication/ResetPasswordPage';
 import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
 import ReportsPage from './Reports/ReportsPage';
+import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 
 function App() {
@@ -40,6 +41,10 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
+                    <Route
+                      path="/communications"
+                      element={<CommunicationsPage />}
+                    />
                     <Route
                       path="/verify-account/:token"
                       element={<VerifyAccountPage />}
