@@ -12,9 +12,12 @@ import {
   Select,
   MenuItem,
   Button,
+  IconButton,
   Input,
   SelectChangeEvent,
+  Link,
 } from '@mui/material';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 interface Column {
   id: string;
@@ -92,19 +95,17 @@ function FilteringTable({
 
     if (filterType === 'calendar') {
       return year === filterYear;
-    } else {
-      // fiscal year
-      return (
-        (month >= 6 && year === filterYear) ||
-        (month < 6 && year - 1 === filterYear)
-      );
     }
+    // fiscal year
+    return (
+      (month >= 6 && year === filterYear) ||
+      (month < 6 && year - 1 === filterYear)
+    );
   });
 
   return (
     <>
-      <Button onClick={toggleFilterVisible}>Filter</Button>
-      {filterVisible && (
+      {/* {filterVisible && (
         <>
           <Select value={filterType} onChange={handleFilterTypeChange}>
             <MenuItem value="calendar">Calendar Year</MenuItem>
@@ -116,12 +117,8 @@ function FilteringTable({
             onChange={handleFilterYearChange}
           />
         </>
-      )}
-      <Input
-        placeholder="Search"
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
+      )} */}
+
       <TableContainer
         style={{
           borderRadius: '16px',
@@ -129,13 +126,28 @@ function FilteringTable({
           boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
           maxWidth: '80%',
           margin: 'auto',
+          padding: '20px',
         }}
       >
+        <TextField
+          label="Search"
+          variant="outlined"
+          onChange={handleSearchChange}
+          style={{ margin: '10px', width: `calc(100% / 4` }}
+        />
+        <IconButton onClick={toggleFilterVisible} style={{ margin: '20px' }}>
+          <FilterAltIcon />
+        </IconButton>
         <Table>
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.id}>{column.label}</TableCell>
+                <TableCell
+                  key={column.id}
+                  style={{ width: `calc(100% / ${columns.length})` }}
+                >
+                  {column.label}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
