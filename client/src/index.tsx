@@ -20,11 +20,11 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TestPage from './TableTestPage'; // replace with the actual path to your TestPage.tsx file
+import TableTestPage from './TableTestPage'; // replace with the actual path to your TestPage.tsx file
 
 ReactDOM.render(
   <React.StrictMode>
-    <TestPage />
+    <TableTestPage />
   </React.StrictMode>,
   document.getElementById('root'),
 );

@@ -1,5 +1,5 @@
 import React from 'react';
-import FilteringTable from './components/FilteringTable';
+import FilteringTable from './components/tables/FilteringTable';
 
 function TableTestPage() {
   // Define the columns
