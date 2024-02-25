@@ -24,6 +24,7 @@ import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
 import ReportsPage from './Reports/ReportsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
+import PopupPage from './Popup/PopupPage';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
                     element={<InviteRegisterPage />}
                   />
                   <Route path="/home" element={<HomeDashboardPage />} />
+                  <Route path="/popup" element={<PopupPage />} />
                   {/* Routes accessed only if user is authenticated */}
                   <Route element={<ProtectedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />

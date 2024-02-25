@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Typography,
   Box,
@@ -11,6 +11,10 @@ import {
   TableCell,
   ToggleButton,
   ToggleButtonGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../util/redux/hooks';
@@ -71,12 +75,21 @@ function HomeDashboard() {
   const dispatch = useAppDispatch();
   const navigator = useNavigate();
   const [alignment, setAlignment] = React.useState('donation'); // Default value for alignment
+  const [openPopup, setOpenPopup] = useState(false);
 
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
     newAlignment: string,
   ) => {
     setAlignment(newAlignment);
+  };
+
+  const handleOpenPopup = () => {
+    setOpenPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setOpenPopup(false);
   };
 
   function handleClick() {
@@ -107,7 +120,7 @@ function HomeDashboard() {
 
         <Button
           onClick={() => {
-            handleClick();
+            handleOpenPopup();
           }}
           style={{
             background: 'grey',
@@ -126,8 +139,19 @@ function HomeDashboard() {
         </Typography>
       </Box>
 
-      {/* Render the BasicTable component with the alignment prop */}
-      <BasicTable alignment={alignment} />
+      {/* Popup */}
+      <Dialog open={openPopup} onClose={handleClosePopup}>
+        <DialogTitle>{`${
+          alignment.charAt(0).toUpperCase() + alignment.slice(1)
+        }'s Summary`}</DialogTitle>
+        <DialogContent>
+          {/* Render the BasicTable component with the alignment prop */}
+          <BasicTable alignment={alignment} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePopup}>Close</Button>
+        </DialogActions>
+      </Dialog>
 
       <p style={{ marginTop: '16px', marginLeft: '16px' }}>
         There are 3 unacknowledged sponsorships.
