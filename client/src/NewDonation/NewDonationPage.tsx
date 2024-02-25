@@ -20,6 +20,7 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { Dayjs } from 'dayjs';
 import FormControl from '@mui/material/FormControl';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Box } from '@mui/system';
 
 /**
  The New Donation Page
@@ -95,23 +96,26 @@ function NewDonationPage() {
         </Typography>
       </Grid>
       <Grid item xs={12}>
-        <ToggleButtonGroup
-          value={donationType}
-          exclusive
-          onChange={handleDonationType}
-          aria-label="donation type"
-          size="large"
-        >
-          <ToggleButton value="donation" aria-label="donation">
-            Donation
-          </ToggleButton>
-          <ToggleButton value="sponsorship" aria-label="sponsorship">
-            Sponsorship
-          </ToggleButton>
-          <ToggleButton value="grant" aria-label="grant">
-            Grant
-          </ToggleButton>
-        </ToggleButtonGroup>
+        <Box sx={{ width: '50%' }}>
+          <ToggleButtonGroup
+            value={donationType}
+            exclusive
+            onChange={handleDonationType}
+            aria-label="donation type"
+            size="large"
+            fullWidth
+          >
+            <ToggleButton value="donation" aria-label="donation">
+              Donation
+            </ToggleButton>
+            <ToggleButton value="sponsorship" aria-label="sponsorship">
+              Sponsorship
+            </ToggleButton>
+            <ToggleButton value="grant" aria-label="grant">
+              Grant
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
       </Grid>
       {donationType === 'grant' && (
         <Grid item xs={2}>
