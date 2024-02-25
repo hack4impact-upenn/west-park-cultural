@@ -21,10 +21,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TableTestPage from './TableTestPage'; // replace with the actual path to your TestPage.tsx file
+import DonorsTable from './components/tables/DonorsTable';
 
 ReactDOM.render(
   <React.StrictMode>
-    <TableTestPage />
+    <DonorsTable />
   </React.StrictMode>,
   document.getElementById('root'),
 );
