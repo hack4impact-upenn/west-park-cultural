@@ -8,6 +8,7 @@ import AlertDialog from '../components/AlertDialog';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import ScreenGrid from '../components/ScreenGrid';
 import FormCol from '../components/form/FormCol';
+import westPark from '../assets/westPark.png';
 
 /**
  * A page that allows users to reset their password by inputting a new password
@@ -114,6 +115,12 @@ function ResetPasswordPage() {
       <FormGrid>
         <FormCol>
           <Grid item container justifyContent="center">
+          <Grid item container justifyContent="center">
+            <img width="70%" src={westPark} alt="West Park Logo" />
+          </Grid>
+          <Typography variant="h5" textAlign="center">
+              Donor Management System
+            </Typography>
             <Typography variant="h2">Excited to have you back!</Typography>
           </Grid>
           <Grid item width="1">
