@@ -26,7 +26,7 @@ import { Box } from '@mui/system';
  The New Donation Page
  */
 
-const filter = createFilterOptions<FilmOptionType>();
+const filter = createFilterOptions<DonorType>();
 
 function NewDonationPage() {
   const [donationType, setDonationType] = useState<string | null>('donation');
@@ -36,14 +36,14 @@ function NewDonationPage() {
   const [donationAmount, setDonationAmount] = useState('');
   const [donationDate, setDonationDate] = useState<Dayjs | null>(null);
 
-  const [donator, setDonator] = useState<FilmOptionType | null>(null);
+  const [donator, setDonator] = useState<DonorType | null>(null);
 
   const [isNewDonator, setIsNewDonator] = useState(false);
   const [newDonatorEmail, setNewDonatorEmail] = useState('');
   const [newDonatorAddress, setNewDonatorAddress] = useState('');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
 
-  const [campaignPurpose, setCampaignPurpose] = useState<FilmOptionType | null>(
+  const [campaignPurpose, setCampaignPurpose] = useState<DonorType | null>(
     null,
   );
 
@@ -118,8 +118,8 @@ function NewDonationPage() {
         </Box>
       </Grid>
       {donationType === 'grant' && (
-        <Grid item xs={2}>
-          <FormControl fullWidth>
+        <Grid item xs={12}>
+          <FormControl sx={{ width: '40%' }}>
             <InputLabel required={donationType === 'grant'}>
               Grant Year
             </InputLabel>
@@ -143,18 +143,22 @@ function NewDonationPage() {
           value={donationAmount}
           onChange={handleDonationAmountChange}
           required
+          sx={{ width: '40%' }}
         />
       </Grid>
       <Grid item xs={12}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             value={donationDate}
+            label="Donation Date"
             onChange={(newDonationDate) => setDonationDate(newDonationDate)}
+            sx={{ width: '40%' }}
           />
         </LocalizationProvider>
       </Grid>
       <Grid item xs={12}>
         <Autocomplete
+          sx={{ width: '40%' }}
           value={donator}
           onChange={(event, newValue) => {
             setIsNewDonator(false);
@@ -178,11 +182,12 @@ function NewDonationPage() {
             const { inputValue } = params;
             // Suggest the creation of a new value
             const isExisting = options.some(
-              (option) => inputValue === option.title,
+              (option) => inputValue === option.contact_name,
             );
             if (inputValue !== '' && !isExisting) {
               filtered.push({
                 inputValue,
+                contact_name: inputValue,
                 title: `Add "${inputValue}"`,
               });
             }
@@ -194,22 +199,25 @@ function NewDonationPage() {
           handleHomeEndKeys
           id="donator-picker"
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          options={top100Films}
+          options={testDonors}
           getOptionLabel={(option) => {
             // Value selected with enter, right from the input
             if (typeof option === 'string') {
               return option;
             }
             // Add "xxx" option created dynamically
-            if (option.inputValue) {
-              return option.inputValue;
+            if (option.title) {
+              return option.title!;
             }
             // Regular option
-            return option.title;
+            return option.contact_name!;
           }}
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          renderOption={(props, option) => <li {...props}>{option.title}</li>}
-          sx={{ width: 300 }}
+          renderOption={(props, option) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <li {...props}>
+              {option.title ? option.title : option.contact_name}
+            </li>
+          )}
           freeSolo
           renderInput={(params) => (
             <TextField
@@ -230,12 +238,13 @@ function NewDonationPage() {
             value={newDonatorEmail}
             onChange={handleNewDonatorEmailChange}
             required={isNewDonator}
+            sx={{ width: '40%' }}
           />
         </Grid>
       )}
       {isNewDonator && (
-        <Grid item xs={2}>
-          <FormControl fullWidth>
+        <Grid item xs={12}>
+          <FormControl sx={{ width: '40%' }}>
             <InputLabel required={isNewDonator}>New Donator Group</InputLabel>
             <Select
               labelId="demo-simple-select-label"
@@ -263,12 +272,14 @@ function NewDonationPage() {
             type="text"
             value={newDonatorAddress}
             onChange={handleNewDonatorAddressChange}
+            sx={{ width: '40%' }}
           />
         </Grid>
       )}
 
       <Grid item xs={12}>
         <Autocomplete
+          sx={{ width: '40%' }}
           value={campaignPurpose}
           onChange={(event, newValue) => {
             if (typeof newValue === 'string') {
@@ -294,7 +305,7 @@ function NewDonationPage() {
             );
             if (inputValue !== '' && !isExisting) {
               filtered.push({
-                inputValue,
+                contact_name: inputValue,
                 title: `Add "${inputValue}"`,
               });
             }
@@ -306,7 +317,7 @@ function NewDonationPage() {
           handleHomeEndKeys
           id="free-solo-with-text-demo"
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          options={top100Films}
+          options={testDonors} // NOTE: using donor data for now but should be a list of campaigns
           getOptionLabel={(option) => {
             // Value selected with enter, right from the input
             if (typeof option === 'string') {
@@ -314,14 +325,17 @@ function NewDonationPage() {
             }
             // Add "xxx" option created dynamically
             if (option.inputValue) {
-              return option.inputValue;
+              return option.contact_name!;
             }
             // Regular option
-            return option.title;
+            return option.contact_name!;
           }}
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          renderOption={(props, option) => <li {...props}>{option.title}</li>}
-          sx={{ width: 300 }}
+          renderOption={(props, option) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <li {...props}>
+              {option.title ? option.title : option.contact_name}
+            </li>
+          )}
           freeSolo
           renderInput={(params) => (
             <TextField
@@ -343,10 +357,11 @@ function NewDonationPage() {
           value={notes}
           onChange={handleNotesChange}
           multiline
+          sx={{ width: '40%' }}
         />
       </Grid>
-      <Grid item xs={2}>
-        <FormControl fullWidth>
+      <Grid item xs={12}>
+        <FormControl sx={{ width: '40%' }}>
           <InputLabel>Payment Type</InputLabel>
           <Select
             value={paymentType}
@@ -367,6 +382,9 @@ function NewDonationPage() {
           onClick={() => {
             alert('clicked');
           }}
+          sx={{ width: '40%' }}
+          size="large"
+          style={{ justifyContent: 'flex-start' }}
         >
           Register Donation
         </Button>
@@ -378,137 +396,68 @@ function NewDonationPage() {
 
 export default NewDonationPage;
 
-interface FilmOptionType {
+interface DonorType {
   inputValue?: string;
-  title: string;
-  year?: number;
+  title?: string;
+  _id?: string;
+  contact_name?: string;
+  contact_email?: string;
+  contact_address?: string;
+  contact_phone?: string;
+  donor_group?: string;
+  registered_date?: { $date: { $numberLong: string } };
+  last_donation_date?: { $date: { $numberLong: string } };
+  last_communication_date?: string;
+  type?: string;
+  org_address?: string;
+  org_email?: string;
+  org_name?: string;
 }
 
-// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-const top100Films: readonly FilmOptionType[] = [
-  { title: 'The Shawshank Redemption', year: 1994 },
-  { title: 'The Godfather', year: 1972 },
-  { title: 'The Godfather: Part II', year: 1974 },
-  { title: 'The Dark Knight', year: 2008 },
-  { title: '12 Angry Men', year: 1957 },
-  { title: "Schindler's List", year: 1993 },
-  { title: 'Pulp Fiction', year: 1994 },
+const testDonors: DonorType[] = [
   {
-    title: 'The Lord of the Rings: The Return of the King',
-    year: 2003,
-  },
-  { title: 'The Good, the Bad and the Ugly', year: 1966 },
-  { title: 'Fight Club', year: 1999 },
-  {
-    title: 'The Lord of the Rings: The Fellowship of the Ring',
-    year: 2001,
+    _id: '65daa67d6c34e8adb9f2d2c4',
+    contact_name: 'John Smith',
+    contact_email: 'jsmith@gmail.com',
+    contact_address: '3820 Spruce',
+    contact_phone: '609-297-6873',
+    donor_group: 'Individual',
+    registered_date: { $date: { $numberLong: '1463587200000' } },
+    last_donation_date: { $date: { $numberLong: '1684425600000' } },
+    last_communication_date: '',
+    type: 'donor',
+    org_address: '',
+    org_email: '',
+    org_name: '',
   },
   {
-    title: 'Star Wars: Episode V - The Empire Strikes Back',
-    year: 1980,
+    _id: '65daa7356c34e8adb9f2d2c5',
+    contact_name: 'Jane Doe',
+    contact_email: 'jdoe@gmail.com',
+    contact_address: '',
+    contact_phone: '609-235-3525',
+    donor_group: 'corporate',
+    registered_date: { $date: { $numberLong: '1517673600000' } },
+    last_donation_date: { $date: { $numberLong: '1635955200000' } },
+    last_communication_date: '',
+    type: 'sponsor',
+    org_name: 'Company A',
+    org_email: 'compa@gmail.com',
+    org_address: '2934 Chestnut st',
   },
-  { title: 'Forrest Gump', year: 1994 },
-  { title: 'Inception', year: 2010 },
   {
-    title: 'The Lord of the Rings: The Two Towers',
-    year: 2002,
+    _id: '65daa8166c34e8adb9f2d2c6',
+    contact_name: 'Lisa Webster',
+    contact_email: 'lwebster@gmail.com',
+    contact_address: '',
+    contact_phone: '235-582-5325',
+    donor_group: 'Government',
+    registered_date: { $date: { $numberLong: '1663516800000' } },
+    last_donation_date: { $date: { $numberLong: '1666540800000' } },
+    last_communication_date: '2022-10-24T16:00:00.000+00:00',
+    type: 'grant',
+    org_address: 'Philadelphia',
+    org_email: 'philly@gmail.com',
+    org_name: 'Philadelphia Gov ',
   },
-  { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
-  { title: 'Goodfellas', year: 1990 },
-  { title: 'The Matrix', year: 1999 },
-  { title: 'Seven Samurai', year: 1954 },
-  {
-    title: 'Star Wars: Episode IV - A New Hope',
-    year: 1977,
-  },
-  { title: 'City of God', year: 2002 },
-  { title: 'Se7en', year: 1995 },
-  { title: 'The Silence of the Lambs', year: 1991 },
-  { title: "It's a Wonderful Life", year: 1946 },
-  { title: 'Life Is Beautiful', year: 1997 },
-  { title: 'The Usual Suspects', year: 1995 },
-  { title: 'Léon: The Professional', year: 1994 },
-  { title: 'Spirited Away', year: 2001 },
-  { title: 'Saving Private Ryan', year: 1998 },
-  { title: 'Once Upon a Time in the West', year: 1968 },
-  { title: 'American History X', year: 1998 },
-  { title: 'Interstellar', year: 2014 },
-  { title: 'Casablanca', year: 1942 },
-  { title: 'City Lights', year: 1931 },
-  { title: 'Psycho', year: 1960 },
-  { title: 'The Green Mile', year: 1999 },
-  { title: 'The Intouchables', year: 2011 },
-  { title: 'Modern Times', year: 1936 },
-  { title: 'Raiders of the Lost Ark', year: 1981 },
-  { title: 'Rear Window', year: 1954 },
-  { title: 'The Pianist', year: 2002 },
-  { title: 'The Departed', year: 2006 },
-  { title: 'Terminator 2: Judgment Day', year: 1991 },
-  { title: 'Back to the Future', year: 1985 },
-  { title: 'Whiplash', year: 2014 },
-  { title: 'Gladiator', year: 2000 },
-  { title: 'Memento', year: 2000 },
-  { title: 'The Prestige', year: 2006 },
-  { title: 'The Lion King', year: 1994 },
-  { title: 'Apocalypse Now', year: 1979 },
-  { title: 'Alien', year: 1979 },
-  { title: 'Sunset Boulevard', year: 1950 },
-  {
-    title:
-      'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
-    year: 1964,
-  },
-  { title: 'The Great Dictator', year: 1940 },
-  { title: 'Cinema Paradiso', year: 1988 },
-  { title: 'The Lives of Others', year: 2006 },
-  { title: 'Grave of the Fireflies', year: 1988 },
-  { title: 'Paths of Glory', year: 1957 },
-  { title: 'Django Unchained', year: 2012 },
-  { title: 'The Shining', year: 1980 },
-  { title: 'WALL·E', year: 2008 },
-  { title: 'American Beauty', year: 1999 },
-  { title: 'The Dark Knight Rises', year: 2012 },
-  { title: 'Princess Mononoke', year: 1997 },
-  { title: 'Aliens', year: 1986 },
-  { title: 'Oldboy', year: 2003 },
-  { title: 'Once Upon a Time in America', year: 1984 },
-  { title: 'Witness for the Prosecution', year: 1957 },
-  { title: 'Das Boot', year: 1981 },
-  { title: 'Citizen Kane', year: 1941 },
-  { title: 'North by Northwest', year: 1959 },
-  { title: 'Vertigo', year: 1958 },
-  {
-    title: 'Star Wars: Episode VI - Return of the Jedi',
-    year: 1983,
-  },
-  { title: 'Reservoir Dogs', year: 1992 },
-  { title: 'Braveheart', year: 1995 },
-  { title: 'M', year: 1931 },
-  { title: 'Requiem for a Dream', year: 2000 },
-  { title: 'Amélie', year: 2001 },
-  { title: 'A Clockwork Orange', year: 1971 },
-  { title: 'Like Stars on Earth', year: 2007 },
-  { title: 'Taxi Driver', year: 1976 },
-  { title: 'Lawrence of Arabia', year: 1962 },
-  { title: 'Double Indemnity', year: 1944 },
-  {
-    title: 'Eternal Sunshine of the Spotless Mind',
-    year: 2004,
-  },
-  { title: 'Amadeus', year: 1984 },
-  { title: 'To Kill a Mockingbird', year: 1962 },
-  { title: 'Toy Story 3', year: 2010 },
-  { title: 'Logan', year: 2017 },
-  { title: 'Full Metal Jacket', year: 1987 },
-  { title: 'Dangal', year: 2016 },
-  { title: 'The Sting', year: 1973 },
-  { title: '2001: A Space Odyssey', year: 1968 },
-  { title: "Singin' in the Rain", year: 1952 },
-  { title: 'Toy Story', year: 1995 },
-  { title: 'Bicycle Thieves', year: 1948 },
-  { title: 'The Kid', year: 1921 },
-  { title: 'Inglourious Basterds', year: 2009 },
-  { title: 'Snatch', year: 2000 },
-  { title: '3 Idiots', year: 2009 },
-  { title: 'Monty Python and the Holy Grail', year: 1975 },
 ];
