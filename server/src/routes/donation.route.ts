@@ -12,11 +12,11 @@ import {
 
 const router = express.Router();
 
-router.get('/all', isAuthenticated, getAllDonations);
+router.get('/all', getAllDonations);
 
 router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
 
-router.get('/:id', isAuthenticated, getDonation);
+router.get('/:id', getDonation);
 
 router.get('/donor/:donorId', isAuthenticated, getDonationsByDonorId);
 
