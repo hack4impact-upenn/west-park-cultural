@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import {
@@ -21,6 +21,7 @@ import { Dayjs } from 'dayjs';
 import FormControl from '@mui/material/FormControl';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Box } from '@mui/system';
+import { useData } from '../util/api';
 
 /**
  The New Donation Page
@@ -30,26 +31,28 @@ const filter = createFilterOptions<DonorType>();
 
 function NewDonationPage() {
   const [donationType, setDonationType] = useState<string | null>('donation');
-
   const [grantYear, setGrantYear] = useState('');
-
   const [donationAmount, setDonationAmount] = useState('');
   const [donationDate, setDonationDate] = useState<Dayjs | null>(null);
-
   const [donator, setDonator] = useState<DonorType | null>(null);
-
   const [isNewDonator, setIsNewDonator] = useState(false);
   const [newDonatorEmail, setNewDonatorEmail] = useState('');
   const [newDonatorAddress, setNewDonatorAddress] = useState('');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
-
   const [campaignPurpose, setCampaignPurpose] = useState<DonorType | null>(
     null,
   );
-
   const [notes, setNotes] = useState('');
-
   const [paymentType, setPaymentType] = useState('');
+
+  const donors = useData('donor/all');
+  const [donorsData, setDonorsData] = useState<DonorType[]>([]);
+
+  useEffect(() => {
+    const data = donors?.data || [];
+    console.log('donors', data);
+    setDonorsData(data);
+  }, [donors]);
 
   const handleDonationType = (
     event: React.MouseEvent<HTMLElement>,
@@ -199,7 +202,7 @@ function NewDonationPage() {
           handleHomeEndKeys
           id="donator-picker"
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          options={testDonors}
+          options={donorsData}
           getOptionLabel={(option) => {
             // Value selected with enter, right from the input
             if (typeof option === 'string') {
