@@ -1,5 +1,5 @@
 import express from 'express';
-import { isAdmin } from '../controllers/admin.middleware';
+import { isAuthenticated } from '../controllers/auth.middleware';
 
 import {
   getAllDonorsController,
@@ -10,12 +10,12 @@ import {
 
 const router = express.Router();
 
-router.get('/all', isAdmin, getAllDonorsController);
+router.get('/all', isAuthenticated, getAllDonorsController);
 
-router.get('/:type', isAdmin, getAllDonorsOfType);
+router.get('/:type', isAuthenticated, getAllDonorsOfType);
 
-router.get('/:id', isAdmin, getDonorByIdController);
+router.get('/:id', isAuthenticated, getDonorByIdController);
 
-router.post('/create', isAdmin, createDonorController);
+router.post('/create', isAuthenticated, createDonorController);
 
 export default router;

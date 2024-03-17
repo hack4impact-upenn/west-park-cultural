@@ -1,6 +1,5 @@
 import express from 'express';
-import { isAdmin } from '../controllers/admin.middleware';
-
+import { isAuthenticated } from '../controllers/auth.middleware';
 import {
   createCommunicationController,
   getCommunicationByIdController,
@@ -9,10 +8,10 @@ import {
 
 const router = express.Router();
 
-router.post('/', isAdmin, createCommunicationController);
+router.post('/', isAuthenticated, createCommunicationController);
 
-router.get('/:id', isAdmin, getCommunicationByIdController);
+router.get('/:id', isAuthenticated, getCommunicationByIdController);
 
-router.get('/', isAdmin, getAllCommunicationsController);
+router.get('/', isAuthenticated, getAllCommunicationsController);
 
 export default router;

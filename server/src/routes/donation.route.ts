@@ -1,5 +1,5 @@
 import express from 'express';
-import { isAdmin } from '../controllers/admin.middleware';
+import { isAuthenticated } from '../controllers/auth.middleware';
 
 import {
   getAllDonations,
@@ -12,16 +12,16 @@ import {
 
 const router = express.Router();
 
-router.get('/all', isAdmin, getAllDonations);
+router.get('/all', isAuthenticated, getAllDonations);
 
-router.get('/type/:type', isAdmin, getAllDonationsOfType);
+router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
 
-router.get('/:id', isAdmin, getDonation);
+router.get('/:id', isAuthenticated, getDonation);
 
-router.get('/donor/:donorId', isAdmin, getDonationsByDonorId);
+router.get('/donor/:donorId', isAuthenticated, getDonationsByDonorId);
 
 router.post('/new', createNewDonation);
 
-router.put('/acknowledge/:id', isAdmin, acknowledgeDonationById);
+router.put('/acknowledge/:id', isAuthenticated, acknowledgeDonationById);
 
 export default router;

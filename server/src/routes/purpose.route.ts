@@ -1,5 +1,5 @@
 import express from 'express';
-import { isAdmin } from '../controllers/admin.middleware';
+import { isAuthenticated } from '../controllers/auth.middleware';
 
 import {
   createPurposeController,
@@ -9,10 +9,10 @@ import {
 
 const router = express.Router();
 
-router.post('/', isAdmin, createPurposeController);
+router.post('/', isAuthenticated, createPurposeController);
 
-router.get('/:id', isAdmin, getPurposeByIdController);
+router.get('/:id', isAuthenticated, getPurposeByIdController);
 
-router.get('/', isAdmin, getAllPurposesController);
+router.get('/', isAuthenticated, getAllPurposesController);
 
 export default router;
