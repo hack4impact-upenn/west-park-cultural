@@ -19,6 +19,26 @@ const prefixToRouterMap: { prefix: string; router: Router }[] = [
     prefix: '/api/admin',
     router: adminRouter,
   },
+  {
+    prefix: '/api/donation',
+    router: adminRouter,
+  },
+  {
+    prefix: '/api/donor',
+    router: adminRouter,
+  },
+  {
+    prefix: '/api/group',
+    router: adminRouter,
+  },
+  {
+    prefix: '/api/purpose',
+    router: adminRouter,
+  },
+  {
+    prefix: '/api/communication',
+    router: adminRouter,
+  },
 ];
 
 export default prefixToRouterMap;
