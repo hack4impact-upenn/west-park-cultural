@@ -134,10 +134,10 @@ function LoginPage() {
       <FormGrid>
         <FormCol>
           <Grid item container justifyContent="center">
-          <Grid item container justifyContent="center">
-            <img width="70%" src={westPark} alt="West Park Logo" />
-          </Grid>
-          <Typography variant="h5" textAlign="center">
+            <Grid item container justifyContent="center">
+              <img width="70%" src={westPark} alt="West Park Logo" />
+            </Grid>
+            <Typography variant="h5" textAlign="center">
               Donor Management System
             </Typography>
             <Typography variant="h2" textAlign="center">
