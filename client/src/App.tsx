@@ -22,7 +22,7 @@ import EmailResetPasswordPage from './Authentication/EmailResetPasswordPage';
 import ResetPasswordPage from './Authentication/ResetPasswordPage';
 import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
-import DonorProfilePage from './components/donorProfile/DonorProfilePage';
+import DonorProfilePage from './donorProfile/DonorProfilePage';
 
 function App() {
   return (
