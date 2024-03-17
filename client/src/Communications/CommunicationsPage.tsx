@@ -1,7 +1,10 @@
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-alert */
 /* eslint-disable import/no-unresolved */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import axios from 'axios';
 
 import {
   Typography,
@@ -85,8 +88,6 @@ const testDataGroup = [
   },
 ];
 
-const notTest = ['user1', 'user2', 'user3'];
-
 const style = {
   position: 'absolute',
   top: '50%',
@@ -109,16 +110,109 @@ function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
   const handleUnackDonoModalOpen = () => setUnackDonoModalOpen(true);
   const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
+  const [groupSearchValue, setGroupSearchValue] = useState(null);
 
   const [rows, setRows] = useState<RowItem[]>([]);
+  const [donors, setDonors] = useState([]);
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    // Fetch all donors
+    axios
+      .get('/api/donor/all')
+      .then((response) => {
+        setDonors(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching donors:', error);
+      });
+
+    // Fetch all groups
+    axios
+      .get('/api/group/all')
+      .then((response) => {
+        setGroups(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching groups:', error);
+      });
+  }, []);
+
+  // Define a function to extract the correct ID
+  const extractId = (id: string | { $oid: string }) => {
+    return typeof id === 'string' ? id : id.$oid;
+  };
+
+  const handleNameChange = (
+    event: React.SyntheticEvent,
+    value: { name: string; id: string | { $oid: string } } | null,
+  ) => {
+    if (value) {
+      setRows([]);
+      const selectedPerson = donors.find(
+        (person) => extractId(person._id) === value.id,
+      );
+      if (selectedPerson) {
+        // const existingRow = rows.find(
+        //   (row) => row.id === extractId(selectedPerson._id),
+        // );
+        // if (existingRow) {
+        //   return;
+        // }
+        const newItem: RowItem = {
+          id: extractId(selectedPerson._id),
+          contact_name: selectedPerson.contact_name,
+          contact_email: selectedPerson.contact_email,
+        };
+        setRows((prevRows: RowItem[]) => [...prevRows, newItem]);
+      }
+    }
+  };
 
   const addItem = () => {
-    const newItem = {
+    const newItem: RowItem = {
       id: '65daa67d6c34e8adb9f2d2c4',
       contact_name: 'John Smith',
       contact_email: 'jsmith@gmail.com',
     };
     setRows((prevRows) => [...prevRows, newItem]);
+  };
+
+  const addGroupItem = (selectedGroup: any) => {
+    // Retrieve the donors associated with the selected group
+    const groupDonors = testDonors.filter((donor) =>
+      selectedGroup.donor_ids.includes(extractId(donor._id)),
+    );
+
+    // Filter out duplicates by comparing with existing rows
+    const newRows = groupDonors.reduce((accumulator: RowItem[], donor) => {
+      // const existingRow = rows.find((row) => row.id === extractId(donor._id));
+      // if (!existingRow) {
+      const newItem: RowItem = {
+        id: extractId(donor._id),
+        contact_name: donor.contact_name,
+        contact_email: donor.contact_email,
+      };
+      accumulator.push(newItem);
+      // }
+      return accumulator;
+    }, []);
+
+    // Update rows state with new rows
+    setRows((prevRows) => [...prevRows, ...newRows]);
+  };
+
+  // Function to handle adding a group
+  const handleGroupChange = (
+    event: React.SyntheticEvent,
+    value: { group_name: string; donor_ids: string[] } | null,
+  ) => {
+    if (value) {
+      setRows([]);
+      addGroupItem(value); // Add members of the selected group to the table
+      // Clear the Autocomplete input after adding the group members
+      setGroupSearchValue(null);
+    }
   };
 
   const clearItems = () => {
@@ -150,10 +244,14 @@ function CommunicationsPage() {
           <Autocomplete
             disablePortal
             id="combo-box-demo"
-            options={testDonors.map((option) => `${option.contact_name}`)}
+            options={donors.map((option) => ({
+              name: option.contact_name,
+              id: option._id,
+            }))}
+            getOptionLabel={(option) => option.name}
             sx={{ width: 300 }}
+            onChange={handleNameChange}
             renderInput={(params) => (
-              // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="Search Name" />
             )}
           />
@@ -204,11 +302,12 @@ function CommunicationsPage() {
               >
                 <Autocomplete
                   disablePortal
-                  id="combo-box-demo"
-                  options={notTest}
-                  sx={{ flexGrow: 5 }}
+                  id="group-search"
+                  options={groups}
+                  getOptionLabel={(option) => option.group_name}
+                  value={groupSearchValue}
+                  onChange={handleGroupChange}
                   renderInput={(params) => (
-                    // eslint-disable-next-line react/jsx-props-no-spreading
                     <TextField {...params} label="Search Name" />
                   )}
                 />
