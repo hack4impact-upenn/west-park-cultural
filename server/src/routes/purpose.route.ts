@@ -13,6 +13,6 @@ router.post('/', isAuthenticated, createPurposeController);
 
 router.get('/:id', isAuthenticated, getPurposeByIdController);
 
-router.get('/', isAuthenticated, getAllPurposesController);
+router.get('/', getAllPurposesController);
 
 export default router;

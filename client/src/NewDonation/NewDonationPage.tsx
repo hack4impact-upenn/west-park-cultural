@@ -39,7 +39,7 @@ function NewDonationPage() {
   const [newDonatorEmail, setNewDonatorEmail] = useState('');
   const [newDonatorAddress, setNewDonatorAddress] = useState('');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
-  const [campaignPurpose, setCampaignPurpose] = useState<DonorType | null>(
+  const [campaignPurpose, setCampaignPurpose] = useState<PurposeType | null>(
     null,
   );
   const [notes, setNotes] = useState('');
@@ -47,12 +47,19 @@ function NewDonationPage() {
 
   const donors = useData('donor/all');
   const [donorsData, setDonorsData] = useState<DonorType[]>([]);
-
   useEffect(() => {
     const data = donors?.data || [];
-    console.log('donors', data);
     setDonorsData(data);
   }, [donors]);
+
+  const purposes = useData('purpose');
+  const [purposesData, setPurposesData] = useState<PurposeType[]>([]);
+
+  useEffect(() => {
+    const data = purposes?.data || [];
+    console.log('purposes', data);
+    setPurposesData(data);
+  }, [purposes]);
 
   const handleDonationType = (
     event: React.MouseEvent<HTMLElement>,
@@ -320,24 +327,22 @@ function NewDonationPage() {
           handleHomeEndKeys
           id="free-solo-with-text-demo"
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          options={testDonors} // NOTE: using donor data for now but should be a list of campaigns
+          options={purposesData}
           getOptionLabel={(option) => {
             // Value selected with enter, right from the input
             if (typeof option === 'string') {
-              return option;
+              return option!;
             }
             // Add "xxx" option created dynamically
-            if (option.inputValue) {
-              return option.contact_name!;
+            if (option.title) {
+              return option.title!;
             }
             // Regular option
-            return option.contact_name!;
+            return option.name!;
           }}
           renderOption={(props, option) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
-            <li {...props}>
-              {option.title ? option.title : option.contact_name}
-            </li>
+            <li {...props}>{option.title ? option.title : option.name}</li>
           )}
           freeSolo
           renderInput={(params) => (
@@ -415,6 +420,14 @@ interface DonorType {
   org_address?: string;
   org_email?: string;
   org_name?: string;
+}
+
+interface PurposeType {
+  inputValue?: string;
+  title?: string;
+  _id?: string;
+  name?: string;
+  date_created?: Date;
 }
 
 const testDonors: DonorType[] = [
