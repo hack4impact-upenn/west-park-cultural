@@ -16,6 +16,7 @@ router.get('/:type', isAuthenticated, getAllDonorsOfType);
 
 router.get('/:id', isAuthenticated, getDonorByIdController);
 
-router.post('/create', isAuthenticated, createDonorController);
+// router.post('/create', isAuthenticated, createDonorController);
+router.post('/create', createDonorController);
 
 export default router;

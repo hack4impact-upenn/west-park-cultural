@@ -21,7 +21,7 @@ import { Dayjs } from 'dayjs';
 import FormControl from '@mui/material/FormControl';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Box } from '@mui/system';
-import { useData } from '../util/api';
+import { postData, useData } from '../util/api';
 
 /**
  The New Donation Page
@@ -57,7 +57,7 @@ function NewDonationPage() {
 
   useEffect(() => {
     const data = purposes?.data || [];
-    console.log('purposes', data);
+    // console.log('purposes', data);
     setPurposesData(data);
   }, [purposes]);
 
@@ -96,6 +96,76 @@ function NewDonationPage() {
 
   const handlePaymentTypeChange = (event: SelectChangeEvent) => {
     setPaymentType(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    if (isNewDonator) {
+      const newDonator = {
+        contact_name: donator?.title,
+        contact_email: newDonatorEmail,
+        contact_address: newDonatorAddress,
+        contact_phone: '0', // no input field for this yet
+        donor_group: newDonatorGroup,
+        registered_date: new Date(), // no input field for this yet
+        last_donation_date: new Date(), // no input field for this yet
+        type: '0', // no input field for this yet
+        // comments: null,
+        // _id: null,
+      };
+
+      postData('donor/create', newDonator)
+        .then((response) => {
+          setDonator(response.data);
+
+          const newDonation = {
+            // eslint-disable-next-line no-underscore-dangle
+            donor_id: response.data._id,
+            date: donationDate?.format('YYYY-MM-DD'),
+            amount: donationAmount,
+            // eslint-disable-next-line no-underscore-dangle
+            purpose_id: campaignPurpose?._id,
+            payment_type: paymentType,
+            type: donationType,
+            comments: notes,
+          };
+
+          postData('donation/new', newDonation)
+            .then((response1) => {
+              // Handle the response here
+              console.log(response1);
+            })
+            .catch((error) => {
+              // Handle the error here
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          // Handle the error here
+          console.log(error);
+        });
+    } else {
+      const newDonation = {
+        // eslint-disable-next-line no-underscore-dangle
+        donor_id: donator?._id,
+        date: donationDate?.format('YYYY-MM-DD'),
+        amount: donationAmount,
+        // eslint-disable-next-line no-underscore-dangle
+        purpose_id: campaignPurpose?._id,
+        payment_type: paymentType,
+        type: donationType,
+        comments: notes,
+      };
+
+      postData('donation/new', newDonation)
+        .then((response) => {
+          // Handle the response here
+          console.log(response);
+        })
+        .catch((error) => {
+          // Handle the error here
+          console.log(error);
+        });
+    }
   };
 
   return (
@@ -387,9 +457,7 @@ function NewDonationPage() {
           variant="contained"
           color="primary"
           endIcon={<ArrowForwardIcon />}
-          onClick={() => {
-            alert('clicked');
-          }}
+          onClick={handleSubmit}
           sx={{ width: '40%' }}
           size="large"
           style={{ justifyContent: 'flex-start' }}

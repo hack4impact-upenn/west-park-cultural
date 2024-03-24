@@ -123,26 +123,27 @@ const createNewDonation = async (
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  const { donorId, date, amount, purposeId, paymentType, type } = req.body;
-  if (!donorId || !date || !amount || !purposeId || !paymentType || !type) {
+  const { donor_id, date, amount, purpose_id, payment_type, type } = req.body;
+  if (!donor_id || !date || !amount || !purpose_id || !payment_type || !type) {
     next(
       ApiError.missingFields([
-        'donorId',
+        'donor_id',
         'date',
         'amount',
-        'purposeId',
-        'paymentType',
+        'purpose_id',
+        'payment_type',
         'type',
       ]),
     );
     return;
   }
-  const newDonation: IDonation | null = req.body.donation as IDonation;
+  // const newDonation: IDonation | null = req.body.donation as IDonation;
+  const newDonation: IDonation | null = req.body as IDonation;
   return createDonation(newDonation)
     .then((donation: any) => {
       res.status(StatusCode.CREATED).send(donation);
     })
-    .catch(() => {
+    .catch((e) => {
       next(ApiError.internal('Unable to create donation'));
     });
 };
