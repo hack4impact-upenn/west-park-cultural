@@ -61,12 +61,12 @@ function App() {
                   <Route path="/donor-profile" element={<DonorProfilePage />} />
                   <Route path="/home" element={<HomeDashboardPage />} />
                   {/* Routes accessed only if user is authenticated */}
-                  <Route element={<ProtectedRoutesWrapper />}>
+                  <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />
                   </Route>
-                  <Route element={<AdminRoutesWrapper />}>
-                    <Route path="/users" element={<AdminDashboardPage />} />
-                  </Route>
+                  
+                  <Route path="/users" element={<AdminDashboardPage />} />
+                  
                   {/* <Route element={<ReportsPage />}>
                     <Route path="/reports" element={<ReportsPage />} />
                   </Route> */}
