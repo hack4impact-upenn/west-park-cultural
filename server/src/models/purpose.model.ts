@@ -5,7 +5,7 @@ const PurposeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  data_created: {
+  date_created: {
     type: Date,
     required: true,
   },
@@ -14,7 +14,7 @@ const PurposeSchema = new mongoose.Schema({
 interface IPurpose extends mongoose.Document {
   _id: string;
   name: string;
-  data_created: Date;
+  date_created: Date;
 }
 
 const Purpose = mongoose.model<IPurpose>('Purpose', PurposeSchema);
