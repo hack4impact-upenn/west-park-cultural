@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import { isAuthenticated } from '../controllers/auth.middleware';
 import { isAdmin } from '../controllers/admin.middleware';
@@ -7,34 +8,61 @@ import {
   getDonorDonation,
 } from '../controllers/donation.controller';
 
-const donationRouter = Router();
+import { Donation, IDonation } from '../models/donation.model';
 
-/**
- * A GET route to get all donations.
- */
- donationRouter.get('/all', isAuthenticated, isAdmin, getAllDonations);
+const getAll = async () => {
+  const donations = await Donation.find().exec();
+  return donations;
+};
 
-/**
- * A GET route with specific school id
- * id (string) - The school id of the particular school
- */
- donationRouter.get('/:id', isAuthenticated, getDonation);
+const getAllDonationsOfTypeDonation = async () => {
+  const donations = await Donation.find({ type: 'donation' }).exec();
+  return donations;
+};
 
- donationRouter.get('/donor/:id', isAuthenticated, getDonorDonation);
+const getAllDonationsOfTypeSponsorship = async () => {
+  const donations = await Donation.find({ type: 'sponsorship' }).exec();
+  return donations;
+};
 
-/**
- * A POST route to create a school.
- */
-// schoolRouter.post('/create', isAuthenticated, isAdmin, createSchool);
+const getAllDonationsOfTypeGrant = async () => {
+  const donations = await Donation.find({ type: 'grant' }).exec();
+  return donations;
+};
 
-/**
- * A PUT route to delete a school.
- */
-// schoolRouter.put('/delete', isAuthenticated, isAdmin, deleteSchool);
+const getDonationById = async (id: string) => {
+  const donation = await Donation.findById(id).exec();
+  return donation;
+};
 
-/**
- * A PUT route to update a school.
- */
-// schoolRouter.put('/update', isAuthenticated, isAdmin, updateSchool);
+const getAllDonationsbyDonorId = async (donorId: string) => {
+  const donations = await Donation.find({ donor_id: donorId }).exec();
+  return donations;
+};
 
-export default donationRouter;
+const createDonation = async (donation: IDonation) => {
+  const newDonation = new Donation(donation);
+  const result = await newDonation.save();
+  return result;
+};
+
+const acknowledgeDonation = async (id: string) => {
+  const donation = await Donation.findById(id).exec();
+  if (donation) {
+    donation.acknowledged = true;
+    const result = await donation.save();
+    return result;
+  }
+  return null;
+};
+
+export {
+  getAll,
+  getAllDonationsOfTypeDonation,
+  getAllDonationsOfTypeSponsorship,
+  getAllDonationsOfTypeGrant,
+  getDonationById,
+  getAllDonationsbyDonorId,
+  createDonation,
+  acknowledgeDonation,
+};

@@ -4,6 +4,7 @@
 import { createTheme } from '@mui/material/styles';
 import COLORS from './colors';
 import 'typeface-hk-grotesk';
+import { color, fontFamily, fontSize, fontStyle } from '@mui/system';
 
 // https://github.com/hack4impact/chapter-website-template/blob/main/public/style.css
 const theme = createTheme({
@@ -39,6 +40,7 @@ const theme = createTheme({
       'Droid Sans',
       'Helvetica Neue',
       'sans-serif',
+      'Fredoka One',
     ].join(','),
   },
   components: {
@@ -52,8 +54,11 @@ const theme = createTheme({
           fontWeight: 'bold !important',
         },
         h2: {
-          fontSize: '38px !important',
+          fontSize: '50px !important',
+          fontFamily: 'Fredoka One',
+          fontWeight: 'bold !important',
           marginBottom: '32px !important',
+          marginTop: '40px !important',
         },
         h3: {
           fontWeight: 'bold !important',
@@ -61,6 +66,12 @@ const theme = createTheme({
         },
         h4: {
           fontWeight: 'bold !important',
+        },
+        h5: {
+          fontFamily: 'Hind Guntur',
+          fontWeight: '400 !important',
+          fontSize: '25px',
+          color: COLORS.green
         },
       },
     },

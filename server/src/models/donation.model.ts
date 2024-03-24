@@ -39,6 +39,7 @@ const DonationSchema = new mongoose.Schema({
   acknowledged: {
     type: Boolean,
     required: false,
+    default: false,
   },
   donor_id: {
     type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
@@ -47,6 +48,10 @@ const DonationSchema = new mongoose.Schema({
   purpose_id: {
     type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
     required: true,
+  },
+  comments: {
+    type: String,
+    required: false,
   },
 });
 
@@ -60,6 +65,7 @@ interface IDonation extends mongoose.Document {
   acknowledged: boolean;
   donor_id: string;
   purpose_id: string;
+  comments: string;
 }
 
 const Donation = mongoose.model<IDonation>('Donation', DonationSchema);

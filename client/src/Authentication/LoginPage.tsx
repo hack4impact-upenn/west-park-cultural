@@ -11,6 +11,7 @@ import { loginUser } from './api';
 import AlertDialog from '../components/AlertDialog';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import ScreenGrid from '../components/ScreenGrid';
+import westPark from '../assets/westPark.png';
 
 /**
  * A page allowing users to input their email and password to login. The default
@@ -133,8 +134,14 @@ function LoginPage() {
       <FormGrid>
         <FormCol>
           <Grid item container justifyContent="center">
+            <Grid item container justifyContent="center">
+              <img width="70%" src={westPark} alt="West Park Logo" />
+            </Grid>
+            <Typography variant="h5" textAlign="center">
+              Donor Management System
+            </Typography>
             <Typography variant="h2" textAlign="center">
-              Welcome to Boilerplate
+              Login
             </Typography>
           </Grid>
           <Grid item width="1">
@@ -172,14 +179,9 @@ function LoginPage() {
             </PrimaryButton>
           </Grid>
           <FormRow>
-            <Grid item>
+            <Grid item container justifyContent="center">
               <Link component={RouterLink} to="/email-reset">
                 Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link component={RouterLink} to="/register">
-                Sign up
               </Link>
             </Grid>
           </FormRow>

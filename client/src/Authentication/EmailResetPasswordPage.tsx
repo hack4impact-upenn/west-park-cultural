@@ -8,6 +8,8 @@ import { emailRegex, InputErrorMessage } from '../util/inputvalidation';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import ScreenGrid from '../components/ScreenGrid';
 import FormCol from '../components/form/FormCol';
+import westPark from '../assets/westPark.png';
+
 
 /**
  * A page allowing users to input their email so a reset password link can be
@@ -80,12 +82,18 @@ function EmailResetPasswordPage() {
     }
   };
 
-  const title = "Let's get you back";
+  const title = "Change Password";
   return (
     <ScreenGrid>
       <FormGrid>
         <FormCol>
           <Grid item container justifyContent="center">
+          <Grid item container justifyContent="center">
+            <img width="70%" src={westPark} alt="West Park Logo" />
+          </Grid>
+          <Typography variant="h5" textAlign="center">
+              Donor Management System
+            </Typography>
             <Typography variant="h2">{title}</Typography>
           </Grid>
           <Grid item width="1">

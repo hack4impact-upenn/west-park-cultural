@@ -23,6 +23,8 @@ import ResetPasswordPage from './Authentication/ResetPasswordPage';
 import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
 import DonorProfilePage from './donorProfile/DonorProfilePage';
+import ReportsPage from './Reports/ReportsPage';
+import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/reports" element={<ReportsPage />} />
                     <Route
                       path="/verify-account/:token"
                       element={<VerifyAccountPage />}
@@ -56,6 +59,7 @@ function App() {
                     element={<InviteRegisterPage />}
                   />
                   <Route path="/donor-profile" element={<DonorProfilePage />} />
+                  <Route path="/home" element={<HomeDashboardPage />} />
                   {/* Routes accessed only if user is authenticated */}
                   <Route element={<ProtectedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />
@@ -63,6 +67,9 @@ function App() {
                   <Route element={<AdminRoutesWrapper />}>
                     <Route path="/users" element={<AdminDashboardPage />} />
                   </Route>
+                  {/* <Route element={<ReportsPage />}>
+                    <Route path="/reports" element={<ReportsPage />} />
+                  </Route> */}
 
                   {/* Route which redirects to a different page depending on if the user is an authenticated or not by utilizing the DynamicRedirect component */}
                   <Route
