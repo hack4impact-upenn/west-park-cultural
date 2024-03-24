@@ -1,9 +1,32 @@
 import mongoose from 'mongoose';
 
 const DonationSchema = new mongoose.Schema({
-  donor_id: {
+  type: {
     type: String,
+    enum: [
+      'donation',
+      'sponsorship',
+      'grant',
+    ],
     required: true,
+  },
+  payment_type: {
+    type: String,
+    enum: [
+      'mail check',
+      'credit',
+      'paypal',
+      'other',
+    ],
+    required: true,
+  },
+  year: {
+    type: String,
+    enum: [
+      'multi-year',
+      'single-year',
+    ],
+    required: false,
   },
   date: {
     type: Date,
@@ -13,21 +36,17 @@ const DonationSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  purpose_id: {
-    type: String,
-    required: true,
-  },
   acknowledged: {
     type: Boolean,
-    required: true,
+    required: false,
     default: false,
   },
-  payment_type: {
-    type: String,
+  donor_id: {
+    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
     required: true,
   },
-  type: {
-    type: String,
+  purpose_id: {
+    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
     required: true,
   },
   comments: {
@@ -38,13 +57,14 @@ const DonationSchema = new mongoose.Schema({
 
 interface IDonation extends mongoose.Document {
   _id: string;
-  donor_id: string;
+  type: string;
+  payment_type: string;
+  year: string;
   date: Date;
   amount: number;
-  purpose_id: string;
   acknowledged: boolean;
-  payment_type: string;
-  type: string;
+  donor_id: string;
+  purpose_id: string;
   comments: string;
 }
 
