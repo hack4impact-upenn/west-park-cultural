@@ -64,9 +64,9 @@ function App() {
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />
                   </Route>
-                  
+
                   <Route path="/users" element={<AdminDashboardPage />} />
-                  
+
                   {/* <Route element={<ReportsPage />}>
                     <Route path="/reports" element={<ReportsPage />} />
                   </Route> */}

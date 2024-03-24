@@ -1,4 +1,3 @@
-
 /* eslint-disable consistent-return */
 /* eslint-disable import/named */
 import express from 'express';
@@ -18,28 +17,28 @@ import {
 } from '../services/donation.service';
 
 const getAllResources = async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    return (
-        getAllDonationsInDB()
-        .then((donationList) => {
-          res.status(StatusCode.OK).send(donationList);
-        })
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .catch((e) => {
-          next(ApiError.internal('Unable to retrieve all resources'));
-        })
-    );
-  };
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  return (
+    getAll()
+      .then((donationList) => {
+        res.status(StatusCode.OK).send(donationList);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .catch((e) => {
+        next(ApiError.internal('Unable to retrieve all resources'));
+      })
+  );
+};
 const getAllDonations = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  return getAllDonationsInDB()
-    .then((donationList) => {
+  return getAll()
+    .then((donationList: any[]) => {
       const sorted = donationList.sort((a, b) => b.date - a.date);
       res.status(StatusCode.OK).send(sorted);
     })
@@ -48,7 +47,6 @@ const getAllDonations = async (
       next(ApiError.internal('Unable to retrieve all donations'));
     });
 };
-
 
 const getAllDonationsOfType = async (
   req: express.Request,
@@ -187,6 +185,7 @@ const acknowledgeDonationById = async (
 };
 
 export {
+  getAllResources,
   getAllDonations,
   getAllDonationsOfType,
   getDonation,
