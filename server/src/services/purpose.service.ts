@@ -2,7 +2,9 @@ import { IPurpose, Purpose } from '../models/purpose.model';
 
 const createPurpose = async (purpose: IPurpose) => {
   const newPurpose = new Purpose(purpose);
-  const result = await newPurpose.save();
+  const result = await newPurpose.save().catch((err) => {
+    console.log(err.message);
+  });
   return result;
 };
 

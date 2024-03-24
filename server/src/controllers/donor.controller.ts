@@ -74,7 +74,7 @@ const createDonorController = async (
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  const donor: IDonor | null = req.body.donation as IDonor;
+  const donor: IDonor | null = req.body as IDonor;
   if (!donor) {
     next(ApiError.missingFields(['donor']));
     return;
@@ -83,7 +83,8 @@ const createDonorController = async (
     .then((donor2: unknown) => {
       res.status(StatusCode.OK).send(donor2);
     })
-    .catch(() => {
+    .catch((e) => {
+      console.log('unable to create donor error', e.message);
       next(ApiError.internal('Unable to create donor'));
     });
 };
