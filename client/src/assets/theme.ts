@@ -2,9 +2,10 @@
  * A file for defining the global MUI theme used in the project.
  */
 import { createTheme } from '@mui/material/styles';
+import { color, fontFamily, fontSize, fontStyle } from '@mui/system';
+
 import COLORS from './colors';
 import 'typeface-hk-grotesk';
-import { color, fontFamily, fontSize, fontStyle } from '@mui/system';
 
 // https://github.com/hack4impact/chapter-website-template/blob/main/public/style.css
 const theme = createTheme({
@@ -71,7 +72,7 @@ const theme = createTheme({
           fontFamily: 'Hind Guntur',
           fontWeight: '400 !important',
           fontSize: '25px',
-          color: COLORS.green
+          color: COLORS.green,
         },
       },
     },

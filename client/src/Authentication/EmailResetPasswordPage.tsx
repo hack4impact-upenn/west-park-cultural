@@ -10,7 +10,6 @@ import ScreenGrid from '../components/ScreenGrid';
 import FormCol from '../components/form/FormCol';
 import westPark from '../assets/westPark.png';
 
-
 /**
  * A page allowing users to input their email so a reset password link can be
  * sent to them
@@ -82,16 +81,16 @@ function EmailResetPasswordPage() {
     }
   };
 
-  const title = "Change Password";
+  const title = 'Change Password';
   return (
     <ScreenGrid>
       <FormGrid>
         <FormCol>
           <Grid item container justifyContent="center">
-          <Grid item container justifyContent="center">
-            <img width="70%" src={westPark} alt="West Park Logo" />
-          </Grid>
-          <Typography variant="h5" textAlign="center">
+            <Grid item container justifyContent="center">
+              <img width="70%" src={westPark} alt="West Park Logo" />
+            </Grid>
+            <Typography variant="h5" textAlign="center">
               Donor Management System
             </Typography>
             <Typography variant="h2">{title}</Typography>

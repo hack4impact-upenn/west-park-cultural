@@ -2,23 +2,41 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import BoxWithShadow from './BoxWithShadow'; // Assuming you have exported it from the file above
 
-function ProfileInfo() {
+interface IDonor {
+  _id: string;
+  contact_name: string;
+  contact_email: string;
+  contact_address: string;
+  contact_phone: string;
+  donor_group: string;
+  registered_date: Date;
+  last_donation_date: Date;
+  last_communication_date: Date;
+  type: string;
+  comments: string;
+}
+
+interface ProfileInfoProps {
+  donatorData: IDonor | null;
+}
+
+function ProfileInfo({ donatorData }: ProfileInfoProps) {
   return (
     <BoxWithShadow>
       <Typography variant="h4" gutterBottom>
-        John Smith
+        {donatorData?.contact_name}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        .Individual
+        {donatorData?.type}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Email address: lsyslc0307@gmail.com
+        Email address: {donatorData?.contact_email}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Phone number: 609-297-6873
+        Phone number: {donatorData?.contact_phone}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Address: Spruce street, 19104
+        Address: {donatorData?.contact_address}
       </Typography>
     </BoxWithShadow>
   );
