@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable consistent-return */
 /* eslint-disable import/named */
 import express from 'express';
@@ -143,7 +144,7 @@ const createNewDonation = async (
     .then((donation: any) => {
       res.status(StatusCode.CREATED).send(donation);
     })
-    .catch((e) => {
+    .catch(() => {
       next(ApiError.internal('Unable to create donation'));
     });
 };
