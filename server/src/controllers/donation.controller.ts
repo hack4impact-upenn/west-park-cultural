@@ -1,4 +1,3 @@
-
 /* eslint-disable consistent-return */
 /* eslint-disable import/named */
 import express from 'express';
@@ -17,38 +16,19 @@ import {
   acknowledgeDonation,
 } from '../services/donation.service';
 
-const getAllResources = async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    return (
-        getAllDonationsInDB()
-        .then((donationList) => {
-          res.status(StatusCode.OK).send(donationList);
-        })
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .catch((e) => {
-          next(ApiError.internal('Unable to retrieve all resources'));
-        })
-    );
-  };
 const getAllDonations = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  return getAllDonationsInDB()
-    .then((donationList) => {
-      const sorted = donationList.sort((a, b) => b.date - a.date);
-      res.status(StatusCode.OK).send(sorted);
+  return getAll()
+    .then((donationList: any) => {
+      res.status(StatusCode.OK).send(donationList);
     })
-    .catch((e) => {
-      console.log(e);
+    .catch(() => {
       next(ApiError.internal('Unable to retrieve all donations'));
     });
 };
-
 
 const getAllDonationsOfType = async (
   req: express.Request,
@@ -143,26 +123,27 @@ const createNewDonation = async (
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  const { donorId, date, amount, purposeId, paymentType, type } = req.body;
-  if (!donorId || !date || !amount || !purposeId || !paymentType || !type) {
+  const { donor_id, date, amount, purpose_id, payment_type, type } = req.body;
+  if (!donor_id || !date || !amount || !purpose_id || !payment_type || !type) {
     next(
       ApiError.missingFields([
-        'donorId',
+        'donor_id',
         'date',
         'amount',
-        'purposeId',
-        'paymentType',
+        'purpose_id',
+        'payment_type',
         'type',
       ]),
     );
     return;
   }
-  const newDonation: IDonation | null = req.body.donation as IDonation;
+  // const newDonation: IDonation | null = req.body.donation as IDonation;
+  const newDonation: IDonation | null = req.body as IDonation;
   return createDonation(newDonation)
     .then((donation: any) => {
       res.status(StatusCode.CREATED).send(donation);
     })
-    .catch(() => {
+    .catch((e) => {
       next(ApiError.internal('Unable to create donation'));
     });
 };
