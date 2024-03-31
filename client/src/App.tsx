@@ -22,6 +22,7 @@ import EmailResetPasswordPage from './Authentication/EmailResetPasswordPage';
 import ResetPasswordPage from './Authentication/ResetPasswordPage';
 import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
+import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 import EmailModal from './components/EmailModal';
@@ -64,6 +65,7 @@ function App() {
                     path="/invite/:token"
                     element={<InviteRegisterPage />}
                   />
+                  <Route path="/donor-profile" element={<DonorProfilePage />} />
                   <Route path="/home" element={<HomeDashboardPage />} />
                   {/* Routes accessed only if user is authenticated */}
                   <Route element={<ProtectedRoutesWrapper />}>
