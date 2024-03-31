@@ -26,6 +26,7 @@ import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 import NewDonationPage from './NewDonation/NewDonationPage';
+import PopupPage from './Popup/PopupPage';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
                 <AlertPopup />
                 <Routes>
                   <Route path="/new-donation" element={<NewDonationPage />} />
+                  <Route path="/popup" element={<PopupPage />} />
                   {/* Routes accessed only if user is not authenticated */}
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />

@@ -30,7 +30,7 @@
     "@mui/material": "^5.4.1",
     "@mui/system": "^5.5.1",
     "@mui/x-charts": "^6.19.5",
-    "@mui/x-date-pickers": "^6.19.6",
+    "@mui/x-date-pickers": "^6.19.8",
     "axios": "^1.1.2",
     "concurrently": "^7.0.0",
     "cross-env": "^7.0.3",
