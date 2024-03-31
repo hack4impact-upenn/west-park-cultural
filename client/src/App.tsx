@@ -24,6 +24,8 @@ import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
 import ReportsPage from './Reports/ReportsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
+import EmailModal from './components/EmailModal';
+import AddEditGroupsModal from './components/AddEditGroupsModal';
 
 function App() {
   return (
@@ -40,6 +42,11 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/emailmodal" element={<EmailModal />} />
+                    <Route
+                      path="/addeditgroupsmodal"
+                      element={<AddEditGroupsModal />}
+                    />
                     <Route
                       path="/verify-account/:token"
                       element={<VerifyAccountPage />}
