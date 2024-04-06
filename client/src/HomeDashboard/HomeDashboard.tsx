@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../util/redux/hooks';
+import DonationsSponsorshipsTable from '../components/tables/DonationsSponsorshipsTable';
+import GrantTable from '../components/tables/GrantTable';
 
 interface BasicTableProps {
   alignment: string;
@@ -147,6 +149,24 @@ function HomeDashboard() {
         <Typography variant="h5" gutterBottom>
           {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
         </Typography>
+      </Box>
+
+      <Box
+        display="flex"
+        flexDirection="row"
+        alignItems="center"
+        marginBottom={2}
+        marginLeft={2}
+        sx={{
+          width: '100%',
+          justifyContent: 'flex-start',
+        }}
+      >
+        {alignment === 'donation' || alignment === 'sponsorship' ? (
+          <DonationsSponsorshipsTable />
+        ) : (
+          <GrantTable />
+        )}
       </Box>
     </Box>
   );

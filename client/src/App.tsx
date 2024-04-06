@@ -60,7 +60,7 @@ function App() {
                     path="/invite/:token"
                     element={<InviteRegisterPage />}
                   />
-                  <Route path="/donor-profile" element={<DonorProfilePage />} />
+                  <Route path="/donor-profile" element={<DonorProfilePage donorID='65daa67d6c34e8adb9f2d2c4' />} />
                   <Route path="/home" element={<HomeDashboardPage />} />
                   {/* Routes accessed only if user is authenticated */}
                   <Route element={<ProtectedRoutesWrapper />}>
