@@ -12,8 +12,11 @@ function DonationsTable({ alignment }: BasicTableProps) {
 
   useEffect(() => {
     const data = donations?.data || [];
-    setDonationsData(data);
-  }, [donations?.data]);
+    const filteredData = data.filter(
+      (donation: any) => donation.type === alignment,
+    );
+    setDonationsData(filteredData);
+  }, [donations?.data, alignment]);
 
   // columns: <Date>, <Amount>, <Donor>, <Payment Type>, <Purpose>
   const columns = [
@@ -33,7 +36,7 @@ function DonationsTable({ alignment }: BasicTableProps) {
   // }));
 
   const rows: any = [];
-  donationsData.forEach((donation : any, index : number) => {
+  donationsData.forEach((donation: any, index: number) => {
     rows.push({
       id: index + 1,
       date: new Date(donation.date).toISOString().split('T')[0],

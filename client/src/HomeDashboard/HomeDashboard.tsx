@@ -28,12 +28,14 @@ function BasicTable({ alignment }: BasicTableProps) {
 
   useEffect(() => {
     const data = donations?.data || [];
-    console.log(data);
-    setDonationsData(data);
-  }, [donations?.data]);
+    const filteredData = data.filter(
+      (donation: any) => donation.type === alignment,
+    );
+    setDonationsData(filteredData);
+  }, [donations?.data, alignment]);
 
   // calculate summary stats
-  const total = donationsData.reduce(
+  const totalDonated = donationsData.reduce(
     (total: number, donation: any) => total + donation.amount,
     0,
   );
@@ -75,23 +77,36 @@ function BasicTable({ alignment }: BasicTableProps) {
 
   if (alignment === 'donation') {
     customRows = [
-      { label: 'Total Donated', value: `$${total.toLocaleString()}` },
+      { label: 'Total Donated', value: `$${totalDonated.toLocaleString()}` },
       { label: 'Last Donation', value: last },
-      { label: 'Donated in last 90 Days', value: `$${donatedInLast90Days}` },
+      {
+        label: 'Donated in last 90 Days',
+        value: `$${donatedInLast90Days.toLocaleString()}`,
+      },
     ];
   } else if (alignment === 'sponsorship') {
     customRows = [
-      { label: 'Total Sponsored', value: `$${total.toLocaleString()}` },
+      { label: 'Total Sponsored', value: `$${totalDonated.toLocaleString()}` },
       { label: 'Last Sponsorship', value: last },
-      { label: 'Sponsored in last 90 Days', value: `$${donatedInLast90Days}` },
+      {
+        label: 'Sponsored in last 90 Days',
+        value: `$${donatedInLast90Days.toLocaleString()}`,
+      },
     ];
   } else if (alignment === 'grant') {
     customRows = [
-      { label: 'Total Granted', value: `$${total.toLocaleString()}` },
+      { label: 'Total Granted', value: `$${totalDonated.toLocaleString()}` },
       { label: 'Last Grant', value: last },
-      { label: 'Granted in last 90 Days', value: `$${donatedInLast90Days}` },
+      {
+        label: 'Granted in last 90 Days',
+        value: `$${donatedInLast90Days.toLocaleString()}`,
+      },
     ];
   }
+
+  const numUnacknowledged = donationsData.filter(
+    (donation: any) => !donation.acknowledged,
+  ).length;
 
   return (
     <Box
@@ -114,6 +129,9 @@ function BasicTable({ alignment }: BasicTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
+      <p style={{ marginTop: '16px' }}>
+        There are {numUnacknowledged} unacknowledged {alignment}s.
+      </p>
     </Box>
   );
 }
@@ -136,7 +154,12 @@ function HomeDashboard() {
   }
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="flex-start">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="flex-start"
+      marginBottom={2}
+    >
       <Box
         display="flex"
         flexDirection="row"
@@ -164,13 +187,14 @@ function HomeDashboard() {
             background: 'grey',
             color: 'white',
             marginRight: '16px',
+            marginTop: '16px',
           }}
         >
           View Report
         </Button>
       </Box>
 
-      <Box marginBottom={2} marginLeft={2}>
+      <Box marginLeft={2}>
         {/* Add a Typography for the title "Summary" */}
         <Typography variant="h5" gutterBottom>
           Summary
@@ -179,10 +203,6 @@ function HomeDashboard() {
 
       {/* Render the BasicTable component with the alignment prop */}
       <BasicTable alignment={alignment} />
-
-      <p style={{ marginTop: '16px', marginLeft: '16px' }}>
-        There are 3 unacknowledged sponsorships.
-      </p>
 
       <Button
         onClick={() => {
@@ -193,26 +213,13 @@ function HomeDashboard() {
         Send them a message now
       </Button>
 
-      <Box marginBottom={2} marginLeft={2}>
+      <Box marginBottom={2} marginLeft={2} marginTop={4}>
         {/* Add a Typography for the title "Sponsorships" */}
         <Typography variant="h5" gutterBottom>
           {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
         </Typography>
       </Box>
-
-      <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        marginBottom={2}
-        marginLeft={2}
-        sx={{
-          width: '100%',
-          justifyContent: 'flex-start',
-        }}
-      >
-        <DonationsTable alignment={alignment} />
-      </Box>
+      <DonationsTable alignment={alignment} />
     </Box>
   );
 }
