@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.get('/all', isAuthenticated, getAllDonorsController);
+router.get('/all', getAllDonorsController);
 
 router.get('/:type', isAuthenticated, getAllDonorsOfType);
 

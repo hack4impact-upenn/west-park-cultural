@@ -25,6 +25,10 @@ import {
   Link,
 } from '@mui/material';
 
+import IDonor from '../util/types/donor';
+import IGroup from '../util/types/group';
+import { useData } from '../util/api';
+
 const testDonors = [
   {
     _id: '65daa67d6c34e8adb9f2d2c4',
@@ -113,30 +117,24 @@ function CommunicationsPage() {
   const [groupSearchValue, setGroupSearchValue] = useState(null);
 
   const [rows, setRows] = useState<RowItem[]>([]);
-  const [donors, setDonors] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [donors, setDonors] = useState<IDonor[]>([]);
+  const [groups, setGroups] = useState<IGroup[]>([]);
+
+  // Fetch data using custom hook
+  const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
+  const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
 
   useEffect(() => {
-    // Fetch all donors
-    axios
-      .get('/api/donor/all')
-      .then((response) => {
-        setDonors(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching donors:', error);
-      });
+    if (allDonors?.data) {
+      setDonors(allDonors.data);
+    }
+  }, [allDonors]);
 
-    // Fetch all groups
-    axios
-      .get('/api/group/all')
-      .then((response) => {
-        setGroups(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching groups:', error);
-      });
-  }, []);
+  useEffect(() => {
+    if (allGroups?.data) {
+      setGroups(allGroups.data);
+    }
+  }, [allGroups]);
 
   // Define a function to extract the correct ID
   const extractId = (id: string | { $oid: string }) => {

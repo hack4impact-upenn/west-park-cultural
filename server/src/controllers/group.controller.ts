@@ -7,7 +7,22 @@ import { IGroup } from '../models/group.model';
 import {
   createCommunicationGroup,
   getCommunicationGroupById,
+  getAllGroups,
 } from '../services/group.service';
+
+const getAllGroupsController = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  return getAllGroups()
+    .then((list: any) => {
+      res.status(StatusCode.OK).send(list);
+    })
+    .catch(() => {
+      next(ApiError.internal('Unable to retrieve all groups'));
+    });
+};
 
 const createCommunicationGroupController = async (
   req: express.Request,
@@ -48,4 +63,5 @@ const getCommunicationGroupByIdController = async (
 export {
   createCommunicationGroupController,
   getCommunicationGroupByIdController,
+  getAllGroupsController,
 };
