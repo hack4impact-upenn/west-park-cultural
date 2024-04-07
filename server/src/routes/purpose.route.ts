@@ -9,10 +9,12 @@ import {
 
 const router = express.Router();
 
-router.post('/', isAuthenticated, createPurposeController);
+// router.post('/', isAuthenticated, createPurposeController);
+// For testing:
+router.post('/', createPurposeController);
 
 router.get('/:id', isAuthenticated, getPurposeByIdController);
 
-router.get('/', isAuthenticated, getAllPurposesController);
+router.get('/', getAllPurposesController);
 
 export default router;

@@ -25,6 +25,7 @@ import InviteRegisterPage from './Authentication/InviteRegisterPage';
 import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
+import NewDonationPage from './NewDonation/NewDonationPage';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               <CssBaseline>
                 <AlertPopup />
                 <Routes>
+                  <Route path="/new-donation" element={<NewDonationPage />} />
                   {/* Routes accessed only if user is not authenticated */}
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />
