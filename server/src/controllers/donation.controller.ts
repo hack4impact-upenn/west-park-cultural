@@ -169,7 +169,6 @@ const acknowledgeDonationById = async (
 };
 
 export {
-  getAllResources,
   getAllDonations,
   getAllDonationsOfType,
   getDonation,
