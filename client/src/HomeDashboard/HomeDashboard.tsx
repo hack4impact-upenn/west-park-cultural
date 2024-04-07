@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Typography,
   Box,
@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../util/redux/hooks';
+import { useData } from '../util/api';
 import DonationsSponsorshipsTable from '../components/tables/DonationsSponsorshipsTable';
 import GrantTable from '../components/tables/GrantTable';
 
@@ -23,6 +24,15 @@ interface BasicTableProps {
 
 function BasicTable({ alignment }: BasicTableProps) {
   let customRows: { label: string; value: string }[] = [];
+  
+  const donations = useData('donation/all');
+  const [donationsData, setDonationsData] = useState<any>([]);
+
+  useEffect(() => {
+    const data = donations?.data || [];
+    setDonationsData(data);
+    console.log(data);
+  }, [donations?.data]);
 
   if (alignment === 'donation') {
     customRows = [
