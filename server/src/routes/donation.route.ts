@@ -20,6 +20,8 @@ router.get('/:id', getDonation);
 
 router.get('/donor/:donorId', isAuthenticated, getDonationsByDonorId);
 
+// router.post('/new', isAuthenticated, createNewDonation);
+// For testing:
 router.post('/new', createNewDonation);
 
 router.put('/acknowledge/:id', isAuthenticated, acknowledgeDonationById);
