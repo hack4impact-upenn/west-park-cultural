@@ -28,8 +28,11 @@ interface Column {
 interface Row {
   [key: string]: number | string;
   id: number;
-  name: string;
   date: string;
+  amount: number;
+  donor_id: string;
+  payment_type: string;
+  purpose_id: string;
 }
 
 interface FilteringTableProps {
@@ -49,9 +52,6 @@ function FilteringTable({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const donations = useData('donation/all');
-  console.log(donations);
 
   const handleFilterTypeChange = (event: SelectChangeEvent<string>) => {
     setFilterType(event.target.value);

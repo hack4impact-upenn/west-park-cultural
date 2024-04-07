@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button } from '@mui/material';
 import ProfileInfo from './ProfileInfo'; // Adjust the import path as needed
 import DateInfoBox from './DateInfoBox'; // Adjust the import path as needed
-import DonationsSponsorshipsTable from '../components/tables/DonationsSponsorshipsTable';
+import DonationsSponsorshipsTable from '../components/tables/DonationsTable';
 
 //begin integration
 interface DonorProfileProps {

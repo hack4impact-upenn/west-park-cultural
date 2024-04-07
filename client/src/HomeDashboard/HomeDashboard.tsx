@@ -15,8 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../util/redux/hooks';
 import { useData } from '../util/api';
-import DonationsSponsorshipsTable from '../components/tables/DonationsSponsorshipsTable';
-import GrantTable from '../components/tables/GrantTable';
+import DonationsTable from '../components/tables/DonationsTable';
 
 interface BasicTableProps {
   alignment: string;
@@ -24,33 +23,73 @@ interface BasicTableProps {
 
 function BasicTable({ alignment }: BasicTableProps) {
   let customRows: { label: string; value: string }[] = [];
-  
   const donations = useData('donation/all');
   const [donationsData, setDonationsData] = useState<any>([]);
 
   useEffect(() => {
     const data = donations?.data || [];
-    setDonationsData(data);
     console.log(data);
+    setDonationsData(data);
   }, [donations?.data]);
+
+  // calculate summary stats
+  const total = donationsData.reduce(
+    (total: number, donation: any) => total + donation.amount,
+    0,
+  );
+  const sortedDonationsData = [...donationsData].sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+  const lastDate =
+    sortedDonationsData.length > 0
+      ? new Date(sortedDonationsData[0].date)
+      : null;
+  let last = 'N/A';
+
+  if (lastDate) {
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - lastDate.getTime();
+    const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    if (daysDifference > 30) {
+      const day = lastDate.getDate();
+      const month = lastDate.toLocaleString('default', { month: 'long' });
+      const year = lastDate.getFullYear();
+      last = `${month} ${day}, ${year}`;
+    } else if (daysDifference > 0) {
+      last = `${daysDifference} days ago`;
+    } else {
+      const hoursDifference = Math.floor(timeDifference / (1000 * 3600));
+      last = `${hoursDifference} hours ago`;
+    }
+  }
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const donatedInLast90Days = donationsData.reduce(
+    (total: number, donation: any) => {
+      const donationDate = new Date(donation.date);
+      return donationDate >= ninetyDaysAgo ? total + donation.amount : total;
+    },
+    0,
+  );
 
   if (alignment === 'donation') {
     customRows = [
-      { label: 'Total Donated', value: '$1350' },
-      { label: 'Last Donation', value: '18 Hours Ago' },
-      { label: 'Donated in last 90 Days', value: '$42' },
+      { label: 'Total Donated', value: `$${total.toLocaleString()}` },
+      { label: 'Last Donation', value: last },
+      { label: 'Donated in last 90 Days', value: `$${donatedInLast90Days}` },
     ];
   } else if (alignment === 'sponsorship') {
     customRows = [
-      { label: 'Total Sponsored', value: '$1350' },
-      { label: 'Last Sponsorship', value: '18 Hours Ago' },
-      { label: 'Sponsored in last 90 Days', value: '$42' },
+      { label: 'Total Sponsored', value: `$${total.toLocaleString()}` },
+      { label: 'Last Sponsorship', value: last },
+      { label: 'Sponsored in last 90 Days', value: `$${donatedInLast90Days}` },
     ];
   } else if (alignment === 'grant') {
     customRows = [
-      { label: 'Total Granted', value: '$1350' },
-      { label: 'Last Grant', value: '18 Hours Ago' },
-      { label: 'Granted in last 90 Days', value: '$42' },
+      { label: 'Total Granted', value: `$${total.toLocaleString()}` },
+      { label: 'Last Grant', value: last },
+      { label: 'Granted in last 90 Days', value: `$${donatedInLast90Days}` },
     ];
   }
 
@@ -172,11 +211,7 @@ function HomeDashboard() {
           justifyContent: 'flex-start',
         }}
       >
-        {alignment === 'donation' || alignment === 'sponsorship' ? (
-          <DonationsSponsorshipsTable />
-        ) : (
-          <GrantTable />
-        )}
+        <DonationsTable alignment={alignment} />
       </Box>
     </Box>
   );
