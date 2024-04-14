@@ -40,11 +40,6 @@ function App() {
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/reports" element={<ReportsPage />} />
-                    <Route
-                      path="/communications"
-                      element={<CommunicationsPage />}
-                    />
                     <Route
                       path="/verify-account/:token"
                       element={<VerifyAccountPage />}
@@ -70,6 +65,11 @@ function App() {
                   <Route element={<AdminRoutesWrapper />}>
                     <Route path="/users" element={<AdminDashboardPage />} />
                   </Route>
+                  <Route path="/reports" element={<ReportsPage />} />
+                    <Route
+                      path="/communications"
+                      element={<CommunicationsPage />}
+                    />
                   {/* <Route element={<ReportsPage />}>
                     <Route path="/reports" element={<ReportsPage />} />
                   </Route> */}
