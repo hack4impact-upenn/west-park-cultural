@@ -14,8 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '../util/api';
 import { useAppDispatch } from '../util/redux/hooks';
 import axios from 'axios';
-import { URLPREFIX } from '../util/api';
-
 
 function BasicTable({ customRows }: { customRows: { label: string; value: string }[] }) {
   return (
@@ -44,20 +42,29 @@ function DonationInfoPage() {
   const [donationData, setDonationData] = useState<any>([]);
   const [customRows, setCustomRows] = useState<{ label: string; value: string }[]>([]);
   const [donorName, setDonorName] = useState('');
+  const [purpose, setPurpose] = useState('');
 
   // Fetch donation data from API
   const donationID = "65daa89e6c34e8adb9f2d2c7";
   const donation = useData(`donation/${donationID}`);
 
   useEffect(() => {
-    const fetchDonorName = async () => {
+    const fetchDonorAndPurpose = async () => {
       if (donation?.data) {
         setDonationData(donation.data);
-
         if (donation.data.donor_id) {
           try {
-            const res = await axios.get(`/donor/${donation.data.donor_id}`); //not fetching; check API
-            setDonorName(res.data[0].contact_name);
+            const res = await axios.get(`http://localhost:4000/api/donor/${donation.data.donor_id}`);
+            setDonorName(res.data.contact_name);
+          } catch (error) {
+            console.error('Failed to fetch donor name:', error);
+          }
+        }
+
+        if (donation.data.purpose_id) {
+          try {
+            const res = await axios.get(`http://localhost:4000/api/purpose/${donation.data.purpose_id}`);
+            setPurpose(res.data.name);
           } catch (error) {
             console.error('Failed to fetch donor name:', error);
           }
@@ -65,7 +72,7 @@ function DonationInfoPage() {
       }
     };
 
-    fetchDonorName();
+    fetchDonorAndPurpose();
   }, [donation?.data]);
 
   function formatDateString(dateString: string): string{
@@ -84,7 +91,7 @@ function DonationInfoPage() {
             { label: 'Date Donated', value: formatDateString(donationData.date) || 'N/A' },
             { label: 'Donor', value: donorName || 'N/A' },
             { label: 'Payment Information', value: donationData.payment_type || 'N/A' },
-            { label: 'Campaign Category', value: donationData.purpose_id || 'N/A' },
+            { label: 'Campaign Category', value: purpose || 'N/A' },
             { label: 'Acknowledged?', value: donationData.acknowledged ? 'Yes' : 'No' },
         ];
         setCustomRows(updatedCustomRows);
@@ -93,7 +100,7 @@ function DonationInfoPage() {
 
   useEffect(() => {
     setTableWithDonation();
-  }, [donationData, donorName]);
+  }, [donationData, donorName, purpose]);
 
   return (
     <Box display="flex" flexDirection="column" alignItems="flex-start">

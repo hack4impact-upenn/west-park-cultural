@@ -12,9 +12,9 @@ const router = express.Router();
 
 router.get('/all', getAllDonorsController);
 
-router.get('/:type', isAuthenticated, getAllDonorsOfType);
-
 router.get('/:id', isAuthenticated, getDonorByIdController);
+
+router.get('/:type', isAuthenticated, getAllDonorsOfType);
 
 // router.post('/create', isAuthenticated, createDonorController);
 // For testing:
