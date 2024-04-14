@@ -16,22 +16,32 @@ import InputLabel from '@mui/material/InputLabel';
 import Box from '@mui/material/Box';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { Typography } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import { match } from 'assert';
 import { postData, putData, useData } from '../../util/api';
 
 function SearchDonorsButton() {
   const [open, setOpen] = useState(false);
-  const [donationType, setDonationType] = useState('Donors / Sponsors');
+  const [donationType, setDonationType] = useState('donation');
   // Add state for the select dropdowns
-  const [timePeriod, setTimePeriod] = useState('');
   const [campaign, setCampaign] = useState('');
   const [yearType, setYearType] = useState('');
   const [minDonation, setMinDonation] = useState('');
   const [maxDonation, setMaxDonation] = useState('');
   const [filteredEmails, setFilteredEmails] = useState('');
+
+  const [startTimePeriod, setStartTimePeriod] = React.useState<Dayjs | null>(
+    dayjs(),
+  );
+
+  const [endTimePeriod, setEndTimePeriod] = React.useState<Dayjs | null>(
+    dayjs(),
+  );
 
   const donations = useData(`donation/all`);
   const purposes = useData('purpose/');
@@ -96,11 +106,33 @@ function SearchDonorsButton() {
 
     const filteredDonations = donationsData.filter((donation) => {
       const matchesDonationType = donation.type === donationType.toLowerCase();
-      const matchesTimePeriod = true; // Assume true if timePeriod is not set
+      const donationDate = dayjs(donation.date);
+      const matchesTimePeriod =
+        (donationDate.isAfter(startTimePeriod) ||
+          donationDate.isSame(startTimePeriod)) &&
+        (donationDate.isBefore(endTimePeriod) ||
+          donationDate.isSame(endTimePeriod));
       const matchesPurpose = donation.purpose_id === campaign;
+      let matchesAmount = false;
+      if (minDonation !== '' && maxDonation !== '') {
+        const minDonationNumber = Number(minDonation);
+        const maxDonationNumber = Number(maxDonation);
+        matchesAmount =
+          donation.amount >= minDonationNumber &&
+          donation.amount <= maxDonationNumber;
+      }
+      let matchesYearType = true;
+      if (donationType === 'grant') {
+        matchesYearType = donation.grant_year === yearType;
+      }
 
-      // More conditions can be added here for 'campaign', 'yearType', etc.
-      return matchesDonationType && matchesTimePeriod && matchesPurpose;
+      return (
+        matchesDonationType &&
+        matchesTimePeriod &&
+        matchesPurpose &&
+        matchesAmount &&
+        matchesYearType
+      );
     });
 
     console.log('FILTERED DONATIONS');
@@ -127,6 +159,9 @@ function SearchDonorsButton() {
     maxDonation,
     donorsData,
     campaign,
+    startTimePeriod,
+    endTimePeriod,
+    yearType,
   ]);
 
   return (
@@ -159,17 +194,30 @@ function SearchDonorsButton() {
 
           <Box sx={{ marginBottom: 1 }}>
             <FormControl fullWidth>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={['DateRangePicker']}>
                   <DateRangePicker
                     localeText={{ start: 'Start date', end: 'End date' }}
                   />
                 </DemoContainer>
+              </LocalizationProvider> */}
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start Time Period"
+                  value={startTimePeriod}
+                  onChange={(newValue) => setStartTimePeriod(newValue)}
+                  sx={{ marginBottom: 1 }}
+                />
+                <DatePicker
+                  label="End Time Period"
+                  value={endTimePeriod}
+                  onChange={(newValue) => setEndTimePeriod(newValue)}
+                />
               </LocalizationProvider>
             </FormControl>
           </Box>
 
-          <Box sx={{ marginBottom: 1 }}>
+          {/* <Box sx={{ marginBottom: 1 }}>
             <FormControl fullWidth>
               <InputLabel id="time-period-label">In time period</InputLabel>
               <Select
@@ -183,7 +231,7 @@ function SearchDonorsButton() {
                 <MenuItem value="2022">2022</MenuItem>
               </Select>
             </FormControl>
-          </Box>
+          </Box> */}
 
           <Box sx={{ marginBottom: 1 }}>
             <FormControl fullWidth>
@@ -204,31 +252,35 @@ function SearchDonorsButton() {
             </FormControl>
           </Box>
 
-          <Box sx={{ marginBottom: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id="year-type-label">Multi / Single-year</InputLabel>
-              <Select
-                labelId="year-type-label"
-                label="Multi / Single-year"
-                value={yearType}
-                onChange={(e) => setYearType(e.target.value)}
-              >
-                <MenuItem value="single">Single Year</MenuItem>
-                <MenuItem value="multi">Multi Year</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+          {donationType === 'Grant' ? (
+            <Box sx={{ marginBottom: 1 }}>
+              <FormControl fullWidth>
+                <InputLabel id="year-type-label">
+                  Multi / Single-year
+                </InputLabel>
+                <Select
+                  labelId="year-type-label"
+                  label="Multi / Single-year"
+                  value={yearType}
+                  onChange={(e) => setYearType(e.target.value)}
+                >
+                  <MenuItem value="single">Single Year</MenuItem>
+                  <MenuItem value="multi">Multi Year</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          ) : null}
 
           <Typography variant="h6">Donation Range</Typography>
           <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
             <TextField
-              label="minimum"
+              label="Minimum"
               variant="outlined"
               value={minDonation}
               onChange={(e) => handleDonationRangeChange(e, 'min')}
             />
             <TextField
-              label="maximum"
+              label="Maximum"
               variant="outlined"
               value={maxDonation}
               onChange={(e) => handleDonationRangeChange(e, 'max')}
@@ -285,6 +337,7 @@ interface DonationType {
   acknowledged: boolean;
   payment_type: string;
   type: string;
+  grant_year?: string;
 }
 
 interface PurposeType {
