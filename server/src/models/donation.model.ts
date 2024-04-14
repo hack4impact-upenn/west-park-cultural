@@ -29,11 +29,19 @@ const DonationSchema = new mongoose.Schema({
     required: false,
     default: false,
   },
+  // commented temporarily for testing donor's donation info popup
+  // (this was bugging the add new donation form)
+  // donor_id: {
+  //   type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
+  // },
+  // purpose_id: {
+  //   type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
+  // },
   donor_id: {
-    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
+    type: String,
   },
   purpose_id: {
-    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
+    type: String,
   },
   comments: {
     type: String,

@@ -144,7 +144,8 @@ const createNewDonation = async (
     .then((donation: any) => {
       res.status(StatusCode.CREATED).send(donation);
     })
-    .catch(() => {
+    .catch((e) => {
+      console.log(e.message);
       next(ApiError.internal('Unable to create donation'));
     });
 };

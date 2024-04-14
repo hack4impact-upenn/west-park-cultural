@@ -516,9 +516,9 @@ function NewDonationPage() {
             label="Payment Type"
             onChange={handlePaymentTypeChange}
           >
-            <MenuItem value="Mail Check">Mail Check</MenuItem>
-            <MenuItem value="Credit">Credit</MenuItem>
-            <MenuItem value="Paypal">Paypal</MenuItem>
+            <MenuItem value="mail check">Mail Check</MenuItem>
+            <MenuItem value="credit">Credit</MenuItem>
+            <MenuItem value="paypal">Paypal</MenuItem>
           </Select>
         </FormControl>
       </Grid>

@@ -18,7 +18,9 @@ router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
 
 router.get('/:id', getDonation);
 
-router.get('/donor/:donorId', isAuthenticated, getDonationsByDonorId);
+// router.get('/donor/:donorId', isAuthenticated, getDonationsByDonorId);
+// For testing:
+router.get('/donor/:donorId', getDonationsByDonorId);
 
 // router.post('/new', isAuthenticated, createNewDonation);
 // For testing:
