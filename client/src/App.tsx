@@ -66,10 +66,10 @@ function App() {
                     <Route path="/users" element={<AdminDashboardPage />} />
                   </Route>
                   <Route path="/reports" element={<ReportsPage />} />
-                    <Route
-                      path="/communications"
-                      element={<CommunicationsPage />}
-                    />
+                  <Route
+                    path="/communications"
+                    element={<CommunicationsPage />}
+                  />
                   {/* <Route element={<ReportsPage />}>
                     <Route path="/reports" element={<ReportsPage />} />
                   </Route> */}

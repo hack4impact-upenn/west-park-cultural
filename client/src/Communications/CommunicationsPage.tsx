@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-alert */
@@ -146,17 +147,17 @@ function CommunicationsPage() {
     value: { name: string; id: string | { $oid: string } } | null,
   ) => {
     if (value) {
-      setRows([]);
+      // setRows([]);
       const selectedPerson = donors.find(
         (person) => extractId(person._id) === value.id,
       );
       if (selectedPerson) {
-        // const existingRow = rows.find(
-        //   (row) => row.id === extractId(selectedPerson._id),
-        // );
-        // if (existingRow) {
-        //   return;
-        // }
+        const existingRow = rows.find(
+          (row) => row.id === extractId(selectedPerson._id),
+        );
+        if (existingRow) {
+          return;
+        }
         const newItem: RowItem = {
           id: extractId(selectedPerson._id),
           contact_name: selectedPerson.contact_name,
@@ -184,15 +185,15 @@ function CommunicationsPage() {
 
     // Filter out duplicates by comparing with existing rows
     const newRows = groupDonors.reduce((accumulator: RowItem[], donor) => {
-      // const existingRow = rows.find((row) => row.id === extractId(donor._id));
-      // if (!existingRow) {
-      const newItem: RowItem = {
-        id: extractId(donor._id),
-        contact_name: donor.contact_name,
-        contact_email: donor.contact_email,
-      };
-      accumulator.push(newItem);
-      // }
+      const existingRow = rows.find((row) => row.id === extractId(donor._id));
+      if (!existingRow) {
+        const newItem: RowItem = {
+          id: extractId(donor._id),
+          contact_name: donor.contact_name,
+          contact_email: donor.contact_email,
+        };
+        accumulator.push(newItem);
+      }
       return accumulator;
     }, []);
 
@@ -217,6 +218,10 @@ function CommunicationsPage() {
     setRows([]);
   };
 
+  const handleRemovePerson = (idToRemove: string) => {
+    setRows((prevRows) => prevRows.filter((row) => row.id !== idToRemove));
+  };
+
   return (
     <div>
       <Grid container sx={{ m: 3 }} spacing={2}>
@@ -226,7 +231,7 @@ function CommunicationsPage() {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h6">
+          <Typography variant="h6" sx={{ width: '80%' }}>
             Send emails to individual users, groups of individuals, and mailing
             lists. Clicking the “email” button, will open a popup with the
             respective emails, which you can then copy and paste into your email
@@ -351,7 +356,12 @@ function CommunicationsPage() {
                         </TableCell>
                         <TableCell>{row.contact_email}</TableCell>
                         <TableCell>
-                          <Link href="/">Remove {row.contact_name}</Link>
+                          <Link
+                            href="#"
+                            onClick={() => handleRemovePerson(row.id)}
+                          >
+                            Remove {row.contact_name}
+                          </Link>
                         </TableCell>
                         <TableCell>
                           <Link href="/">View</Link>
