@@ -101,9 +101,6 @@ function SearchDonorsButton() {
       return;
     }
 
-    console.log('DONATIONS DATA');
-    console.log(donationsData);
-
     const filteredDonations = donationsData.filter((donation) => {
       const matchesDonationType = donation.type === donationType.toLowerCase();
       const donationDate = dayjs(donation.date);
@@ -194,13 +191,6 @@ function SearchDonorsButton() {
 
           <Box sx={{ marginBottom: 1 }}>
             <FormControl fullWidth>
-              {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['DateRangePicker']}>
-                  <DateRangePicker
-                    localeText={{ start: 'Start date', end: 'End date' }}
-                  />
-                </DemoContainer>
-              </LocalizationProvider> */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Start Time Period"
@@ -216,22 +206,6 @@ function SearchDonorsButton() {
               </LocalizationProvider>
             </FormControl>
           </Box>
-
-          {/* <Box sx={{ marginBottom: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id="time-period-label">In time period</InputLabel>
-              <Select
-                labelId="time-period-label"
-                label="In time period"
-                value={timePeriod}
-                onChange={(e) => setTimePeriod(e.target.value)}
-              >
-                <MenuItem value="2020">2020</MenuItem>
-                <MenuItem value="2021">2021</MenuItem>
-                <MenuItem value="2022">2022</MenuItem>
-              </Select>
-            </FormControl>
-          </Box> */}
 
           <Box sx={{ marginBottom: 1 }}>
             <FormControl fullWidth>
