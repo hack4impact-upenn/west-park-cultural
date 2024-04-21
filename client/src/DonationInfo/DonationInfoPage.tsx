@@ -118,15 +118,14 @@ function DonationInfoPage() {
           <p style={{ marginTop: '16px', marginLeft: '16px' }}>
             This donation has not been acknowledged.
           </p>
-
-          <Button
-            onClick={() => navigate('/home')}
-            style={{ marginLeft: '16px', background: 'blue', color: 'white' }}
-          >
-            Send them a message now ->
-          </Button>
         </>
       )}
+      <Button
+        onClick={() => navigate('/home')}
+            style={{ marginLeft: '16px', background: 'blue', color: 'white' }}
+        >
+          Send them a message now ->
+      </Button>
     </Box>
   );
 }
