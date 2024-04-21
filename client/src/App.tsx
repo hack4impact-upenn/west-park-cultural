@@ -26,6 +26,7 @@ import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 import NewDonationPage from './NewDonation/NewDonationPage';
+import DonationInfoPage from './DonationInfo/DonationInfoPage';
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
                   <Route element={<ProtectedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />
                   </Route>
+                  <Route path="/donationInfo" element={<DonationInfoPage />} />
                   <Route element={<AdminRoutesWrapper />}>
                     <Route path="/users" element={<AdminDashboardPage />} />
                   </Route>
