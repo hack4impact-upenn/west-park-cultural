@@ -30,7 +30,6 @@ const getDonorById = async (id: string) => {
   const donor = await Donor.findById(id).exec();
   return donor;
 };
-
 export {
   getAllDonors,
   getAllDonorsTypeDonor,
@@ -38,4 +37,5 @@ export {
   getAllDonorsTypeGrant,
   createDonor,
   getDonorById,
+  updateDonorById,
 };

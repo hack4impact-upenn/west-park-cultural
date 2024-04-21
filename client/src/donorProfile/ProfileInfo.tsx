@@ -9,7 +9,7 @@ function ProfileInfo() {
         John Smith
       </Typography>
       <Typography variant="body1" gutterBottom>
-        .Individual
+        Individual
       </Typography>
       <Typography variant="body1" gutterBottom>
         Email address: lsyslc0307@gmail.com
