@@ -36,5 +36,5 @@ export {
   getAllDonorsTypeSponsor,
   getAllDonorsTypeGrant,
   createDonor,
-  getDonorById
+  getDonorById,
 };
