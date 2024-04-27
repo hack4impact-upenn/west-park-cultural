@@ -13,7 +13,8 @@ const router = express.Router();
 // For testing:
 router.post('/', createPurposeController);
 
-router.get('/:id', isAuthenticated, getPurposeByIdController);
+// router.get('/:id', isAuthenticated, getPurposeByIdController);
+router.get('/:id', getPurposeByIdController);
 
 router.get('/', getAllPurposesController);
 
