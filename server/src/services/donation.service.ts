@@ -1,13 +1,3 @@
-
-import { Router } from 'express';
-import { isAuthenticated } from '../controllers/auth.middleware';
-import { isAdmin } from '../controllers/admin.middleware';
-import {
-  getAllDonations,
-  getDonation,
-  getDonorDonation,
-} from '../controllers/donation.controller';
-
 import { Donation, IDonation } from '../models/donation.model';
 
 const getAll = async () => {

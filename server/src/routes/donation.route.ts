@@ -1,27 +1,37 @@
-// import express from 'express';
-// import { isAuthenticated } from '../controllers/auth.middleware';
+import express from 'express';
+import { isAuthenticated } from '../controllers/auth.middleware';
 
-// import {
-//   getAllDonations,
-//   getAllDonationsOfType,
-//   getDonation,
-//   getDonationsByDonorId,
-//   createNewDonation,
-//   acknowledgeDonationById,
-// } from '../controllers/donation.controller';
+import {
+  getAllDonations,
+  getAllDonationsOfType,
+  getDonation,
+  getDonationsByDonorId,
+  createNewDonation,
+  editDonation,
+  acknowledgeDonationById,
+  deleteDonation,
+} from '../controllers/donation.controller';
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.get('/all', getAllDonations);
+router.get('/all', getAllDonations);
 
-// router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
+router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
 
-// router.get('/:id', getDonation);
+router.get('/:id', getDonation);
 
-// router.get('/donor/:donorId', isAuthenticated, getDonationsByDonorId);
+router.get('/donor/:id', isAuthenticated, getDonationsByDonorId);
 
-// router.post('/new', createNewDonation);
+// router.post('/new', isAuthenticated, createNewDonation);
+// For testing:
+router.post('/new', createNewDonation);
 
-// router.put('/acknowledge/:id', isAuthenticated, acknowledgeDonationById);
+// router.post('/edit', isAuthenticated, editDonation);
+router.post('/edit', editDonation);
 
-// export default router;
+router.put('/acknowledge/:id', isAuthenticated, acknowledgeDonationById);
+
+// router.post('/delete', isAuthenticated, deleteDonation);
+router.post('/delete', deleteDonation);
+
+export default router;

@@ -29,11 +29,23 @@ const DonorSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  last_communication_date: {
+    type: Date,
+    required: false,
+  },
   type: {
     type: String,
     required: true,
   },
-  comments: {
+  org_address: {
+    type: String,
+    required: false,
+  },
+  org_email: {
+    type: String,
+    required: false,
+  },
+  org_name: {
     type: String,
     required: false,
   },
@@ -48,8 +60,12 @@ interface IDonor extends mongoose.Document {
   donor_group: string;
   registered_date: Date;
   last_donation_date: Date;
+  last_communication_date: string;
   type: string;
   comments: string;
+  org_address: string;
+  org_email: string;
+  org_name: string;
 }
 
 const Donor = mongoose.model<IDonor>('Donor', DonorSchema);

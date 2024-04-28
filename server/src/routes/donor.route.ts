@@ -10,14 +10,11 @@ import {
 
 const router = express.Router();
 
-router.get('/all', isAuthenticated, getAllDonorsController);
+router.get('/all', getAllDonorsController);
 
-// edited this to avoid conflict with /:id
-router.get('/type/:type', isAuthenticated, getAllDonorsOfType);
+router.get('type/:type', isAuthenticated, getAllDonorsOfType);
 
-// router.get('/id/:id', isAuthenticated, getDonorByIdController);
-// for testing:
-router.get('/id/:id', getDonorByIdController);
+router.get('/id/:id', isAuthenticated, getDonorByIdController);
 
 router.post('/create', isAuthenticated, createDonorController);
 
