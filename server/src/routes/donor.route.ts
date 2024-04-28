@@ -6,6 +6,8 @@ import {
   getAllDonorsOfType,
   createDonorController,
   getDonorByIdController,
+  editDonor,
+  updateDonorNote,
 } from '../controllers/donor.controller';
 
 const router = express.Router();
@@ -16,6 +18,10 @@ router.get('type/:type', isAuthenticated, getAllDonorsOfType);
 
 router.get('/id/:id', isAuthenticated, getDonorByIdController);
 
+router.post('/edit', isAuthenticated, editDonor);
+
 router.post('/create', isAuthenticated, createDonorController);
+
+router.post('/note', isAuthenticated, updateDonorNote);
 
 export default router;

@@ -4,21 +4,9 @@ import { Box, Button, TextField, MenuItem, Popover, Grid } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import ProfileInfo from './ProfileInfo';
 import DateInfoBox from './DateInfoBox';
-import { useData } from '../util/api';
-
-interface IDonor {
-  _id: string;
-  contact_name: string;
-  contact_email: string;
-  contact_address: string;
-  contact_phone: string;
-  donor_group: string;
-  registered_date: Date;
-  last_donation_date: Date;
-  last_communication_date: Date;
-  type: string;
-  comments: string;
-}
+import DonorNoteBox from './DonorNoteBox';
+import IDonor from '../util/types/donor';
+import { useData, postData } from '../util/api';
 
 function DonorProfilePage() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -40,10 +28,28 @@ function DonorProfilePage() {
   useEffect(() => {
     const data = donator?.data || null;
     setDonatorData(data);
+    setName(data?.contact_name);
+    setEmail(data?.contact_email);
+    setPhone(data?.contact_phone);
+    setAddress(data?.contact_address);
+    setSelectedDonorGroup(data?.donor_group);
+    setOrgName(data?.org_name);
+    setOrgEmail(data?.org_email);
+    setOrgAddress(data?.org_address);
   }, [donator]);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
+    if (donatorData != null) {
+      setName(donatorData.contact_name);
+      setEmail(donatorData.contact_email);
+      setPhone(donatorData.contact_phone);
+      setAddress(donatorData.contact_address);
+      setSelectedDonorGroup(donatorData.donor_group);
+      setOrgName(donatorData.org_name);
+      setOrgEmail(donatorData.org_email);
+      setOrgAddress(donatorData.org_address);
+    }
   };
 
   const handleClose = () => {
@@ -57,11 +63,37 @@ function DonorProfilePage() {
     setOrgAddress('');
     setSelectedDonorGroup('');
     setSelectedDonorType('');
-    setConfirmDisabled(true); // Reset confirm button state
+    setConfirmDisabled(true);
   };
 
   const handleConfirm = () => {
     // update donor
+    const updateDonor = {
+      donor_id: donatorData._id,
+      contact_name: name,
+      contact_email: email,
+      contact_address: address,
+      contact_phone: phone,
+      donor_group: selectedDonorGroup,
+      registered_date: donatorData?.registered_date,
+      last_donation_date: donatorData?.last_donation_date,
+      last_communication_date: donatorData?.last_communication_date,
+      type: donatorData?.type,
+      comments: donatorData?.comments,
+      org_address: orgAddress,
+      org_email: orgEmail,
+      org_name: orgName,
+    };
+
+    postData('donor/edit', updateDonor)
+      .then((response2) => {
+        // Handle the response here
+        console.log(response2);
+      })
+      .catch((error) => {
+        // Handle the error here
+        console.log(error);
+      });
     handleClose(); // Close the popover after confirming changes
   };
 
@@ -71,8 +103,7 @@ function DonorProfilePage() {
       email !== '' &&
       phone !== '' &&
       address !== '' &&
-      selectedDonorGroup !== '' &&
-      selectedDonorType !== ''
+      selectedDonorGroup !== ''
     );
   };
 
@@ -87,7 +118,10 @@ function DonorProfilePage() {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <ProfileInfo donatorData={donatorData} />
-        <DateInfoBox donatorData={donatorData} />
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+          <DonorNoteBox donatorData={donatorData} />
+          <DateInfoBox donatorData={donatorData} />
+        </Box>
       </Box>
 
       {/* Buttons */}
@@ -163,7 +197,7 @@ function DonorProfilePage() {
               <Grid item xs={6}>
                 <TextField
                   select
-                  label="Donor Group"
+                  label="Donor Group*"
                   value={selectedDonorGroup}
                   onChange={(e) => {
                     setSelectedDonorGroup(e.target.value);
@@ -181,50 +215,38 @@ function DonorProfilePage() {
                   <MenuItem value="Gov/Municipal">Gov/Municipal</MenuItem>
                 </TextField>
               </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  select
-                  label="Donation Type"
-                  value={selectedDonorType}
-                  onChange={(e) => {
-                    setSelectedDonorType(e.target.value);
-                    handleFieldChange();
-                  }}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="Donation">Donation</MenuItem>
-                  <MenuItem value="Sponsor">Sponsor</MenuItem>
-                  <MenuItem value="Grant">Grant</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Organization name"
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Organization email"
-                  value={orgEmail}
-                  onChange={(e) => setOrgEmail(e.target.value)}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Organization address"
-                  value={orgAddress}
-                  onChange={(e) => setOrgAddress(e.target.value)}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
+              {donatorData?.donor_group !== 'Individual' &&
+              donatorData?.donor_group !== 'Board Member' ? (
+                <>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Organization name"
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Organization email"
+                      value={orgEmail}
+                      onChange={(e) => setOrgEmail(e.target.value)}
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Organization address"
+                      value={orgAddress}
+                      onChange={(e) => setOrgAddress(e.target.value)}
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                </>
+              ) : null}
             </Grid>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Button variant="outlined" onClick={handleClose}>
