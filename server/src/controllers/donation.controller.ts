@@ -107,12 +107,12 @@ const getDonationsByDonorId = async (
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  const { donorId } = req.params;
-  if (!donorId) {
-    next(ApiError.missingFields(['donorId']));
+  const { id } = req.params;
+  if (!id) {
+    next(ApiError.missingFields(['id']));
     return;
   }
-  return getAllDonationsbyDonorId(donorId)
+  return getAllDonationsbyDonorId(id)
     .then((donationList: any) => {
       res.status(StatusCode.OK).send(donationList);
     })

@@ -208,7 +208,7 @@ function PopupPage() {
 
       {/* Popup */}
       <Dialog open={openPopup} onClose={handleClosePopup}>
-        <DialogTitle>  {donorData?.contact_name} Summary </DialogTitle>
+        <DialogTitle> {donorData?.contact_name} Summary </DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
             <Table>
