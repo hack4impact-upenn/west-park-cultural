@@ -3,13 +3,14 @@ import { createRoot } from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
 import { AlertProvider } from './util/context/AlertContext';
+import Sidebar from './Sidebar/Sidebar';
 
 const container = document.getElementById('root');
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 root.render(
   <AlertProvider>
-    <App />
+    <Sidebar side={<App />} />
   </AlertProvider>,
 );
 
