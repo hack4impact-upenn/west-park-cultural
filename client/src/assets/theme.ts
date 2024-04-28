@@ -36,6 +36,7 @@ const theme = createTheme({
       'Oxygen',
       'Ubuntu',
       'Cantarell',
+      'Varela Round',
       'Fira Sans',
       'Droid Sans',
       'Helvetica Neue',

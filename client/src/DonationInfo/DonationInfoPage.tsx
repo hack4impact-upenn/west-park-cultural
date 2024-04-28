@@ -421,7 +421,11 @@ function DonationInfoPage() {
           >
             <Button
               onClick={() => navigate('/home')}
-              style={{ marginLeft: '16px', background: 'blue', color: 'white' }}
+              style={{
+                marginLeft: '16px',
+                background: '#417FED',
+                color: 'white',
+              }}
             >
               Send them a message now
             </Button>
