@@ -12,9 +12,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Typography,
 } from '@mui/material';
 import IDonor from '../util/types/donor';
-import { useData } from '../util/api';
+import { useData  } from '../util/api';
 
 interface BasicDonationStat {
   amount: number;
@@ -42,7 +43,7 @@ function PopupPage() {
 
   const donorID = '662e7657350953c9287c543c';
   const donations = useData(`donation/donor/${donorID}`);
-  const donor = useData(`donor/${donorID}`);
+  const donor = useData(`donor/id/${donorID}`);
   const [donorData, setDonatorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
@@ -207,7 +208,7 @@ function PopupPage() {
 
       {/* Popup */}
       <Dialog open={openPopup} onClose={handleClosePopup}>
-        <DialogTitle>{donorData?.contact_name} Summary</DialogTitle>
+        <DialogTitle>  {donorData?.contact_name} Summary </DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
             <Table>
