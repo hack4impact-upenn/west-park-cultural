@@ -121,7 +121,7 @@ function HomeDashboard() {
 
       <Box marginBottom={2} marginLeft={2}>
         {/* Add a Typography for the title "Summary" */}
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Summary
         </Typography>
       </Box>
@@ -143,8 +143,7 @@ function HomeDashboard() {
       </Button>
 
       <Box marginBottom={2} marginLeft={2}>
-        {/* Add a Typography for the title "Sponsorships" */}
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
         </Typography>
       </Box>

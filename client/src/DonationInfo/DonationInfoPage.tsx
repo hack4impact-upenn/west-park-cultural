@@ -88,7 +88,7 @@ function DonationInfoPage() {
   const [purpose, setPurpose] = useState('');
 
   // Fetch donation data from API
-  const donationID = '65ff8bb31e7005cf6092267a';
+  const donationID = '65ff8dae78febaeaa6e02651';
   const donation = useData(`donation/${donationID}`);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -377,21 +377,25 @@ function DonationInfoPage() {
   };
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="flex-start">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="flex-start"
+      padding={2}
+    >
       <Box
         display="flex"
         flexDirection="row"
         alignItems="center"
-        marginBottom={2}
+        marginBottom={1}
         marginLeft={2}
       >
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Donation Information
         </Typography>
       </Box>
 
       <Box width="100%">
-        {/* Render the BasicTable component with the updated customRows data */}
         <BasicTable customRows={customRows} />
 
         {!donationData.acknowledged && (
@@ -404,6 +408,7 @@ function DonationInfoPage() {
             display: 'flex',
             flexDirection: 'row',
             width: '100%',
+            paddingRight: '16px',
           }}
         >
           <Box
@@ -418,7 +423,7 @@ function DonationInfoPage() {
               onClick={() => navigate('/home')}
               style={{ marginLeft: '16px', background: 'blue', color: 'white' }}
             >
-              Send them a message now -{'>'}
+              Send them a message now
             </Button>
           </Box>
           <Box
@@ -436,17 +441,6 @@ function DonationInfoPage() {
             >
               Edit
             </Button>
-            {/* <Button
-              onClick={() => navigate('/home')}
-              style={{
-                background: 'red',
-                color: 'white',
-                width: '100px',
-                marginRight: '16px',
-              }}
-            >
-              Delete
-            </Button> */}
             <ConfirmModal
               buttonText="Delete"
               title="Are you sure you want to delete this donation?"
