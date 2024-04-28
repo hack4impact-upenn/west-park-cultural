@@ -27,7 +27,6 @@ interface Column {
 
 interface Row {
   [key: string]: number | string;
-  id: number;
   date: string;
   amount: number;
   donor_id: string;
@@ -84,7 +83,7 @@ function FilteringTable({
   };
 
   // Apply the search filter first
-  const searchedRows = rows.filter((row) => {
+  const searchedRows = initialRows.filter((row) => {
     // Convert all row values to string and lowercase, then check if they include the search term
     return Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchTerm),
