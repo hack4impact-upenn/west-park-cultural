@@ -13,6 +13,7 @@ import {
   TableRow,
   TableCell,
 } from '@mui/material';
+import IDonor from '../util/types/donor';
 import { useData } from '../util/api';
 
 interface BasicDonationStat {
@@ -39,9 +40,10 @@ function PopupPage() {
     setOpenPopup(false);
   };
 
-  const donorID = '65daa67d6c34e8adb9f2d2c4';
+  const donorID = '662e7657350953c9287c543c';
   const donations = useData(`donation/donor/${donorID}`);
-
+  const donor = useData(`donor/${donorID}`);
+  const [donorData, setDonatorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
   const [purposeID, setPurposeID] = useState('');
@@ -54,6 +56,12 @@ function PopupPage() {
     const data = purposes?.data || [];
     setPurposesData(data);
   }, [purposes]);
+
+  useEffect(() => {
+    const data = donor?.data || null;
+    setDonatorData(data);
+    console.log(data);
+  }, [donor]);
 
   useEffect(() => {
     const data = donations?.data || [];
@@ -199,7 +207,7 @@ function PopupPage() {
 
       {/* Popup */}
       <Dialog open={openPopup} onClose={handleClosePopup}>
-        <DialogTitle>John Smith Summary</DialogTitle>
+        <DialogTitle>{donorData?.contact_name} Summary</DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
             <Table>

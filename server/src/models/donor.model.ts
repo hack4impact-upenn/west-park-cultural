@@ -48,6 +48,7 @@ interface IDonor extends mongoose.Document {
   donor_group: string;
   registered_date: Date;
   last_donation_date: Date;
+  last_communication_date: Date;
   type: string;
   comments: string;
 }
