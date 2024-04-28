@@ -91,7 +91,6 @@ const createDonorController = async (
 
 const getDonorByIdController = async (
   req: express.Request,
-
   res: express.Response,
   next: express.NextFunction,
 ) => {
