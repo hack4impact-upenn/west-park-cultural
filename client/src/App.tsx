@@ -22,9 +22,12 @@ import EmailResetPasswordPage from './Authentication/EmailResetPasswordPage';
 import ResetPasswordPage from './Authentication/ResetPasswordPage';
 import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
+import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
+import NewDonationPage from './NewDonation/NewDonationPage';
+import DonationInfoPage from './DonationInfo/DonationInfoPage';
 
 function App() {
   return (
@@ -36,6 +39,7 @@ function App() {
               <CssBaseline>
                 <AlertPopup />
                 <Routes>
+                  <Route path="/new-donation" element={<NewDonationPage />} />
                   {/* Routes accessed only if user is not authenticated */}
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />
@@ -57,11 +61,13 @@ function App() {
                     path="/invite/:token"
                     element={<InviteRegisterPage />}
                   />
+                  <Route path="/donor-profile" element={<DonorProfilePage />} />
                   <Route path="/home" element={<HomeDashboardPage />} />
                   {/* Routes accessed only if user is authenticated */}
                   <Route element={<ProtectedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />
                   </Route>
+                  <Route path="/donationInfo" element={<DonationInfoPage />} />
                   <Route element={<AdminRoutesWrapper />}>
                     <Route path="/users" element={<AdminDashboardPage />} />
                   </Route>
