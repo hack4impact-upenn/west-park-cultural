@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import IDonor from '../util/types/donor';
-import { useData  } from '../util/api';
+import { useData } from '../util/api';
 
 interface BasicDonationStat {
   amount: number;
