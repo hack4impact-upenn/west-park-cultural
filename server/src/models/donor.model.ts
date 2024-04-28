@@ -37,6 +37,10 @@ const DonorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+//   comments: {
+//     type: String,
+//     required: false,
+//   },
   org_address: {
     type: String,
     required: false,
@@ -66,6 +70,7 @@ interface IDonor extends mongoose.Document {
   org_address: string;
   org_email: string;
   org_name: string;
+//   comments: string;
 }
 
 const Donor = mongoose.model<IDonor>('Donor', DonorSchema);
