@@ -15,6 +15,8 @@ import {
   getAllDonationsbyDonorId,
   createDonation,
   acknowledgeDonation,
+  editDonationById,
+  deleteDonationById,
 } from '../services/donation.service';
 
 const getAllDonations = async (
@@ -149,6 +151,21 @@ const createNewDonation = async (
     });
 };
 
+const editDonation = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  const { donation_id, ...restOfBody } = req.body;
+
+  editDonationById(donation_id, restOfBody)
+    .then((response) => res.status(StatusCode.OK).send(response))
+    .catch((e: any) => {
+      console.log(e);
+      next(ApiError.internal('Failed to edit donation.'));
+    });
+};
+
 const acknowledgeDonationById = async (
   req: express.Request,
   res: express.Response,
@@ -168,6 +185,24 @@ const acknowledgeDonationById = async (
     });
 };
 
+const deleteDonation = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  const { donation_id } = req.body;
+  deleteDonationById(donation_id)
+    .then((response) =>
+      response
+        ? res.status(StatusCode.OK).send(response)
+        : res.sendStatus(StatusCode.NOT_FOUND),
+    )
+    .catch((e: any) => {
+      console.log(e);
+      next(ApiError.internal('Failed to delete lesson.'));
+    });
+};
+
 export {
   getAllDonations,
   getAllDonationsOfType,
@@ -175,4 +210,6 @@ export {
   getDonationsByDonorId,
   createNewDonation,
   acknowledgeDonationById,
+  editDonation,
+  deleteDonation,
 };
