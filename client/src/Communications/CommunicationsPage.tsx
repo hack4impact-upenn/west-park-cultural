@@ -226,12 +226,12 @@ function CommunicationsPage() {
     <div>
       <Grid container sx={{ m: 3 }} spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
             Communications
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h6" sx={{ width: '80%' }}>
+          <Typography variant="h7" sx={{ width: '80%', color: '#7C7C7C' }}>
             Send emails to individual users, groups of individuals, and mailing
             lists. Clicking the “email” button, will open a popup with the
             respective emails, which you can then copy and paste into your email
@@ -239,7 +239,7 @@ function CommunicationsPage() {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
             Individual Person
           </Typography>
         </Grid>
@@ -262,7 +262,7 @@ function CommunicationsPage() {
         <Grid item xs={6}>
           <Grid container spacing={2}>
             <Grid item xs={8}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                 Groups
               </Typography>
             </Grid>
@@ -327,7 +327,7 @@ function CommunicationsPage() {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                 Emails
               </Typography>
             </Grid>
