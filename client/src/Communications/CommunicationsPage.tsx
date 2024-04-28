@@ -1,3 +1,8 @@
+/* eslint-disable consistent-return */
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-empty */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-underscore-dangle */
@@ -29,6 +34,25 @@ import {
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import { useData } from '../util/api';
+
+const BACKENDURL = process.env.PUBLIC_URL
+  ? process.env.PUBLIC_URL
+  : 'http://localhost:4000';
+
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  maxWidth: '80%',
+  maxHeight: '80%',
+  overflow: 'auto',
+  width: 600, // Adjust width as needed
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const testDonors = [
   {
@@ -113,7 +137,48 @@ type RowItem = {
 
 function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
-  const handleUnackDonoModalOpen = () => setUnackDonoModalOpen(true);
+  const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
+    [],
+  );
+
+  const handleUnackDonoModalOpen = async () => {
+    try {
+      console.log('opened');
+      const allDonationsResponse = await axios.get(
+        `${BACKENDURL}/api/donation/all`,
+      );
+      if (!allDonationsResponse) {
+        return;
+      }
+      const allDonations = allDonationsResponse.data;
+      console.log('here');
+      console.log(allDonations);
+      const temp = allDonations.filter(
+        (donation: any) => !donation.acknowledged,
+      );
+      const tempWithDonorInfo = await Promise.all(
+        temp.map(async (donation: any) => {
+          const donorInfoResponse = await axios.get(
+            `${BACKENDURL}/api/donor/id/${donation.donor_id}`,
+          );
+          console.log(donorInfoResponse);
+          if (!donorInfoResponse) {
+            return;
+          }
+          const donorInfo = donorInfoResponse.data;
+          return {
+            ...donation,
+            donorName: donorInfo.contact_name,
+            donorEmail: donorInfo.contact_email,
+          };
+        }),
+      );
+      setUnacknowledgedDonations(tempWithDonorInfo);
+    } catch (error) {
+      console.log(error);
+    }
+    setUnackDonoModalOpen(true);
+  };
   const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
   const [groupSearchValue, setGroupSearchValue] = useState(null);
 
@@ -400,10 +465,25 @@ function CommunicationsPage() {
         aria-labelledby="Email Unacknowledged Donations Modal"
         aria-describedby="Email Unacknowledged Donations Modal"
       >
-        <Box sx={style}>
+        <Box sx={modalStyle}>
           <Typography variant="h6" component="h2">
             Email Unacknowledged Donations
           </Typography>
+          {unacknowledgedDonations.map((donation) => (
+            <Box key={donation._id} sx={{ border: 1, p: 2, my: 1 }}>
+              <Typography variant="body1">
+                Donation ID: {donation._id}
+              </Typography>
+              <Typography variant="body1">Amount: {donation.amount}</Typography>
+              <Typography variant="body1">Date: {donation.date}</Typography>
+              <Typography variant="body1">
+                Donor Name: {donation.donorName}
+              </Typography>
+              <Typography variant="body1">
+                Donor Email: {donation.donorEmail}
+              </Typography>
+            </Box>
+          ))}
           <Button onClick={handleUnackDonoModalClose}>Close</Button>
         </Box>
       </Modal>
