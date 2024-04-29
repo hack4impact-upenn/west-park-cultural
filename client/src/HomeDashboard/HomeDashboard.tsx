@@ -158,21 +158,24 @@ function HomeDashboard() {
       display="flex"
       flexDirection="column"
       alignItems="flex-start"
+      marginLeft={4}
+      marginTop={2}
       marginBottom={2}
     >
       <Box
         display="flex"
         flexDirection="row"
         alignItems="center"
+        justifyContent="space-between" // Align items at start and end of the box
+        width="100%" // Set box width to 100% of its container
         marginBottom={2}
-        marginLeft={2} // Added marginLeft to align with the left edge
+        paddingRight={3}
       >
         <ToggleButtonGroup
           color="primary"
           value={alignment}
           exclusive
           onChange={handleChange}
-          style={{ marginTop: '16px', marginRight: '8px' }}
         >
           <ToggleButton value="donation">Donation</ToggleButton>
           <ToggleButton value="sponsorship">Sponsorship</ToggleButton>
@@ -188,37 +191,40 @@ function HomeDashboard() {
             color: 'white',
             marginRight: '16px',
             marginTop: '16px',
+            padding: '15px',
           }}
         >
           View Report
         </Button>
       </Box>
 
-      <Box marginLeft={2}>
+      <Box width="100%" marginBottom={4}>
         {/* Add a Typography for the title "Summary" */}
         <Typography variant="h4" gutterBottom>
           Summary
         </Typography>
+        <BasicTable alignment={alignment} />
+        <Button
+          onClick={() => {
+            handleClick();
+          }}
+          style={{
+            background: '#0693e3',
+            color: 'white',
+            marginLeft: '15px',
+            paddingLeft: '15px',
+            paddingRight: '15px',
+          }}
+        >
+          Send them a message now
+        </Button>
       </Box>
-
-      {/* Render the BasicTable component with the alignment prop */}
-      <BasicTable alignment={alignment} />
-
-      <Button
-        onClick={() => {
-          handleClick();
-        }}
-        style={{ marginLeft: '16px', background: 'blue', color: 'white' }}
-      >
-        Send them a message now
-      </Button>
-
-      <Box marginBottom={2} marginLeft={2} marginTop={2}>
+      <Box width="100%" paddingRight={3}>
         <Typography variant="h4" gutterBottom>
           {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
         </Typography>
+        <DonationsTable alignment={alignment} />
       </Box>
-      <DonationsTable alignment={alignment} />
     </Box>
   );
 }

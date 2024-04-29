@@ -127,7 +127,7 @@ function FilteringTable({
           borderRadius: '16px',
           overflow: 'hidden',
           boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-          maxWidth: '95%',
+          maxWidth: '100%',
           margin: 'auto',
           padding: '20px',
         }}
