@@ -134,6 +134,7 @@ function DonationInfoPage() {
             const res = await axios.get(
               `http://localhost:4000/api/donor/${donation.data.donor_id}`,
             );
+            console.log(res.data);
             setDonorName(res.data.contact_name);
             setDonator(res.data);
           } catch (error) {
@@ -169,6 +170,7 @@ function DonationInfoPage() {
 
   useEffect(() => {
     if (donationData) {
+
       const updatedCustomRows = [
         {
           label: 'Donation Amount',
