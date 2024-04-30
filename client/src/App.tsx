@@ -27,6 +27,7 @@ import ReportsPage from './Reports/ReportsPage';
 import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 import NewDonationPage from './NewDonation/NewDonationPage';
+import Sidebar from './Sidebar/Sidebar';
 import DonationInfoPage from './DonationInfo/DonationInfoPage';
 import PopupPage from './Popup/PopupPage';
 
@@ -40,6 +41,7 @@ function App() {
               <CssBaseline>
                 <AlertPopup />
                 <Routes>
+                  <Route path="/test-sidebar" element={<Sidebar />} />
                   <Route path="/new-donation" element={<NewDonationPage />} />
                   <Route path="/popup" element={<PopupPage />} />
                   {/* Routes accessed only if user is not authenticated */}
