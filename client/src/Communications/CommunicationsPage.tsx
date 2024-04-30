@@ -187,8 +187,11 @@ function CommunicationsPage() {
   const [groups, setGroups] = useState<IGroup[]>([]);
 
   // Fetch data using custom hook
-  const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
-  const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
+  const allDonors: any | null = useData('donor/all');
+  const allGroups: any | null = useData('group/all');
+
+  // const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
+  // const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
 
   useEffect(() => {
     if (allDonors?.data) {
@@ -288,176 +291,171 @@ function CommunicationsPage() {
   };
 
   return (
-    <div>
-      <Grid container sx={{ m: 3 }} spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-            Communications
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h7" sx={{ width: '80%', color: '#7C7C7C' }}>
-            Send emails to individual users, groups of individuals, and mailing
-            lists. Clicking the “email” button, will open a popup with the
-            respective emails, which you can then copy and paste into your email
-            application (i.e. Gmail or Outlook)
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            Individual Person
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
+    <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
+      <Box>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 'bold', marginBottom: '15px' }}
+        >
+          Communications
+        </Typography>
+        <p style={{ color: '#7C7C7C', marginBottom: '20px', maxWidth: '75%' }}>
+          Send emails to individual users, groups of individuals, and mailing
+          lists. Clicking the “email” button, will open a popup with the
+          respective emails, which you can then copy and paste into your email
+          application (i.e. Gmail or Outlook)
+        </p>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+        >
+          Individual Person
+        </Typography>
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={donors.map((option) => ({
+            name: option.contact_name,
+            id: option._id,
+          }))}
+          getOptionLabel={(option) => option.name}
+          sx={{ width: 300, marginBottom: '15px' }}
+          onChange={handleNameChange}
+          renderInput={(params) => (
+            <TextField {...params} label="Search Name" />
+          )}
+        />
+      </Box>
+      <Box sx={{ width: '40%' }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+        >
+          Groups
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleUnackDonoModalOpen}
+          size="large"
+          sx={{ marginBottom: '5px' }}
+          endIcon={<ArrowForwardIcon />}
+          fullWidth
+          style={{ justifyContent: 'flex-start' }}
+        >
+          Email Unacknowledged Donations
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          endIcon={<ArrowForwardIcon />}
+          fullWidth
+          sx={{ marginBottom: '10px' }}
+          style={{ justifyContent: 'flex-start' }}
+        >
+          Search All Donors & Sponsors
+        </Button>
+        <Button
+          variant="contained"
+          color="inherit"
+          sx={{ marginBottom: '5px' }}
+          fullWidth
+        >
+          Add / Edit Groups
+        </Button>
+        <Stack
+          spacing={{ xs: 2 }}
+          direction="row"
+          useFlexGap
+          flexWrap="wrap"
+          sx={{ marginBottom: '10px' }}
+        >
           <Autocomplete
             disablePortal
-            id="combo-box-demo"
-            options={donors.map((option) => ({
-              name: option.contact_name,
-              id: option._id,
-            }))}
-            getOptionLabel={(option) => option.name}
-            sx={{ width: 300 }}
-            onChange={handleNameChange}
+            id="group-search"
+            options={groups}
+            getOptionLabel={(option) => option.group_name}
+            value={groupSearchValue}
+            onChange={handleGroupChange}
             renderInput={(params) => (
               <TextField {...params} label="Search Name" />
             )}
           />
-        </Grid>
-        <Grid item xs={6}>
-          <Grid container spacing={2}>
-            <Grid item xs={8}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                Groups
-              </Typography>
-            </Grid>
-            <Grid item xs={4}>
-              <Button variant="contained" color="inherit" fullWidth>
-                Add / Edit Groups
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleUnackDonoModalOpen}
-                size="large"
-                endIcon={<ArrowForwardIcon />}
-                fullWidth
-                style={{ justifyContent: 'flex-start' }}
-              >
-                Email Unacknowledged Donations
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                endIcon={<ArrowForwardIcon />}
-                fullWidth
-                style={{ justifyContent: 'flex-start' }}
-              >
-                Search All Donors & Sponsors
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Stack
-                spacing={{ xs: 2 }}
-                direction="row"
-                useFlexGap
-                flexWrap="wrap"
-              >
-                <Autocomplete
-                  disablePortal
-                  id="group-search"
-                  options={groups}
-                  getOptionLabel={(option) => option.group_name}
-                  value={groupSearchValue}
-                  onChange={handleGroupChange}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Search Name" />
-                  )}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    addItem(); // testing for now
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              addItem(); // testing for now
+            }}
+            sx={{ flexGrow: 1 }}
+          >
+            Add Group
+          </Button>
+        </Stack>
+      </Box>
+      <Box sx={{ width: '80%' }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+        >
+          Emails
+        </Typography>
+        <TableContainer component={Paper} sx={{ marginBottom: '20px' }}>
+          <Table sx={{ minWidth: 650 }} aria-label="communications table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Remove</TableCell>
+                <TableCell>View Summary</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 },
                   }}
-                  sx={{ flexGrow: 1 }}
                 >
-                  Add Group
-                </Button>
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                Emails
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} aria-label="communications table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Remove</TableCell>
-                      <TableCell>View Summary</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {row.contact_name}
-                        </TableCell>
-                        <TableCell>{row.contact_email}</TableCell>
-                        <TableCell>
-                          <Link
-                            href="#"
-                            onClick={() => handleRemovePerson(row.id)}
-                          >
-                            Remove {row.contact_name}
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Link href="/">View</Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-
-            <Grid item xs={6}>
-              <Button
-                variant="contained"
-                color="inherit"
-                onClick={clearItems}
-                size="large"
-              >
-                Clear
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Box display="flex" justifyContent="flex-end">
-                <Button variant="contained" color="primary" size="large">
-                  Copy All Emails
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
+                  <TableCell component="th" scope="row">
+                    {row.contact_name}
+                  </TableCell>
+                  <TableCell>{row.contact_email}</TableCell>
+                  <TableCell>
+                    <Link href="#" onClick={() => handleRemovePerson(row.id)}>
+                      Remove {row.contact_name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link href="/">View</Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box display="flex" justifyContent="space-between" marginBottom={2}>
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={clearItems}
+            size="large"
+          >
+            Clear
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            style={{ marginLeft: 'auto' }} // This will push the button to the right end
+          >
+            Copy All Emails
+          </Button>
+        </Box>
+      </Box>
 
       <Modal
         open={unackDonoModalOpen}
@@ -487,7 +485,7 @@ function CommunicationsPage() {
           <Button onClick={handleUnackDonoModalClose}>Close</Button>
         </Box>
       </Modal>
-    </div>
+    </Box>
   );
 }
 

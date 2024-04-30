@@ -16,20 +16,20 @@ const router = express.Router();
 
 router.get('/all', getAllDonations);
 
-router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
+router.get('/type/:type', getAllDonationsOfType);
 
 router.get('/:id', getDonation);
 
-router.get('/donor/:id', isAuthenticated, getDonationsByDonorId);
+router.get('/donor/:id', getDonationsByDonorId);
 
 // router.post('/new', isAuthenticated, createNewDonation);
 // For testing:
 router.post('/new', createNewDonation);
 
+
+router.put('/acknowledge/:id', acknowledgeDonationById);
 // router.post('/edit', isAuthenticated, editDonation);
 router.post('/edit', editDonation);
-
-router.put('/acknowledge/:id', isAuthenticated, acknowledgeDonationById);
 
 // router.post('/delete', isAuthenticated, deleteDonation);
 router.post('/delete', deleteDonation);

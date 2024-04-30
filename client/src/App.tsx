@@ -27,6 +27,7 @@ import ReportsPage from './Reports/ReportsPage';
 import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 import NewDonationPage from './NewDonation/NewDonationPage';
+import Sidebar from './Sidebar/Sidebar';
 import DonationInfoPage from './DonationInfo/DonationInfoPage';
 import PopupPage from './Popup/PopupPage';
 
@@ -40,8 +41,6 @@ function App() {
               <CssBaseline>
                 <AlertPopup />
                 <Routes>
-                  <Route path="/new-donation" element={<NewDonationPage />} />
-                  <Route path="/popup" element={<PopupPage />} />
                   {/* Routes accessed only if user is not authenticated */}
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />
@@ -59,40 +58,62 @@ function App() {
                       element={<ResetPasswordPage />}
                     />
                   </Route>
-                  <Route
-                    path="/invite/:token"
-                    element={<InviteRegisterPage />}
-                  />
-                  <Route path="/donor-profile" element={<DonorProfilePage />} />
-                  <Route path="/home" element={<HomeDashboardPage />} />
-                  {/* Routes accessed only if user is authenticated */}
-                  <Route element={<ProtectedRoutesWrapper />}>
-                    <Route path="/home" element={<HomePage />} />
-                  </Route>
-                  <Route path="/donationInfo" element={<DonationInfoPage />} />
-                  <Route element={<AdminRoutesWrapper />}>
-                    <Route path="/users" element={<AdminDashboardPage />} />
-                  </Route>
-                  <Route path="/reports" element={<ReportsPage />} />
-                  <Route
-                    path="/communications"
-                    element={<CommunicationsPage />}
-                  />
-                  {/* <Route element={<ReportsPage />}>
+                </Routes>
+                <Sidebar
+                  side={
+                    <Routes>
+                      <Route path="/test-sidebar" element={<Sidebar />} />
+                      <Route
+                        path="/new-donation"
+                        element={<NewDonationPage />}
+                      />
+                      <Route path="/popup" element={<PopupPage />} />
+                      <Route
+                        path="/invite/:token"
+                        element={<InviteRegisterPage />}
+                      />
+                      <Route
+                        path="/donor-profile"
+                        element={<DonorProfilePage />}
+                      />
+                      <Route path="/home" element={<HomeDashboardPage />} />
+
+                      {/* Routes accessed only if user is authenticated */}
+                      <Route element={<ProtectedRoutesWrapper />}>
+                        <Route path="/home" element={<HomePage />} />
+                      </Route>
+                      <Route
+                        path="/donationInfo"
+                        element={<DonationInfoPage />}
+                      />
+                      <Route element={<AdminRoutesWrapper />}>
+                        <Route path="/users" element={<AdminDashboardPage />} />
+                      </Route>
+                      <Route path="/reports" element={<ReportsPage />} />
+                      <Route
+                        path="/communications"
+                        element={<CommunicationsPage />}
+                      />
+                      {/* <Route element={<ReportsPage />}>
                     <Route path="/reports" element={<ReportsPage />} />
                   </Route> */}
 
-                  {/* Route which redirects to a different page depending on if the user is an authenticated or not by utilizing the DynamicRedirect component */}
-                  <Route
-                    path="/"
-                    element={
-                      <DynamicRedirect unAuthPath="/login" authPath="/home" />
-                    }
-                  />
+                      {/* Route which redirects to a different page depending on if the user is an authenticated or not by utilizing the DynamicRedirect component */}
+                      <Route
+                        path="/"
+                        element={
+                          <DynamicRedirect
+                            unAuthPath="/login"
+                            authPath="/home"
+                          />
+                        }
+                      />
 
-                  {/* Route which is accessed if no other route is matched */}
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
+                      {/* Route which is accessed if no other route is matched */}
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  }
+                />
               </CssBaseline>
             </ThemeProvider>
           </PersistGate>
