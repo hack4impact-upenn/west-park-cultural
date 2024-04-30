@@ -259,127 +259,134 @@ function CommunicationsPage() {
         />
       </Box>
       <Box sx={{ width: '40%' }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold',  marginBottom: '10px' }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+        >
           Groups
         </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleUnackDonoModalOpen}
-                size="large"
-                sx={{ marginBottom: '5px' }}
-                endIcon={<ArrowForwardIcon />}
-                fullWidth
-                style={{ justifyContent: 'flex-start' }}
-              >
-                Email Unacknowledged Donations
-              </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleUnackDonoModalOpen}
+          size="large"
+          sx={{ marginBottom: '5px' }}
+          endIcon={<ArrowForwardIcon />}
+          fullWidth
+          style={{ justifyContent: 'flex-start' }}
+        >
+          Email Unacknowledged Donations
+        </Button>
 
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                endIcon={<ArrowForwardIcon />}
-                fullWidth
-                sx={{ marginBottom: '10px' }}
-                style={{ justifyContent: 'flex-start' }}
-              >
-                Search All Donors & Sponsors
-              </Button>
-              <Button variant="contained" color="inherit" sx={{ marginBottom: '5px' }} fullWidth>
-                Add / Edit Groups
-              </Button>
-              <Stack
-                spacing={{ xs: 2}}
-                direction="row"
-                useFlexGap
-                flexWrap="wrap"
-                sx={{ marginBottom: '10px' }}
-              >
-                <Autocomplete
-                  disablePortal
-                  id="group-search"
-                  options={groups}
-                  getOptionLabel={(option) => option.group_name}
-                  value={groupSearchValue}
-                  onChange={handleGroupChange}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Search Name" />
-                  )}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    addItem(); // testing for now
-                  }}
-                  sx={{ flexGrow: 1 }}
-                >
-                  Add Group
-                </Button>
-              </Stack>
-
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          endIcon={<ArrowForwardIcon />}
+          fullWidth
+          sx={{ marginBottom: '10px' }}
+          style={{ justifyContent: 'flex-start' }}
+        >
+          Search All Donors & Sponsors
+        </Button>
+        <Button
+          variant="contained"
+          color="inherit"
+          sx={{ marginBottom: '5px' }}
+          fullWidth
+        >
+          Add / Edit Groups
+        </Button>
+        <Stack
+          spacing={{ xs: 2 }}
+          direction="row"
+          useFlexGap
+          flexWrap="wrap"
+          sx={{ marginBottom: '10px' }}
+        >
+          <Autocomplete
+            disablePortal
+            id="group-search"
+            options={groups}
+            getOptionLabel={(option) => option.group_name}
+            value={groupSearchValue}
+            onChange={handleGroupChange}
+            renderInput={(params) => (
+              <TextField {...params} label="Search Name" />
+            )}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              addItem(); // testing for now
+            }}
+            sx={{ flexGrow: 1 }}
+          >
+            Add Group
+          </Button>
+        </Stack>
       </Box>
       <Box sx={{ width: '80%' }}>
-         <Typography variant="h5" sx={{ fontWeight: 'bold', marginBottom: '10px'}}>
-            Emails
-         </Typography>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+        >
+          Emails
+        </Typography>
         <TableContainer component={Paper} sx={{ marginBottom: '20px' }}>
-                <Table sx={{ minWidth: 650 }} aria-label="communications table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Remove</TableCell>
-                      <TableCell>View Summary</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {row.contact_name}
-                        </TableCell>
-                        <TableCell>{row.contact_email}</TableCell>
-                        <TableCell>
-                          <Link
-                            href="#"
-                            onClick={() => handleRemovePerson(row.id)}
-                          >
-                            Remove {row.contact_name}
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Link href="/">View</Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Button
-                  variant="contained"
-                  color="inherit"
-                  onClick={clearItems}
-                  size="large"
+          <Table sx={{ minWidth: 650 }} aria-label="communications table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Remove</TableCell>
+                <TableCell>View Summary</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 },
+                  }}
                 >
-                  Clear
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  style={{ marginLeft: 'auto' }} // This will push the button to the right end
-                >
-                  Copy All Emails
-                </Button>
-              </Box>
+                  <TableCell component="th" scope="row">
+                    {row.contact_name}
+                  </TableCell>
+                  <TableCell>{row.contact_email}</TableCell>
+                  <TableCell>
+                    <Link href="#" onClick={() => handleRemovePerson(row.id)}>
+                      Remove {row.contact_name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link href="/">View</Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box display="flex" justifyContent="space-between" marginBottom={2}>
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={clearItems}
+            size="large"
+          >
+            Clear
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            style={{ marginLeft: 'auto' }} // This will push the button to the right end
+          >
+            Copy All Emails
+          </Button>
+        </Box>
       </Box>
 
       <Modal
