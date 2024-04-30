@@ -40,14 +40,14 @@ function Sidebar(props: any) {
                       </div>
                       <div
                         className="sidebar-link"
-                        onClick={() => navto('/donor-dashboard')}
+                        onClick={() => navto('/donationInfo')}
                       >
                         <i className="fa-solid fa-table-columns" /> &nbsp; Donor
                         Dashboard
                       </div>
                       <div
                         className="sidebar-link"
-                        onClick={() => navto('/communication')}
+                        onClick={() => navto('/communications')}
                       >
                         <i className="fa-solid fa-envelope" /> &nbsp;
                         Communications
@@ -57,6 +57,13 @@ function Sidebar(props: any) {
                         onClick={() => navto('/new-donation')}
                       >
                         <i className="fa-solid fa-plus" /> &nbsp; New Donation
+                      </div>
+                      <div
+                        className="sidebar-link"
+                        onClick={() => navto('/reports')}
+                      >
+                        <i className="fa-solid fa-sheet-plastic" /> &nbsp;
+                        Reports
                       </div>
                     </div>
                   </div>

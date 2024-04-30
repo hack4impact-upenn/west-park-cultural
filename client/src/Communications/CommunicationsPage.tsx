@@ -122,8 +122,11 @@ function CommunicationsPage() {
   const [groups, setGroups] = useState<IGroup[]>([]);
 
   // Fetch data using custom hook
-  const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
-  const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
+  const allDonors: any | null = useData('donor/all');
+  const allGroups: any | null = useData('group/all');
+
+  // const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
+  // const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
 
   useEffect(() => {
     if (allDonors?.data) {
