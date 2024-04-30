@@ -24,9 +24,12 @@ import AlertPopup from './components/AlertPopup';
 import InviteRegisterPage from './Authentication/InviteRegisterPage';
 import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
+import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
 import NewDonationPage from './NewDonation/NewDonationPage';
 import Sidebar from './Sidebar/Sidebar';
+import DonationInfoPage from './DonationInfo/DonationInfoPage';
+import PopupPage from './Popup/PopupPage';
 
 function App() {
   return (
@@ -40,11 +43,11 @@ function App() {
                 <Routes>
                   <Route path="/test-sidebar" element={<Sidebar />} />
                   <Route path="/new-donation" element={<NewDonationPage />} />
+                  <Route path="/popup" element={<PopupPage />} />
                   {/* Routes accessed only if user is not authenticated */}
                   <Route element={<UnauthenticatedRoutesWrapper />}>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/reports" element={<ReportsPage />} />
                     <Route
                       path="/verify-account/:token"
                       element={<VerifyAccountPage />}
@@ -68,9 +71,15 @@ function App() {
                   <Route element={<ProtectedRoutesWrapper />}>
                     <Route path="/home" element={<HomePage />} />
                   </Route>
+                  <Route path="/donationInfo" element={<DonationInfoPage />} />
                   <Route element={<AdminRoutesWrapper />}>
                     <Route path="/users" element={<AdminDashboardPage />} />
                   </Route>
+                  <Route path="/reports" element={<ReportsPage />} />
+                  <Route
+                    path="/communications"
+                    element={<CommunicationsPage />}
+                  />
                   {/* <Route element={<ReportsPage />}>
                     <Route path="/reports" element={<ReportsPage />} />
                   </Route> */}

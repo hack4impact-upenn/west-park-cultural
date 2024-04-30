@@ -7,7 +7,9 @@ import {
   getDonation,
   getDonationsByDonorId,
   createNewDonation,
+  editDonation,
   acknowledgeDonationById,
+  deleteDonation,
 } from '../controllers/donation.controller';
 
 const router = express.Router();
@@ -24,6 +26,12 @@ router.get('/donor/:id', getDonationsByDonorId);
 // For testing:
 router.post('/new', createNewDonation);
 
+
 router.put('/acknowledge/:id', acknowledgeDonationById);
+// router.post('/edit', isAuthenticated, editDonation);
+router.post('/edit', editDonation);
+
+// router.post('/delete', isAuthenticated, deleteDonation);
+router.post('/delete', deleteDonation);
 
 export default router;

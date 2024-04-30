@@ -36,6 +36,7 @@ const theme = createTheme({
       'Oxygen',
       'Ubuntu',
       'Cantarell',
+      'Varela Round',
       'Fira Sans',
       'Droid Sans',
       'Helvetica Neue',
@@ -66,12 +67,17 @@ const theme = createTheme({
         },
         h4: {
           fontWeight: 'bold !important',
+          fontFamily: 'Varela Round',
+          color: '#3B7A2E',
         },
         h5: {
           fontFamily: 'Hind Guntur',
-          fontWeight: '400 !important',
+          fontWeight: 'bold !important',
           fontSize: '25px',
+<<<<<<< HEAD
           color: COLORS.green,
+=======
+>>>>>>> main
         },
       },
     },

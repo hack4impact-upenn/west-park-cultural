@@ -1,5 +1,10 @@
 import { IGroup, Group } from '../models/group.model';
 
+const getAllGroups = async () => {
+  const groups = await Group.find().exec();
+  return groups;
+};
+
 const createCommunicationGroup = async (group: IGroup) => {
   const newGroup = new Group(group);
   const result = await newGroup.save();
@@ -11,4 +16,4 @@ const getCommunicationGroupById = async (id: string) => {
   return group;
 };
 
-export { createCommunicationGroup, getCommunicationGroupById };
+export { createCommunicationGroup, getCommunicationGroupById, getAllGroups };
