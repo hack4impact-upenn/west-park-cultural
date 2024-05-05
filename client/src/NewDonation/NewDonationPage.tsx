@@ -39,8 +39,12 @@ function NewDonationPage() {
   const [donator, setDonator] = useState<DonorType | null>(null);
   const [isNewDonator, setIsNewDonator] = useState(false);
   const [isNewPurpose, setIsNewPurpose] = useState(false);
+  const [showOrgFields, setShowOrgFields] = useState(false);
   const [newDonatorEmail, setNewDonatorEmail] = useState('');
   const [newDonatorAddress, setNewDonatorAddress] = useState('');
+  const [orgEmail, setOrgEmail] = useState('');
+  const [orgAddress, setOrgAddress] = useState('');
+  const [orgName, setOrgName] = useState('');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
   const [campaignPurpose, setCampaignPurpose] = useState<PurposeType | null>(
     null,
@@ -89,7 +93,29 @@ function NewDonationPage() {
     setNewDonatorAddress(event.target.value);
   };
 
+  const handleOrgEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOrgEmail(event.target.value);
+  };
+
+  const handleOrgAddressChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setOrgAddress(event.target.value);
+  };
+
+  const handleOrgNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOrgName(event.target.value);
+  };
+
   const handleNewDonatorGroupChange = (event: SelectChangeEvent) => {
+    if (
+      event.target.value !== 'Individual' &&
+      event.target.value !== 'Board Member'
+    ) {
+      setShowOrgFields(true);
+    } else {
+      setShowOrgFields(false);
+    }
     setNewDonatorGroup(event.target.value);
   };
 
@@ -114,6 +140,9 @@ function NewDonationPage() {
         type: '0', // no input field for this yet
         // comments: null,
         // _id: null,
+        org_address: orgAddress,
+        org_email: orgEmail,
+        org_name: orgName,
       };
 
       postData('donor/create', newDonator)
@@ -419,6 +448,39 @@ function NewDonationPage() {
             type="text"
             value={newDonatorAddress}
             onChange={handleNewDonatorAddressChange}
+            sx={{ width: '40%' }}
+          />
+        </Grid>
+      )}
+      {showOrgFields && (
+        <Grid item xs={12}>
+          <TextField
+            label="Organization Address"
+            type="text"
+            value={orgAddress}
+            onChange={handleOrgAddressChange}
+            sx={{ width: '40%' }}
+          />
+        </Grid>
+      )}
+      {showOrgFields && (
+        <Grid item xs={12}>
+          <TextField
+            label="Organization Email"
+            type="text"
+            value={orgEmail}
+            onChange={handleOrgEmailChange}
+            sx={{ width: '40%' }}
+          />
+        </Grid>
+      )}
+      {showOrgFields && (
+        <Grid item xs={12}>
+          <TextField
+            label="Organization Name"
+            type="text"
+            value={orgName}
+            onChange={handleOrgNameChange}
             sx={{ width: '40%' }}
           />
         </Grid>
