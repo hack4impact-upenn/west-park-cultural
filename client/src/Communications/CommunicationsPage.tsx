@@ -1,15 +1,6 @@
-/* eslint-disable consistent-return */
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-empty */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-alert */
-/* eslint-disable import/no-unresolved */
 import React, { useEffect, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import SearchDonorsButton from '../components/buttons/SearchDonorsButton';
 import axios from 'axios';
 
 import {
@@ -33,6 +24,7 @@ import {
 
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
+import IDonation from '../util/types/donation';
 import { useData } from '../util/api';
 
 const BACKENDURL = process.env.PUBLIC_URL
@@ -134,33 +126,40 @@ type RowItem = {
   contact_email: string;
 };
 
+interface DonorInfo {
+  email: string
+  name: string;
+  _id: string;
+}
+
 function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
   const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
     [],
   );
+  const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
+  const [groupSearchValue, setGroupSearchValue] = useState(null);
+  const [rows, setRows] = useState<RowItem[]>([]);
+
+  const [donors, setDonors] = useState<IDonor[]>([]);
+  const [groups, setGroups] = useState<IGroup[]>([]);
+  const [donations, setDonations] = useState<IDonation[]>([]);
+
+  const allDonors: any | null = useData('donor/all');
+  const allDonations: any | null = useData('donation/all');
+  const allGroups: any | null = useData('group/all');
 
   const handleUnackDonoModalOpen = async () => {
     try {
       console.log('opened');
-      const allDonationsResponse = await axios.get(
-        `${BACKENDURL}/api/donation/all`,
-      );
-      if (!allDonationsResponse) {
-        return;
-      }
-      const allDonations = allDonationsResponse.data;
-      console.log('here');
-      console.log(allDonations);
-      const temp = allDonations.filter(
-        (donation: any) => !donation.acknowledged,
+      const temp = donations.filter(
+        (donation: IDonation) => !donation.acknowledged,
       );
       const tempWithDonorInfo = await Promise.all(
         temp.map(async (donation: any) => {
           const donorInfoResponse = await axios.get(
             `${BACKENDURL}/api/donor/id/${donation.donor_id}`,
           );
-          console.log(donorInfoResponse);
           if (!donorInfoResponse) {
             return;
           }
@@ -179,25 +178,18 @@ function CommunicationsPage() {
     }
     setUnackDonoModalOpen(true);
   };
-  const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
-  const [groupSearchValue, setGroupSearchValue] = useState(null);
-
-  const [rows, setRows] = useState<RowItem[]>([]);
-  const [donors, setDonors] = useState<IDonor[]>([]);
-  const [groups, setGroups] = useState<IGroup[]>([]);
-
-  // Fetch data using custom hook
-  const allDonors: any | null = useData('donor/all');
-  const allGroups: any | null = useData('group/all');
-
-  // const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
-  // const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
 
   useEffect(() => {
     if (allDonors?.data) {
       setDonors(allDonors.data);
     }
   }, [allDonors]);
+
+  useEffect(() => {
+    if (allDonations?.data) {
+      setDonations(allDonations.data);
+    }
+  }, [allDonations]);
 
   useEffect(() => {
     if (allGroups?.data) {
@@ -215,7 +207,6 @@ function CommunicationsPage() {
     value: { name: string; id: string | { $oid: string } } | null,
   ) => {
     if (value) {
-      // setRows([]);
       const selectedPerson = donors.find(
         (person) => extractId(person._id) === value.id,
       );
@@ -235,7 +226,6 @@ function CommunicationsPage() {
       }
     }
   };
-
 
   const addItem = () => {
     const newItem: RowItem = {
@@ -277,8 +267,7 @@ function CommunicationsPage() {
   ) => {
     if (value) {
       setRows([]);
-      addGroupItem(value); // Add members of the selected group to the table
-      // Clear the Autocomplete input after adding the group members
+      addGroupItem(value); 
       setGroupSearchValue(null);
     }
   };
@@ -321,6 +310,12 @@ function CommunicationsPage() {
       }
     }
   }
+  const handleFilteredDonors = (filteredDonors: DonorInfo[]) => {
+    console.log('Received filtered donors:', filteredDonors);
+    filteredDonors.forEach((donor: DonorInfo) => {
+      handleAddUnackDonation(donor.name, donor.email, donor._id);
+    })
+  };
 
   return (
     <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
@@ -378,17 +373,7 @@ function CommunicationsPage() {
           Email Unacknowledged Donations
         </Button>
 
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          endIcon={<ArrowForwardIcon />}
-          fullWidth
-          sx={{ marginBottom: '10px' }}
-          style={{ justifyContent: 'flex-start' }}
-        >
-          Search All Donors & Sponsors
-        </Button>
+        <SearchDonorsButton onConfirm={handleFilteredDonors} />
         <Button
           variant="contained"
           color="inherit"

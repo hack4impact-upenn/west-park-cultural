@@ -22,10 +22,15 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { match } from 'assert';
 import { postData, putData, useData } from '../../util/api';
 
-function SearchDonorsButton() {
+interface SearchDonorsButtonProps {
+  onConfirm: (filteredDonors: DonorInfo[]) => void;
+}
+
+function SearchDonorsButton({ onConfirm }: SearchDonorsButtonProps) {
   const [open, setOpen] = useState(false);
   const [donationType, setDonationType] = useState('donation');
   // Add state for the select dropdowns
@@ -34,7 +39,7 @@ function SearchDonorsButton() {
   const [minDonation, setMinDonation] = useState('');
   const [maxDonation, setMaxDonation] = useState('');
   const [filteredEmails, setFilteredEmails] = useState('');
-
+  const [filteredDonors, setFilteredDonors] = useState<DonorInfo[]>([]);
   const [startTimePeriod, setStartTimePeriod] = React.useState<Dayjs | null>(
     dayjs(),
   );
@@ -60,6 +65,7 @@ function SearchDonorsButton() {
   }, [donations]);
 
   const [donorsData, setDonorsData] = useState<DonorType[]>([]);
+
   useEffect(() => {
     const data = donors?.data || null;
     setDonorsData(data);
@@ -78,6 +84,9 @@ function SearchDonorsButton() {
     setStartTimePeriod(dayjs());
     setEndTimePeriod(dayjs());
     setOpen(false);
+
+    //add the filtered emails to Communication Page
+    onConfirm(filteredDonors);
   };
 
   const handleDonationTypeChange = (event: any, newDonationType: string) => {
@@ -150,19 +159,27 @@ function SearchDonorsButton() {
     console.log('FILTERED DONATIONS');
     console.log(filteredDonations);
 
-    const emails = filteredDonations.map((donation) => {
-      const donor = donorsData.find(
-        (currDonor) => currDonor._id === donation.donor_id,
-      );
-      return donor ? donor.contact_email : 'No email found';
+    const filteredEmails: string[] = [];
+    const donorInfoArray: DonorInfo[] = [];
+
+    filteredDonations.forEach((donation) => {
+      const donor = donorsData.find((currDonor) => currDonor._id === donation.donor_id);
+      if (donor) {
+        const { _id, contact_name, contact_email } = donor;
+        const existingDonor = donorInfoArray.find((info) => info._id === _id);
+    
+        if (!existingDonor) {
+          if (_id != undefined && contact_name != undefined && contact_email != undefined) {
+            donorInfoArray.push({ _id, name: contact_name, email: contact_email });
+            filteredEmails.push(contact_email);
+          }
+        }
+      }
     });
-    const uniqueEmailsArray = Array.from(new Set(emails));
-    const uniqueEmails = uniqueEmailsArray.join(', ');
 
-    console.log('EMAILS');
-    console.log(uniqueEmails);
-
+    const uniqueEmails = filteredEmails.join(', ');
     setFilteredEmails(uniqueEmails);
+    setFilteredDonors(donorInfoArray);
   }, [
     donationType,
     donationsData,
@@ -178,11 +195,20 @@ function SearchDonorsButton() {
 
   return (
     <div style={{ marginBottom: '10px' }}>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Search Donor
-      </Button>
+      <Button
+          variant="contained"
+          color="primary"
+          onClick={handleClickOpen}
+          size="large"
+          endIcon={<ArrowForwardIcon />}
+          fullWidth
+          sx={{ marginBottom: '10px' }}
+          style={{ justifyContent: 'flex-start' }}
+        >
+          Search Donor
+        </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>Search All {donationType}</DialogTitle>
+        <DialogTitle>Search All {donationType.charAt(0).toUpperCase() + donationType.slice(1)}</DialogTitle>
         <DialogContent>
           <Box sx={{ marginBottom: 2 }}>
             <ToggleButtonGroup
@@ -335,4 +361,10 @@ interface PurposeType {
   _id?: string;
   name?: string;
   date_created?: Date;
+}
+
+interface DonorInfo {
+  email: string
+  name: string;
+  _id: string;
 }

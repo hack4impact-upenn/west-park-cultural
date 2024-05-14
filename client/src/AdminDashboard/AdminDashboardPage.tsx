@@ -3,7 +3,7 @@ import { Typography, Grid } from '@mui/material';
 import ScreenGrid from '../components/ScreenGrid';
 import UserTable from './UserTable';
 import InviteUserButton from '../components/buttons/InviteUserButton';
-import SearchDonorsButton from '../components/buttons/SearchDonorsButton';
+
 /**
  * A page only accessible to admins that displays all users in a table and allows
  * Admin to delete users from admin and promote users to admin.
@@ -17,9 +17,6 @@ function AdminDashboardPage() {
       <Grid item container width="60vw" justifyContent="flex-end" spacing={2}>
         <Grid item>
           <InviteUserButton />
-        </Grid>
-        <Grid item>
-          <SearchDonorsButton />
         </Grid>
       </Grid>
       <Grid item>
