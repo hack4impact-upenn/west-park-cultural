@@ -70,6 +70,13 @@ function SearchDonorsButton() {
   };
 
   const handleClose = () => {
+    setCampaign('');
+    setYearType('');
+    setMinDonation('');
+    setMaxDonation('');
+    setFilteredEmails('');
+    setStartTimePeriod(dayjs());
+    setEndTimePeriod(dayjs());
     setOpen(false);
   };
 
@@ -109,8 +116,16 @@ function SearchDonorsButton() {
           donationDate.isSame(startTimePeriod)) &&
         (donationDate.isBefore(endTimePeriod) ||
           donationDate.isSame(endTimePeriod));
-      const matchesPurpose = donation.purpose_id === campaign;
-      let matchesAmount = false;
+      //initialize all true
+      let matchesYearType = true;
+      let matchesPurpose = true;
+      let matchesAmount = true;
+      
+      //if filters are non-empty
+      if (campaign !== null && campaign!== undefined && campaign!== '') {
+        matchesPurpose = donation.purpose_id === campaign;
+      }
+
       if (minDonation !== '' && maxDonation !== '') {
         const minDonationNumber = Number(minDonation);
         const maxDonationNumber = Number(maxDonation);
@@ -118,8 +133,8 @@ function SearchDonorsButton() {
           donation.amount >= minDonationNumber &&
           donation.amount <= maxDonationNumber;
       }
-      let matchesYearType = true;
-      if (donationType === 'grant') {
+
+      if (donationType === 'Grant') {
         matchesYearType = donation.grant_year === yearType;
       }
 
@@ -238,8 +253,8 @@ function SearchDonorsButton() {
                   value={yearType}
                   onChange={(e) => setYearType(e.target.value)}
                 >
-                  <MenuItem value="single">Single Year</MenuItem>
-                  <MenuItem value="multi">Multi Year</MenuItem>
+                  <MenuItem value="single-year">Single Year</MenuItem>
+                  <MenuItem value="multi-year">Multi Year</MenuItem>
                 </Select>
               </FormControl>
             </Box>
