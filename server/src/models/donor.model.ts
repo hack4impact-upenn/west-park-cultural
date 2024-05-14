@@ -37,6 +37,10 @@ const DonorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+//   comments: {
+//     type: String,
+//     required: false,
+//   },
   org_address: {
     type: String,
     required: false,
@@ -64,7 +68,7 @@ interface IDonor extends mongoose.Document {
   donor_group: string;
   registered_date: Date;
   last_donation_date: Date;
-  last_communication_date: string;
+  last_communication_date: Date;
   type: string;
   comments: string;
   org_address: string;
