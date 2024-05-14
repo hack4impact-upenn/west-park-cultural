@@ -51,7 +51,7 @@ const style = {
   overflow: 'scroll',
   height: '80%',
 };
-
+  
 function BasicTable({
   customRows,
 }: {
@@ -88,6 +88,7 @@ function DonationInfoPage() {
   const [purpose, setPurpose] = useState('');
 
   // Fetch donation data from API
+
   const donationID = '65ff8dae78febaeaa6e02651';
   const donation = useData(`donation/${donationID}`);
 
@@ -134,7 +135,6 @@ function DonationInfoPage() {
             const res = await axios.get(
               `http://localhost:4000/api/donor/${donation.data.donor_id}`,
             );
-            console.log(res.data);
             setDonorName(res.data.contact_name);
             setDonator(res.data);
           } catch (error) {
@@ -399,7 +399,6 @@ function DonationInfoPage() {
 
       <Box width="100%">
         <BasicTable customRows={customRows} />
-
         {!donationData.acknowledged && (
           <p style={{ marginTop: '16px', marginLeft: '16px' }}>
             This donation has not been acknowledged.
