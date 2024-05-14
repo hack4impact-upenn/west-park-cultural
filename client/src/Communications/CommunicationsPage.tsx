@@ -49,7 +49,6 @@ const modalStyle = {
   overflow: 'auto',
   width: 600, // Adjust width as needed
   bgcolor: 'background.paper',
-  border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -170,6 +169,7 @@ function CommunicationsPage() {
             ...donation,
             donorName: donorInfo.contact_name,
             donorEmail: donorInfo.contact_email,
+            donorId: donorInfo._id,
           };
         }),
       );
@@ -236,6 +236,7 @@ function CommunicationsPage() {
     }
   };
 
+
   const addItem = () => {
     const newItem: RowItem = {
       id: '65daa67d6c34e8adb9f2d2c4',
@@ -289,6 +290,37 @@ function CommunicationsPage() {
   const handleRemovePerson = (idToRemove: string) => {
     setRows((prevRows) => prevRows.filter((row) => row.id !== idToRemove));
   };
+
+  function formatDateString(dateString: string): string {
+    if (dateString) {
+      const date = new Date(dateString);
+      const formattedDate = date.toISOString().slice(0, 10);
+      return formattedDate;
+    }
+    return '';
+  }
+
+  function handleAddUnackDonation(selectedName: string, selectedEmail: string, selectedId: string) {
+    if (selectedId) {
+      const selectedPerson = donors.find(
+        (person) => extractId(person._id) === selectedId,
+      );
+      if (selectedPerson) {
+        const existingRow = rows.find(
+          (row) => row.id === extractId(selectedPerson._id),
+        );
+        if (existingRow) {
+          return;
+        }
+        const newItem: RowItem = {
+          id: extractId(selectedPerson._id),
+          contact_name: selectedPerson.contact_name,
+          contact_email: selectedPerson.contact_email,
+        };
+        setRows((prevRows: RowItem[]) => [...prevRows, newItem]);
+      }
+    }
+  }
 
   return (
     <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
@@ -464,22 +496,34 @@ function CommunicationsPage() {
         aria-describedby="Email Unacknowledged Donations Modal"
       >
         <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2">
-            Email Unacknowledged Donations
+          <Typography variant="h6" component="h6">
+            Contact Unacknowledged Donations
           </Typography>
           {unacknowledgedDonations.map((donation) => (
-            <Box key={donation._id} sx={{ border: 1, p: 2, my: 1 }}>
-              <Typography variant="body1">
-                Donation ID: {donation._id}
-              </Typography>
+            <Box key={donation._id} 
+              sx={{
+                p: 2,
+                my: 1,
+                borderRadius: 2,
+                boxShadow: 3,
+              }}>
               <Typography variant="body1">Amount: {donation.amount}</Typography>
-              <Typography variant="body1">Date: {donation.date}</Typography>
+              <Typography variant="body1">Date: {formatDateString(donation.date) || 'N/A'}</Typography>
               <Typography variant="body1">
                 Donor Name: {donation.donorName}
               </Typography>
               <Typography variant="body1">
                 Donor Email: {donation.donorEmail}
               </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                style={{ marginTop: '10px' }} 
+                onClick={() => handleAddUnackDonation(donation.donorName, donation.donorEmail, donation.donorId)}
+              >
+                Select
+              </Button >
             </Box>
           ))}
           <Button onClick={handleUnackDonoModalClose}>Close</Button>
