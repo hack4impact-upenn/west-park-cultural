@@ -27,6 +27,8 @@ import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
+import EmailModal from './components/EmailModal';
+import AddEditGroupsModal from './components/AddEditGroupsModal';
 import NewDonationPage from './NewDonation/NewDonationPage';
 import Sidebar from './Sidebar/Sidebar';
 import DonationInfoPage from './DonationInfo/DonationInfoPage';
@@ -90,6 +92,11 @@ function App() {
                         <Route
                           path="/communications"
                           element={<CommunicationsPage />}
+                        />
+                        <Route path="/emailmodal" element={<EmailModal />} />
+                        <Route
+                          path="/addeditgroupsmodal"
+                          element={<AddEditGroupsModal />}
                         />
                       </Route>
                       <Route element={<AdminRoutesWrapper />}>
