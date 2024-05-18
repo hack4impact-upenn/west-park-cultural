@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default */
 import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
@@ -26,6 +27,8 @@ import DonorProfilePage from './donorProfile/DonorProfilePage';
 import ReportsPage from './Reports/ReportsPage';
 import CommunicationsPage from './Communications/CommunicationsPage';
 import HomeDashboardPage from './HomeDashboard/HomeDashboard';
+import EmailModal from './components/EmailModal';
+import AddEditGroupsModal from './components/AddEditGroupsModal';
 import NewDonationPage from './NewDonation/NewDonationPage';
 import Sidebar from './Sidebar/Sidebar';
 import DonationInfoPage from './DonationInfo/DonationInfoPage';
@@ -73,7 +76,7 @@ function App() {
                         element={<InviteRegisterPage />}
                       />
                       <Route
-                        path="/donor-profile"
+                        path="/donor-profile/:donatorId"
                         element={<DonorProfilePage />}
                       />
                       <Route path="/home" element={<HomeDashboardPage />} />
@@ -81,22 +84,24 @@ function App() {
                       {/* Routes accessed only if user is authenticated */}
                       <Route element={<ProtectedRoutesWrapper />}>
                         <Route path="/home" element={<HomePage />} />
+                         <Route
+                            path="/donationInfo"
+                            element={<DonationInfoPage />}
+                          />
+                        <Route path="/reports" element={<ReportsPage />} />
+                        <Route
+                          path="/communications"
+                          element={<CommunicationsPage />}
+                        />
+                        <Route path="/emailmodal" element={<EmailModal />} />
+                        <Route
+                          path="/addeditgroupsmodal"
+                          element={<AddEditGroupsModal />}
+                        />
                       </Route>
-                      <Route
-                        path="/donationInfo"
-                        element={<DonationInfoPage />}
-                      />
                       <Route element={<AdminRoutesWrapper />}>
                         <Route path="/users" element={<AdminDashboardPage />} />
                       </Route>
-                      <Route path="/reports" element={<ReportsPage />} />
-                      <Route
-                        path="/communications"
-                        element={<CommunicationsPage />}
-                      />
-                      {/* <Route element={<ReportsPage />}>
-                    <Route path="/reports" element={<ReportsPage />} />
-                  </Route> */}
 
                       {/* Route which redirects to a different page depending on if the user is an authenticated or not by utilizing the DynamicRedirect component */}
                       <Route

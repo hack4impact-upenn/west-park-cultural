@@ -14,24 +14,23 @@ import {
 
 const router = express.Router();
 
-router.get('/all', getAllDonations);
+router.get('/all', isAuthenticated, getAllDonations);
 
-router.get('/type/:type', getAllDonationsOfType);
+router.get('/type/:type', isAuthenticated, getAllDonationsOfType);
 
-router.get('/:id', getDonation);
+router.get('/:id', isAuthenticated, getDonation);
 
-router.get('/donor/:id', getDonationsByDonorId);
+router.get('/donor/:id', isAuthenticated, getDonationsByDonorId);
 
 // router.post('/new', isAuthenticated, createNewDonation);
 // For testing:
-router.post('/new', createNewDonation);
+router.post('/new', isAuthenticated, createNewDonation);
 
-
-router.put('/acknowledge/:id', acknowledgeDonationById);
 // router.post('/edit', isAuthenticated, editDonation);
-router.post('/edit', editDonation);
+router.post('/edit', isAuthenticated, editDonation);
 
-// router.post('/delete', isAuthenticated, deleteDonation);
-router.post('/delete', deleteDonation);
+router.put('/acknowledge/:id', isAuthenticated, acknowledgeDonationById);
+
+router.post('/delete', isAuthenticated, deleteDonation);
 
 export default router;

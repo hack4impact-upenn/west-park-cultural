@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import SearchDonorsButton from '../components/buttons/SearchDonorsButton';
 import axios from 'axios';
-
 import {
   Typography,
   Grid,
@@ -21,7 +20,7 @@ import {
   TableHead,
   Link,
 } from '@mui/material';
-
+import AddEditGroupsModal from '../components/AddEditGroupsModal';
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import IDonation from '../util/types/donation';
@@ -134,10 +133,10 @@ interface DonorInfo {
 
 function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
+  const [editGroupModalOpen, setEditGroupModalOpen] = React.useState(false);
   const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
     [],
   );
-  const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
   const [groupSearchValue, setGroupSearchValue] = useState(null);
   const [rows, setRows] = useState<RowItem[]>([]);
 
@@ -149,6 +148,7 @@ function CommunicationsPage() {
   const allDonations: any | null = useData('donation/all');
   const allGroups: any | null = useData('group/all');
 
+  
   const handleUnackDonoModalOpen = async () => {
     try {
       console.log('opened');
@@ -177,6 +177,16 @@ function CommunicationsPage() {
       console.log(error);
     }
     setUnackDonoModalOpen(true);
+  };
+
+  const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
+
+  const handleGroupModalOpen = () => {
+    setEditGroupModalOpen(true);
+  };
+
+  const handleGroupModalClose = () => {
+    setEditGroupModalOpen(false);
   };
 
   useEffect(() => {
@@ -379,9 +389,11 @@ function CommunicationsPage() {
           color="inherit"
           sx={{ marginBottom: '5px' }}
           fullWidth
+          onClick={handleGroupModalOpen}
         >
           Add / Edit Groups
         </Button>
+        <AddEditGroupsModal open={editGroupModalOpen} onClose={handleGroupModalClose} />
         <Stack
           spacing={{ xs: 2 }}
           direction="row"

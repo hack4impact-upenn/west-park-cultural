@@ -10,7 +10,9 @@ import {
   getAllDonorsTypeSponsor,
   getAllDonorsTypeGrant,
   createDonor,
+  editDonorById,
   getDonorById,
+  updateNote,
 } from '../services/donor.service';
 
 const getAllDonorsController = async (
@@ -108,9 +110,45 @@ const getDonorByIdController = async (
     });
 };
 
+const editDonor = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  // eslint-disable-next-line camelcase
+  const { donor_id, ...restOfBody } = req.body;
+  editDonorById(donor_id, restOfBody)
+    .then((response) => res.status(StatusCode.OK).send(response))
+    .catch((e: any) => {
+      console.log(e);
+      next(ApiError.internal('Failed to edit donation.'));
+    });
+};
+
+const updateDonorNote = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  const { id, note } = req.body;
+  if (!id) {
+    next(ApiError.missingFields(['id']));
+    return;
+  }
+  if (!note) {
+    next(ApiError.missingFields(['note']));
+    return;
+  }
+
+  const donor = updateNote(id, note);
+  res.status(StatusCode.OK).send(donor);
+};
+
 export {
   getAllDonorsController,
   getAllDonorsOfType,
   createDonorController,
   getDonorByIdController,
+  editDonor,
+  updateDonorNote,
 };
