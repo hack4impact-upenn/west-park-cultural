@@ -58,11 +58,13 @@ function UserTable() {
 
   // Upon getting the list of users for the database, set the state of the userList to contain all users except for logged in user
   useEffect(() => {
-    setUserList(
-      users?.data.filter(
-        (entry: IUser) => entry && entry.email && entry.email !== self.email,
-      ),
-    );
+    if (users && users.data) {
+      setUserList(
+        users?.data.filter(
+          (entry: IUser) => entry && entry.email && entry.email !== self.email,
+        ),
+      );
+    }
   }, [users, self]);
 
   // update state of userlist to remove a user from  the frontend representation of the data

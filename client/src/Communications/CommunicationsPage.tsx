@@ -1,17 +1,7 @@
-/* eslint-disable consistent-return */
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-empty */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-alert */
-/* eslint-disable import/no-unresolved */
 import React, { useEffect, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import SearchDonorsButton from '../components/buttons/SearchDonorsButton';
 import axios from 'axios';
-
 import {
   Typography,
   Grid,
@@ -30,9 +20,10 @@ import {
   TableHead,
   Link,
 } from '@mui/material';
-
+import AddEditGroupsModal from '../components/AddEditGroupsModal';
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
+import IDonation from '../util/types/donation';
 import { useData } from '../util/api';
 
 const BACKENDURL = process.env.PUBLIC_URL
@@ -49,7 +40,6 @@ const modalStyle = {
   overflow: 'auto',
   width: 600, // Adjust width as needed
   bgcolor: 'background.paper',
-  border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -135,33 +125,41 @@ type RowItem = {
   contact_email: string;
 };
 
+interface DonorInfo {
+  email: string
+  name: string;
+  _id: string;
+}
+
 function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
+  const [editGroupModalOpen, setEditGroupModalOpen] = React.useState(false);
   const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
     [],
   );
+  const [groupSearchValue, setGroupSearchValue] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState<IGroup | null>(null);
+  const [rows, setRows] = useState<RowItem[]>([]);
 
+  const [donors, setDonors] = useState<IDonor[]>([]);
+  const [groups, setGroups] = useState<IGroup[]>([]);
+  const [donations, setDonations] = useState<IDonation[]>([]);
+
+  const allDonors: any | null = useData('donor/all');
+  const allDonations: any | null = useData('donation/all');
+  const allGroups: any | null = useData('group/all');
+  
   const handleUnackDonoModalOpen = async () => {
     try {
       console.log('opened');
-      const allDonationsResponse = await axios.get(
-        `${BACKENDURL}/api/donation/all`,
-      );
-      if (!allDonationsResponse) {
-        return;
-      }
-      const allDonations = allDonationsResponse.data;
-      console.log('here');
-      console.log(allDonations);
-      const temp = allDonations.filter(
-        (donation: any) => !donation.acknowledged,
+      const temp = donations.filter(
+        (donation: IDonation) => !donation.acknowledged,
       );
       const tempWithDonorInfo = await Promise.all(
         temp.map(async (donation: any) => {
           const donorInfoResponse = await axios.get(
             `${BACKENDURL}/api/donor/id/${donation.donor_id}`,
           );
-          console.log(donorInfoResponse);
           if (!donorInfoResponse) {
             return;
           }
@@ -170,6 +168,7 @@ function CommunicationsPage() {
             ...donation,
             donorName: donorInfo.contact_name,
             donorEmail: donorInfo.contact_email,
+            donorId: donorInfo._id,
           };
         }),
       );
@@ -179,25 +178,28 @@ function CommunicationsPage() {
     }
     setUnackDonoModalOpen(true);
   };
+
   const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
-  const [groupSearchValue, setGroupSearchValue] = useState(null);
 
-  const [rows, setRows] = useState<RowItem[]>([]);
-  const [donors, setDonors] = useState<IDonor[]>([]);
-  const [groups, setGroups] = useState<IGroup[]>([]);
+  const handleGroupModalOpen = () => {
+    setEditGroupModalOpen(true);
+  };
 
-  // Fetch data using custom hook
-  const allDonors: any | null = useData('donor/all');
-  const allGroups: any | null = useData('group/all');
-
-  // const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
-  // const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
+  const handleGroupModalClose = () => {
+    setEditGroupModalOpen(false);
+  };
 
   useEffect(() => {
     if (allDonors?.data) {
       setDonors(allDonors.data);
     }
   }, [allDonors]);
+
+  useEffect(() => {
+    if (allDonations?.data) {
+      setDonations(allDonations.data);
+    }
+  }, [allDonations]);
 
   useEffect(() => {
     if (allGroups?.data) {
@@ -215,7 +217,6 @@ function CommunicationsPage() {
     value: { name: string; id: string | { $oid: string } } | null,
   ) => {
     if (value) {
-      // setRows([]);
       const selectedPerson = donors.find(
         (person) => extractId(person._id) === value.id,
       );
@@ -245,40 +246,41 @@ function CommunicationsPage() {
     setRows((prevRows) => [...prevRows, newItem]);
   };
 
-  const addGroupItem = (selectedGroup: any) => {
+  const addGroupItem = () => {
     // Retrieve the donors associated with the selected group
-    const groupDonors = testDonors.filter((donor) =>
-      selectedGroup.donor_ids.includes(extractId(donor._id)),
-    );
+    if (selectedGroup != null) {
+      console.log(selectedGroup);
+      const groupDonors = donors.filter((donor) =>
+        selectedGroup.donor_ids.includes(extractId(donor._id)),
+      );
 
-    // Filter out duplicates by comparing with existing rows
-    const newRows = groupDonors.reduce((accumulator: RowItem[], donor) => {
-      const existingRow = rows.find((row) => row.id === extractId(donor._id));
-      if (!existingRow) {
-        const newItem: RowItem = {
-          id: extractId(donor._id),
-          contact_name: donor.contact_name,
-          contact_email: donor.contact_email,
-        };
-        accumulator.push(newItem);
-      }
-      return accumulator;
-    }, []);
+      // Filter out duplicates by comparing with existing rows
+      const newRows = groupDonors.reduce((accumulator: RowItem[], donor) => {
+        const existingRow = rows.find((row) => row.id === extractId(donor._id));
+        if (!existingRow) {
+          const newItem: RowItem = {
+            id: extractId(donor._id),
+            contact_name: donor.contact_name,
+            contact_email: donor.contact_email,
+          };
+          accumulator.push(newItem);
+        }
+        return accumulator;
+      }, []);
 
-    // Update rows state with new rows
-    setRows((prevRows) => [...prevRows, ...newRows]);
+      // Update rows state with new rows
+      setRows((prevRows) => [...prevRows, ...newRows]);
+    }
+    setGroupSearchValue(null);
   };
 
-  // Function to handle adding a group
+
   const handleGroupChange = (
     event: React.SyntheticEvent,
-    value: { group_name: string; donor_ids: string[] } | null,
+    value: IGroup | null,
   ) => {
     if (value) {
-      setRows([]);
-      addGroupItem(value); // Add members of the selected group to the table
-      // Clear the Autocomplete input after adding the group members
-      setGroupSearchValue(null);
+      setSelectedGroup(value);
     }
   };
 
@@ -286,8 +288,52 @@ function CommunicationsPage() {
     setRows([]);
   };
 
+  const copyEmails = () => {
+    rows.forEach((row) => 
+      console.log(row.contact_email)
+    );
+  };
+
+
   const handleRemovePerson = (idToRemove: string) => {
     setRows((prevRows) => prevRows.filter((row) => row.id !== idToRemove));
+  };
+
+  function formatDateString(dateString: string): string {
+    if (dateString) {
+      const date = new Date(dateString);
+      const formattedDate = date.toISOString().slice(0, 10);
+      return formattedDate;
+    }
+    return '';
+  }
+
+  function handleAddUnackDonation(selectedName: string, selectedEmail: string, selectedId: string) {
+    if (selectedId) {
+      const selectedPerson = donors.find(
+        (person) => extractId(person._id) === selectedId,
+      );
+      if (selectedPerson) {
+        const existingRow = rows.find(
+          (row) => row.id === extractId(selectedPerson._id),
+        );
+        if (existingRow) {
+          return;
+        }
+        const newItem: RowItem = {
+          id: extractId(selectedPerson._id),
+          contact_name: selectedPerson.contact_name,
+          contact_email: selectedPerson.contact_email,
+        };
+        setRows((prevRows: RowItem[]) => [...prevRows, newItem]);
+      }
+    }
+  }
+  const handleFilteredDonors = (filteredDonors: DonorInfo[]) => {
+    console.log('Received filtered donors:', filteredDonors);
+    filteredDonors.forEach((donor: DonorInfo) => {
+      handleAddUnackDonation(donor.name, donor.email, donor._id);
+    })
   };
 
   return (
@@ -346,25 +392,17 @@ function CommunicationsPage() {
           Email Unacknowledged Donations
         </Button>
 
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          endIcon={<ArrowForwardIcon />}
-          fullWidth
-          sx={{ marginBottom: '10px' }}
-          style={{ justifyContent: 'flex-start' }}
-        >
-          Search All Donors & Sponsors
-        </Button>
+        <SearchDonorsButton onConfirm={handleFilteredDonors} />
         <Button
           variant="contained"
           color="inherit"
           sx={{ marginBottom: '5px' }}
           fullWidth
+          onClick={handleGroupModalOpen}
         >
           Add / Edit Groups
         </Button>
+        <AddEditGroupsModal open={editGroupModalOpen} onClose={handleGroupModalClose} />
         <Stack
           spacing={{ xs: 2 }}
           direction="row"
@@ -387,7 +425,7 @@ function CommunicationsPage() {
             variant="contained"
             color="primary"
             onClick={() => {
-              addItem(); // testing for now
+              addGroupItem();
             }}
             sx={{ flexGrow: 1 }}
           >
@@ -447,6 +485,7 @@ function CommunicationsPage() {
             Clear
           </Button>
           <Button
+            onClick={copyEmails}
             variant="contained"
             color="primary"
             size="large"
@@ -464,22 +503,34 @@ function CommunicationsPage() {
         aria-describedby="Email Unacknowledged Donations Modal"
       >
         <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2">
-            Email Unacknowledged Donations
+          <Typography variant="h6" component="h6">
+            Contact Unacknowledged Donations
           </Typography>
           {unacknowledgedDonations.map((donation) => (
-            <Box key={donation._id} sx={{ border: 1, p: 2, my: 1 }}>
-              <Typography variant="body1">
-                Donation ID: {donation._id}
-              </Typography>
+            <Box key={donation._id} 
+              sx={{
+                p: 2,
+                my: 1,
+                borderRadius: 2,
+                boxShadow: 3,
+              }}>
               <Typography variant="body1">Amount: {donation.amount}</Typography>
-              <Typography variant="body1">Date: {donation.date}</Typography>
+              <Typography variant="body1">Date: {formatDateString(donation.date) || 'N/A'}</Typography>
               <Typography variant="body1">
                 Donor Name: {donation.donorName}
               </Typography>
               <Typography variant="body1">
                 Donor Email: {donation.donorEmail}
               </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                style={{ marginTop: '10px' }} 
+                onClick={() => handleAddUnackDonation(donation.donorName, donation.donorEmail, donation.donorId)}
+              >
+                Select
+              </Button >
             </Box>
           ))}
           <Button onClick={handleUnackDonoModalClose}>Close</Button>

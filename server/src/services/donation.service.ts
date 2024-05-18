@@ -47,12 +47,12 @@ const acknowledgeDonation = async (id: string) => {
 };
 
 const editDonationById = async (
-  donationId: string,
+  _id: string,
   newDonationInfo: IDonation,
 ) => {
   try {
     const donation = await Donation.updateOne(
-      { donationId },
+      { _id },
       newDonationInfo,
     ).exec();
     return donation;

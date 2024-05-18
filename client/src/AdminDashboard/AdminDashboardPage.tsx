@@ -14,8 +14,10 @@ function AdminDashboardPage() {
       <Grid item>
         <Typography variant="h2">Welcome to the Admin Dashboard</Typography>
       </Grid>
-      <Grid item container width="60vw" justifyContent="flex-end">
-        <InviteUserButton />
+      <Grid item container width="60vw" justifyContent="flex-end" spacing={2}>
+        <Grid item>
+          <InviteUserButton />
+        </Grid>
       </Grid>
       <Grid item>
         <div style={{ height: '60vh', width: '60vw' }}>

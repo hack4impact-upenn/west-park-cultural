@@ -11,7 +11,7 @@ const DonationSchema = new mongoose.Schema({
     enum: ['mail check', 'credit', 'paypal', 'other'],
     required: true,
   },
-  year: {
+  grant_year: {
     type: String,
     enum: ['multi-year', 'single-year'],
     required: false,
@@ -45,7 +45,7 @@ interface IDonation extends mongoose.Document {
   _id: string;
   type: string;
   payment_type: string;
-  year: string;
+  grant_year: string;
   date: Date;
   amount: number;
   acknowledged: boolean;
