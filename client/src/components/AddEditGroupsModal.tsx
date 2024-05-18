@@ -18,6 +18,7 @@ import {
   Button,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useData } from '../util/api';
 
 interface Group {
   _id: string;
@@ -145,17 +146,27 @@ const updateGroupDonorsAPI = (groupId: string, donorIds: string[]): Promise<void
 
 export default function AddEditGroupsModal() {
   const [open, setOpen] = useState(true);
-  const [groups, setGroups] = useState<Group[]>(initialGroups);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedDonors, setSelectedDonors] = useState<Donor[]>([]);
   const [unselectedDonors, setUnselectedDonors] = useState<Donor[]>([]);
   const [selectedDonorName, setSelectedDonorName] = useState<string | null>(null);
 
+  const group = useData(`group/all`);
+  const donors = useData(`donor/all`);
+
   useEffect(() => {
-    fetchDonorsFromAPI().then((donors) => {
-      setUnselectedDonors(donors);
-    });
-  }, []);
+    const data = donors?.data || [];
+    setUnselectedDonors(data);
+    console.log(data);
+  }, [donors]);
+
+  useEffect(() => {
+    const data = group?.data || [];
+    setGroups(data);
+    console.log(data);
+  }, [group]);
+
 
   useEffect(() => {
     if (selectedGroup) {
@@ -205,7 +216,7 @@ export default function AddEditGroupsModal() {
   const handleSubmit = () => {
     if (selectedGroup) {
       const donorIds = selectedDonors.map((donor) => donor._id);
-      updateGroupDonorsAPI(selectedGroup._id, donorIds)
+      updateGroupDonorsAPI(selectedGroup._id, donorIds) //update group
         .then(() => {
           setSelectedDonorName(''); // Reset selected donor value after submit
         })
