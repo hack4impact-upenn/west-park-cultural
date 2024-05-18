@@ -1,26 +1,58 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import BoxWithShadow from './BoxWithShadow'; // Assuming you have exported it from the file above
+import IDonor from '../util/types/donor';
 
-function ProfileInfo() {
+interface ProfileInfoProps {
+  donatorData: IDonor | null;
+}
+
+function ProfileInfo({ donatorData }: ProfileInfoProps) {
   return (
-    <BoxWithShadow>
+    <Box
+      sx={{
+        maxWidth: 400,
+        maxHeight: 300,
+        overflow: 'auto',
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        borderRadius: 2,
+        p: 2,
+      }}
+    >
       <Typography variant="h4" gutterBottom>
-        John Smith
+        {donatorData?.contact_name}
+      </Typography>
+      <Typography
+        variant="body1"
+        sx={{ fontWeight: 600, color: 'grey' }}
+        gutterBottom
+      >
+        {donatorData?.donor_group}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        .Individual
+        Email address: {donatorData?.contact_email}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Email address: lsyslc0307@gmail.com
+        Phone number: {donatorData?.contact_phone}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Phone number: 609-297-6873
+        Address: {donatorData?.contact_address}
       </Typography>
-      <Typography variant="body1" gutterBottom>
-        Address: Spruce street, 19104
-      </Typography>
-    </BoxWithShadow>
+      {donatorData?.donor_group !== 'Individual' &&
+      donatorData?.donor_group !== 'Board Member' ? (
+        <>
+          <Typography variant="body1" gutterBottom>
+            Org Name: {donatorData?.org_name}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            Org Email: {donatorData?.org_email}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            Org Address: {donatorData?.org_address}
+          </Typography>
+        </>
+      ) : null}
+    </Box>
   );
 }
 

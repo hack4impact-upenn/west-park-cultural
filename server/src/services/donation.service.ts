@@ -1,13 +1,3 @@
-
-import { Router } from 'express';
-import { isAuthenticated } from '../controllers/auth.middleware';
-import { isAdmin } from '../controllers/admin.middleware';
-import {
-  getAllDonations,
-  getDonation,
-  getDonorDonation,
-} from '../controllers/donation.controller';
-
 import { Donation, IDonation } from '../models/donation.model';
 
 const getAll = async () => {
@@ -56,6 +46,30 @@ const acknowledgeDonation = async (id: string) => {
   return null;
 };
 
+const editDonationById = async (
+  donationId: string,
+  newDonationInfo: IDonation,
+) => {
+  try {
+    const donation = await Donation.updateOne(
+      { donationId },
+      newDonationInfo,
+    ).exec();
+    return donation;
+  } catch (error) {
+    throw new Error('Error updating donation');
+  }
+};
+
+const deleteDonationById = async (id: string) => {
+  try {
+    const donation = await Donation.findByIdAndDelete(id).exec();
+    return donation;
+  } catch (error) {
+    throw new Error('Error deleting lesson');
+  }
+};
+
 export {
   getAll,
   getAllDonationsOfTypeDonation,
@@ -65,4 +79,6 @@ export {
   getAllDonationsbyDonorId,
   createDonation,
   acknowledgeDonation,
+  editDonationById,
+  deleteDonationById,
 };

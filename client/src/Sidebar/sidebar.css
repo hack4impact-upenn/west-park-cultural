@@ -1,0 +1,127 @@
+.overallwrapper {
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+}
+
+.sidebar-parent-flex {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    flex-direction: row;
+}
+
+.sidewrapper {
+    width: 275px;
+    min-height: 100%;
+    background-color: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    overflow-y: auto;
+    position: relative
+}
+
+.main-content {
+    width: calc(100% - 275px);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sidebar-inner {
+    min-height: 100%;
+}
+
+.sidebar .abs-wrapper {
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    width: 100%;
+    padding: 10px 10px 10px 10px;
+    /* padding-left: inherit;
+    padding-right: inherit; */
+    right: 0;
+}
+.sidebar .imgwrapper {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+.imglogo {
+    height:90px;
+}
+
+.sect-header {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 10px 0;
+}
+
+.sidebar .sidebar-direction-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 20px 5px 20px 5px;
+}
+
+.sidebar .sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    color: #495057;
+    text-decoration: none;
+    font-size: 1.3em;
+    font-weight: 700;
+    transition: 0.3s;
+    padding-left: 15px;
+    padding-right: 5px;
+    border-radius: 10px;
+}
+
+.sidebar .sidebar-link:hover {
+    /* background-color: #5c9821; */
+    background-color: green;
+    color: white;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+
+
+.sidebar .sidebar-menu {
+    /* display: flex;
+    bottom: 0;
+    top: 0;
+    position: absolute;
+    flex-direction: column;
+    justify-content: space-between; */
+}
+
+.sidebar .sidebar-bottom-links {
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar .sidebar-log-out {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    color: #495057;
+    text-decoration: none;
+    font-size: 1.3em;
+    font-weight: 700;
+    transition: 0.3s;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+
+}
+
+.sidebar .sidebar-log-out:hover {
+    background-color: green;
+    color: white;
+    transition: 0.3s;
+    cursor: pointer;
+    
+}
+
