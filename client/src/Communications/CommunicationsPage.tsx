@@ -11,7 +11,6 @@
 import React, { useEffect, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import axios from 'axios';
-
 import {
   Typography,
   Grid,
@@ -30,7 +29,7 @@ import {
   TableHead,
   Link,
 } from '@mui/material';
-
+import AddEditGroupsModal from '../components/AddEditGroupsModal';
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import { useData } from '../util/api';
@@ -137,10 +136,20 @@ type RowItem = {
 
 function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
+  const [editGroupModalOpen, setEditGroupModalOpen] = React.useState(false);
   const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
     [],
   );
+  const [groupSearchValue, setGroupSearchValue] = useState(null);
+  const [rows, setRows] = useState<RowItem[]>([]);
+  const [donors, setDonors] = useState<IDonor[]>([]);
+  const [groups, setGroups] = useState<IGroup[]>([]);
 
+  // Fetch data using custom hook
+  const allDonors: any | null = useData('donor/all');
+  const allGroups: any | null = useData('group/all');
+
+  
   const handleUnackDonoModalOpen = async () => {
     try {
       console.log('opened');
@@ -180,18 +189,14 @@ function CommunicationsPage() {
     setUnackDonoModalOpen(true);
   };
   const handleUnackDonoModalClose = () => setUnackDonoModalOpen(false);
-  const [groupSearchValue, setGroupSearchValue] = useState(null);
 
-  const [rows, setRows] = useState<RowItem[]>([]);
-  const [donors, setDonors] = useState<IDonor[]>([]);
-  const [groups, setGroups] = useState<IGroup[]>([]);
+  const handleGroupModalOpen = () => {
+    setEditGroupModalOpen(true);
+  };
 
-  // Fetch data using custom hook
-  const allDonors: any | null = useData('donor/all');
-  const allGroups: any | null = useData('group/all');
-
-  // const allDonors: ResolvedReq<IDonor[]> | null = useData('donor/all');
-  // const allGroups: ResolvedReq<IGroup[]> | null = useData('group/all');
+  const handleGroupModalClose = () => {
+    setEditGroupModalOpen(false);
+  };
 
   useEffect(() => {
     if (allDonors?.data) {
@@ -362,9 +367,11 @@ function CommunicationsPage() {
           color="inherit"
           sx={{ marginBottom: '5px' }}
           fullWidth
+          onClick={handleGroupModalOpen}
         >
           Add / Edit Groups
         </Button>
+        <AddEditGroupsModal open={editGroupModalOpen} onClose={handleGroupModalClose} />
         <Stack
           spacing={{ xs: 2 }}
           direction="row"

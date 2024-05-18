@@ -16,4 +16,14 @@ const getCommunicationGroupById = async (id: string) => {
   return group;
 };
 
-export { createCommunicationGroup, getCommunicationGroupById, getAllGroups };
+const editGroupById = async (_id: string, newGroupInfo: IGroup) => {
+  try {
+    const group = await Group.updateOne({ _id }, newGroupInfo).exec();
+    return group;
+  } catch (error) {
+    throw new Error('Error updating group');
+  }
+};
+
+
+export { createCommunicationGroup, getCommunicationGroupById, getAllGroups, editGroupById};

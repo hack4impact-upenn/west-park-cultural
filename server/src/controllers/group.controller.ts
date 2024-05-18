@@ -8,6 +8,7 @@ import {
   createCommunicationGroup,
   getCommunicationGroupById,
   getAllGroups,
+  editGroupById,
 } from '../services/group.service';
 
 const getAllGroupsController = async (
@@ -60,8 +61,24 @@ const getCommunicationGroupByIdController = async (
     });
 };
 
+const editGroupController = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  // eslint-disable-next-line camelcase
+  const { _id, ...restOfBody } = req.body;
+  editGroupById(_id, restOfBody)
+    .then((response) => res.status(StatusCode.OK).send(response))
+    .catch((e: any) => {
+      console.log(e);
+      next(ApiError.internal('Failed to edit group.'));
+    });
+};
+
 export {
   createCommunicationGroupController,
   getCommunicationGroupByIdController,
   getAllGroupsController,
+  editGroupController,
 };
