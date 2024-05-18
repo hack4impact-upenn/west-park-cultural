@@ -138,6 +138,7 @@ function CommunicationsPage() {
     [],
   );
   const [groupSearchValue, setGroupSearchValue] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState<IGroup | null>(null);
   const [rows, setRows] = useState<RowItem[]>([]);
 
   const [donors, setDonors] = useState<IDonor[]>([]);
@@ -147,7 +148,6 @@ function CommunicationsPage() {
   const allDonors: any | null = useData('donor/all');
   const allDonations: any | null = useData('donation/all');
   const allGroups: any | null = useData('group/all');
-
   
   const handleUnackDonoModalOpen = async () => {
     try {
@@ -246,45 +246,54 @@ function CommunicationsPage() {
     setRows((prevRows) => [...prevRows, newItem]);
   };
 
-  const addGroupItem = (selectedGroup: any) => {
+  const addGroupItem = () => {
     // Retrieve the donors associated with the selected group
-    const groupDonors = testDonors.filter((donor) =>
-      selectedGroup.donor_ids.includes(extractId(donor._id)),
-    );
+    if (selectedGroup != null) {
+      console.log(selectedGroup);
+      const groupDonors = donors.filter((donor) =>
+        selectedGroup.donor_ids.includes(extractId(donor._id)),
+      );
 
-    // Filter out duplicates by comparing with existing rows
-    const newRows = groupDonors.reduce((accumulator: RowItem[], donor) => {
-      const existingRow = rows.find((row) => row.id === extractId(donor._id));
-      if (!existingRow) {
-        const newItem: RowItem = {
-          id: extractId(donor._id),
-          contact_name: donor.contact_name,
-          contact_email: donor.contact_email,
-        };
-        accumulator.push(newItem);
-      }
-      return accumulator;
-    }, []);
+      // Filter out duplicates by comparing with existing rows
+      const newRows = groupDonors.reduce((accumulator: RowItem[], donor) => {
+        const existingRow = rows.find((row) => row.id === extractId(donor._id));
+        if (!existingRow) {
+          const newItem: RowItem = {
+            id: extractId(donor._id),
+            contact_name: donor.contact_name,
+            contact_email: donor.contact_email,
+          };
+          accumulator.push(newItem);
+        }
+        return accumulator;
+      }, []);
 
-    // Update rows state with new rows
-    setRows((prevRows) => [...prevRows, ...newRows]);
+      // Update rows state with new rows
+      setRows((prevRows) => [...prevRows, ...newRows]);
+    }
+    setGroupSearchValue(null);
   };
 
-  // Function to handle adding a group
+
   const handleGroupChange = (
     event: React.SyntheticEvent,
-    value: { group_name: string; donor_ids: string[] } | null,
+    value: IGroup | null,
   ) => {
     if (value) {
-      setRows([]);
-      addGroupItem(value); 
-      setGroupSearchValue(null);
+      setSelectedGroup(value);
     }
   };
 
   const clearItems = () => {
     setRows([]);
   };
+
+  const copyEmails = () => {
+    rows.forEach((row) => 
+      console.log(row.contact_email)
+    );
+  };
+
 
   const handleRemovePerson = (idToRemove: string) => {
     setRows((prevRows) => prevRows.filter((row) => row.id !== idToRemove));
@@ -416,7 +425,7 @@ function CommunicationsPage() {
             variant="contained"
             color="primary"
             onClick={() => {
-              addItem(); // testing for now
+              addGroupItem();
             }}
             sx={{ flexGrow: 1 }}
           >
@@ -476,6 +485,7 @@ function CommunicationsPage() {
             Clear
           </Button>
           <Button
+            onClick={copyEmails}
             variant="contained"
             color="primary"
             size="large"
