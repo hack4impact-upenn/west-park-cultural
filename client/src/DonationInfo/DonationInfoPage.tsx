@@ -51,7 +51,7 @@ const style = {
   overflow: 'scroll',
   height: '80%',
 };
-  
+
 function BasicTable({
   customRows,
 }: {
@@ -170,7 +170,6 @@ function DonationInfoPage() {
 
   useEffect(() => {
     if (donationData) {
-
       const updatedCustomRows = [
         {
           label: 'Donation Amount',

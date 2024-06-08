@@ -1,6 +1,7 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import SearchDonorsButton from '../components/buttons/SearchDonorsButton';
 import axios from 'axios';
 import {
   Typography,
@@ -20,6 +21,7 @@ import {
   TableHead,
   Link,
 } from '@mui/material';
+import SearchDonorsButton from '../components/buttons/SearchDonorsButton';
 import AddEditGroupsModal from '../components/AddEditGroupsModal';
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
@@ -126,7 +128,7 @@ type RowItem = {
 };
 
 interface DonorInfo {
-  email: string
+  email: string;
   name: string;
   _id: string;
 }
@@ -148,7 +150,7 @@ function CommunicationsPage() {
   const allDonors: any | null = useData('donor/all');
   const allDonations: any | null = useData('donation/all');
   const allGroups: any | null = useData('group/all');
-  
+
   const handleUnackDonoModalOpen = async () => {
     try {
       console.log('opened');
@@ -164,6 +166,7 @@ function CommunicationsPage() {
             return;
           }
           const donorInfo = donorInfoResponse.data;
+          // eslint-disable-next-line consistent-return
           return {
             ...donation,
             donorName: donorInfo.contact_name,
@@ -274,7 +277,6 @@ function CommunicationsPage() {
     setGroupSearchValue(null);
   };
 
-
   const handleGroupChange = (
     event: React.SyntheticEvent,
     value: IGroup | null,
@@ -289,11 +291,8 @@ function CommunicationsPage() {
   };
 
   const copyEmails = () => {
-    rows.forEach((row) => 
-      console.log(row.contact_email)
-    );
+    rows.forEach((row) => console.log(row.contact_email));
   };
-
 
   const handleRemovePerson = (idToRemove: string) => {
     setRows((prevRows) => prevRows.filter((row) => row.id !== idToRemove));
@@ -308,7 +307,11 @@ function CommunicationsPage() {
     return '';
   }
 
-  function handleAddUnackDonation(selectedName: string, selectedEmail: string, selectedId: string) {
+  function handleAddUnackDonation(
+    selectedName: string,
+    selectedEmail: string,
+    selectedId: string,
+  ) {
     if (selectedId) {
       const selectedPerson = donors.find(
         (person) => extractId(person._id) === selectedId,
@@ -333,7 +336,7 @@ function CommunicationsPage() {
     console.log('Received filtered donors:', filteredDonors);
     filteredDonors.forEach((donor: DonorInfo) => {
       handleAddUnackDonation(donor.name, donor.email, donor._id);
-    })
+    });
   };
 
   return (
@@ -368,6 +371,7 @@ function CommunicationsPage() {
           sx={{ width: 300, marginBottom: '15px' }}
           onChange={handleNameChange}
           renderInput={(params) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
             <TextField {...params} label="Search Name" />
           )}
         />
@@ -402,7 +406,10 @@ function CommunicationsPage() {
         >
           Add / Edit Groups
         </Button>
-        <AddEditGroupsModal open={editGroupModalOpen} onClose={handleGroupModalClose} />
+        <AddEditGroupsModal
+          open={editGroupModalOpen}
+          onClose={handleGroupModalClose}
+        />
         <Stack
           spacing={{ xs: 2 }}
           direction="row"
@@ -418,6 +425,7 @@ function CommunicationsPage() {
             value={groupSearchValue}
             onChange={handleGroupChange}
             renderInput={(params) => (
+              // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="Search Name" />
             )}
           />
@@ -507,15 +515,19 @@ function CommunicationsPage() {
             Contact Unacknowledged Donations
           </Typography>
           {unacknowledgedDonations.map((donation) => (
-            <Box key={donation._id} 
+            <Box
+              key={donation._id}
               sx={{
                 p: 2,
                 my: 1,
                 borderRadius: 2,
                 boxShadow: 3,
-              }}>
+              }}
+            >
               <Typography variant="body1">Amount: {donation.amount}</Typography>
-              <Typography variant="body1">Date: {formatDateString(donation.date) || 'N/A'}</Typography>
+              <Typography variant="body1">
+                Date: {formatDateString(donation.date) || 'N/A'}
+              </Typography>
               <Typography variant="body1">
                 Donor Name: {donation.donorName}
               </Typography>
@@ -526,11 +538,17 @@ function CommunicationsPage() {
                 variant="contained"
                 color="primary"
                 size="medium"
-                style={{ marginTop: '10px' }} 
-                onClick={() => handleAddUnackDonation(donation.donorName, donation.donorEmail, donation.donorId)}
+                style={{ marginTop: '10px' }}
+                onClick={() =>
+                  handleAddUnackDonation(
+                    donation.donorName,
+                    donation.donorEmail,
+                    donation.donorId,
+                  )
+                }
               >
                 Select
-              </Button >
+              </Button>
             </Box>
           ))}
           <Button onClick={handleUnackDonoModalClose}>Close</Button>

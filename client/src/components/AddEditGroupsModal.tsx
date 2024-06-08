@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -56,18 +57,20 @@ const updateGroupDonorsAPI = (selectedGroup: Group, donorIds: string[]) => {
     donor_ids: donorIds,
   };
   console.log(updatedGroup);
-  
+
   return postData('group/edit', updatedGroup);
 };
 
-export default function AddEditGroupsModal({ open, onClose }) {
+export default function AddEditGroupsModal({ open, onClose }: any) {
   // const [open, setOpen] = React.useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedDonors, setSelectedDonors] = useState<Donor[]>([]);
   const [unselectedDonors, setUnselectedDonors] = useState<Donor[]>([]);
   const [allDonors, setAllDonors] = useState<Donor[]>([]);
-  const [selectedDonorName, setSelectedDonorName] = useState<string | null>(null);
+  const [selectedDonorName, setSelectedDonorName] = useState<string | null>(
+    null,
+  );
   const [isNewGroup, setIsNewGroup] = useState(false);
 
   const group = useData(`group/all`);
@@ -86,29 +89,30 @@ export default function AddEditGroupsModal({ open, onClose }) {
     // console.log(data);
   }, [group]);
 
-
   useEffect(() => {
     if (selectedGroup) {
       const selected = allDonors.filter((donor) =>
-        selectedGroup.donor_ids.includes(donor._id),
+        (selectedGroup.donor_ids || []).includes(donor._id),
       );
-      
+
       const unselected = allDonors.filter(
-        (donor) => !selectedGroup.donor_ids.includes(donor._id),
+        (donor) => !(selectedGroup.donor_ids || []).includes(donor._id),
       );
-      
+
       setSelectedDonors(selected);
       setUnselectedDonors(unselected);
-
     } else {
       setSelectedDonors([]);
       setUnselectedDonors(allDonors);
     }
     setSelectedDonorName(''); // Reset selected donor value when group changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGroup]);
 
   const handleAddDonor = () => {
-    const donor = unselectedDonors.find((d) => d.contact_name === selectedDonorName);
+    const donor = unselectedDonors.find(
+      (d) => d.contact_name === selectedDonorName,
+    );
     if (donor) {
       setSelectedDonors([...selectedDonors, donor]);
       setUnselectedDonors(unselectedDonors.filter((d) => d._id !== donor._id));
@@ -126,7 +130,7 @@ export default function AddEditGroupsModal({ open, onClose }) {
       // console.log(selectedGroup);
       const donorIds = selectedDonors.map((donor) => donor._id);
 
-      updateGroupDonorsAPI(selectedGroup, donorIds) //update group
+      updateGroupDonorsAPI(selectedGroup, donorIds) // update group
         .then(() => {
           setSelectedDonorName(''); // Reset selected donor value after submit
         })
@@ -152,7 +156,7 @@ export default function AddEditGroupsModal({ open, onClose }) {
         })
         .catch((error) => {
           console.log(error);
-      });  
+        });
     }
   };
 
@@ -169,7 +173,7 @@ export default function AddEditGroupsModal({ open, onClose }) {
         </IconButton>
       </DialogTitle>
       <DialogContent>
-      <Autocomplete
+        <Autocomplete
           value={selectedGroup}
           onChange={(event, newValue) => {
             setIsNewGroup(false);
@@ -191,7 +195,9 @@ export default function AddEditGroupsModal({ open, onClose }) {
 
             const { inputValue } = params;
             // Suggest the creation of a new value
-            const isExisting = options.some((option) => inputValue === option.group_name);
+            const isExisting = options.some(
+              (option) => inputValue === option.group_name,
+            );
             if (inputValue !== '' && !isExisting) {
               filtered.push({
                 inputValue,
@@ -213,18 +219,22 @@ export default function AddEditGroupsModal({ open, onClose }) {
             }
             // Add "xxx" option created dynamically
             if (option.title) {
-              return option.group_name;
+              return option.group_name ?? '';
             }
             // Regular option
             return option.group_name || '';
           }}
           renderOption={(props, option) => (
-            <li {...props}>{option.title ? option.title : option.group_name}</li>
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <li {...props}>
+              {option.title ? option.title : option.group_name}
+            </li>
           )}
           sx={{ width: 300 }}
           freeSolo
           renderInput={(params) => (
             <TextField
+              // eslint-disable-next-line react/jsx-props-no-spreading
               {...params}
               label="Group"
               required
@@ -239,6 +249,7 @@ export default function AddEditGroupsModal({ open, onClose }) {
             freeSolo
             options={unselectedDonors.map((option) => option.contact_name)}
             renderInput={(params) => (
+              // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="Donor / Sponsor" margin="normal" />
             )}
             value={selectedDonorName}

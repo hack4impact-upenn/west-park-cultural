@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -85,7 +86,7 @@ function SearchDonorsButton({ onConfirm }: SearchDonorsButtonProps) {
     setEndTimePeriod(dayjs());
     setOpen(false);
 
-    //add the filtered emails to Communication Page
+    // add the filtered emails to Communication Page
     onConfirm(filteredDonors);
   };
 
@@ -125,13 +126,13 @@ function SearchDonorsButton({ onConfirm }: SearchDonorsButtonProps) {
           donationDate.isSame(startTimePeriod)) &&
         (donationDate.isBefore(endTimePeriod) ||
           donationDate.isSame(endTimePeriod));
-      //initialize all true
+      // initialize all true
       let matchesYearType = true;
       let matchesPurpose = true;
       let matchesAmount = true;
-      
-      //if filters are non-empty
-      if (campaign !== null && campaign!== undefined && campaign!== '') {
+
+      // if filters are non-empty
+      if (campaign !== null && campaign !== undefined && campaign !== '') {
         matchesPurpose = donation.purpose_id === campaign;
       }
 
@@ -159,18 +160,32 @@ function SearchDonorsButton({ onConfirm }: SearchDonorsButtonProps) {
     console.log('FILTERED DONATIONS');
     console.log(filteredDonations);
 
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const filteredEmails: string[] = [];
     const donorInfoArray: DonorInfo[] = [];
 
     filteredDonations.forEach((donation) => {
-      const donor = donorsData.find((currDonor) => currDonor._id === donation.donor_id);
+      const donor = donorsData.find(
+        (currDonor) => currDonor._id === donation.donor_id,
+      );
       if (donor) {
         const { _id, contact_name, contact_email } = donor;
         const existingDonor = donorInfoArray.find((info) => info._id === _id);
-    
+
         if (!existingDonor) {
-          if (_id != undefined && contact_name != undefined && contact_email != undefined) {
-            donorInfoArray.push({ _id, name: contact_name, email: contact_email });
+          if (
+            // eslint-disable-next-line eqeqeq
+            _id != undefined &&
+            // eslint-disable-next-line eqeqeq
+            contact_name != undefined &&
+            // eslint-disable-next-line eqeqeq
+            contact_email != undefined
+          ) {
+            donorInfoArray.push({
+              _id,
+              name: contact_name,
+              email: contact_email,
+            });
             filteredEmails.push(contact_email);
           }
         }
@@ -196,19 +211,22 @@ function SearchDonorsButton({ onConfirm }: SearchDonorsButtonProps) {
   return (
     <div style={{ marginBottom: '10px' }}>
       <Button
-          variant="contained"
-          color="primary"
-          onClick={handleClickOpen}
-          size="large"
-          endIcon={<ArrowForwardIcon />}
-          fullWidth
-          sx={{ marginBottom: '10px' }}
-          style={{ justifyContent: 'flex-start' }}
-        >
-          Search Donor
-        </Button>
+        variant="contained"
+        color="primary"
+        onClick={handleClickOpen}
+        size="large"
+        endIcon={<ArrowForwardIcon />}
+        fullWidth
+        sx={{ marginBottom: '10px' }}
+        style={{ justifyContent: 'flex-start' }}
+      >
+        Search Donor
+      </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>Search All {donationType.charAt(0).toUpperCase() + donationType.slice(1)}</DialogTitle>
+        <DialogTitle>
+          Search All{' '}
+          {donationType.charAt(0).toUpperCase() + donationType.slice(1)}
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ marginBottom: 2 }}>
             <ToggleButtonGroup
@@ -364,7 +382,7 @@ interface PurposeType {
 }
 
 interface DonorInfo {
-  email: string
+  email: string;
   name: string;
   _id: string;
 }

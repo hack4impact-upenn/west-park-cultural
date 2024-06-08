@@ -14,7 +14,8 @@ function DateInfoBox({ donatorData }: ProfileInfoProps) {
       const month = (time.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so add 1
       const day = time.getDate().toString().padStart(2, '0');
       return `${year}-${month}-${day}`;
-    } if (typeof time === 'string') {
+    }
+    if (typeof time === 'string') {
       const date = new Date(time);
       const year = date.getFullYear().toString();
       const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so add 1
@@ -23,7 +24,7 @@ function DateInfoBox({ donatorData }: ProfileInfoProps) {
     }
     return '';
   };
-  
+
   return (
     <Box
       sx={{

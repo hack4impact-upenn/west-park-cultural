@@ -17,7 +17,6 @@ interface ProfileInfoProps {
 }
 
 function DonorNoteBox({ donatorData }: ProfileInfoProps) {
-
   const [open, setOpen] = useState(false); // State to manage dialog visibility
   const [noteText, setNoteText] = useState<string>(''); // State to capture note text
 
@@ -37,12 +36,12 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
       // eslint-disable-next-line no-underscore-dangle
       const data = { id: donatorData._id, note: noteText };
       postData('donor/note', data)
-      .then((response2) => {
-        console.log(response2);
-    })
-    .catch((error) => {
-        console.log(error);
-    });
+        .then((response2) => {
+          console.log(response2);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     handleClose(); // Close dialog after saving note
   };

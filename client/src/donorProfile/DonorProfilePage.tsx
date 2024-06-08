@@ -69,7 +69,8 @@ function DonorProfilePage() {
   const handleConfirm = () => {
     // update donor
     const updateDonor = {
-      donor_id: donatorData._id,
+      // eslint-disable-next-line no-underscore-dangle
+      donor_id: donatorData ? donatorData._id : null,
       contact_name: name,
       contact_email: email,
       contact_address: address,

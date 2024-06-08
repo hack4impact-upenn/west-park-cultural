@@ -84,10 +84,10 @@ function App() {
                       {/* Routes accessed only if user is authenticated */}
                       <Route element={<ProtectedRoutesWrapper />}>
                         <Route path="/home" element={<HomePage />} />
-                         <Route
-                            path="/donationInfo"
-                            element={<DonationInfoPage />}
-                          />
+                        <Route
+                          path="/donationInfo"
+                          element={<DonationInfoPage />}
+                        />
                         <Route path="/reports" element={<ReportsPage />} />
                         <Route
                           path="/communications"
