@@ -74,6 +74,7 @@ const theme = createTheme({
           fontFamily: 'Hind Guntur',
           fontWeight: 'bold !important',
           fontSize: '25px',
+          color: COLORS.green,
         },
       },
     },

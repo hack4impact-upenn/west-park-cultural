@@ -11,7 +11,7 @@ const DonationSchema = new mongoose.Schema({
     enum: ['mail check', 'credit', 'paypal', 'other'],
     required: true,
   },
-  year: {
+  grant_year: {
     type: String,
     enum: ['multi-year', 'single-year'],
     required: false,
@@ -26,22 +26,14 @@ const DonationSchema = new mongoose.Schema({
   },
   acknowledged: {
     type: Boolean,
-    required: false,
+    required: true,
     default: false,
   },
-  // commented temporarily for testing donor's donation info popup
-  // (this was bugging the add new donation form)
-  // donor_id: {
-  //   type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
-  // },
-  // purpose_id: {
-  //   type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
-  // },
   donor_id: {
-    type: String,
+    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
   },
   purpose_id: {
-    type: String,
+    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
   },
   comments: {
     type: String,
@@ -53,7 +45,7 @@ interface IDonation extends mongoose.Document {
   _id: string;
   type: string;
   payment_type: string;
-  year: string;
+  grant_year: string;
   date: Date;
   amount: number;
   acknowledged: boolean;

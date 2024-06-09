@@ -41,9 +41,9 @@ function PopupPage() {
     setOpenPopup(false);
   };
 
-  const donorID = '662e7657350953c9287c543c';
+  const donorID = '65daa67d6c34e8adb9f2d2c4';
   const donations = useData(`donation/donor/${donorID}`);
-  const donor = useData(`donor/id/${donorID}`);
+  const donor = useData(`donor/${donorID}`);
   const [donorData, setDonatorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
@@ -137,7 +137,9 @@ function PopupPage() {
         // Calculate the average donation per calendar year
         const avDonationPerCalendar: BasicDonationStat = {
           amount: calendarYearDonations.length
-            ? totalCalendarYearDonationAmount / calendarYearDonations.length
+            ? +(
+                totalCalendarYearDonationAmount / calendarYearDonations.length
+              ).toFixed(2)
             : 0,
           count: calendarYearDonations.length,
         };

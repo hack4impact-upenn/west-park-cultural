@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../util/redux/hooks';
 import { useData } from '../util/api';
 import DonationsTable from '../components/tables/DonationsTable';
+import './homedashboard.css';
 
 interface BasicTableProps {
   alignment: string;
@@ -109,12 +110,13 @@ function BasicTable({ alignment }: BasicTableProps) {
   ).length;
 
   return (
-    <Box
+    <div className="basic-table">
+      {/* <Box
       border="none"
       borderRadius={4}
       p={2}
       sx={{ width: 'min(500px, 100%)' }}
-    >
+    > */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 300 }} aria-label="simple table">
           <TableBody>
@@ -132,7 +134,8 @@ function BasicTable({ alignment }: BasicTableProps) {
       <p style={{ marginTop: '16px' }}>
         There are {numUnacknowledged} unacknowledged {alignment}s.
       </p>
-    </Box>
+      {/* </Box> */}
+    </div>
   );
 }
 
@@ -145,7 +148,9 @@ function HomeDashboard() {
     event: React.MouseEvent<HTMLElement>,
     newAlignment: string,
   ) => {
-    setAlignment(newAlignment);
+    if (newAlignment) {
+      setAlignment(newAlignment);
+    }
   };
 
   function handleClick() {
@@ -154,49 +159,90 @@ function HomeDashboard() {
   }
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="flex-start"
-      marginLeft={4}
-      marginTop={2}
-      marginBottom={2}
-    >
-      <Box
+    <div className="max-width-wrapper">
+      <div className="home-dashboard">
+        <div className="home-dashboard-header">
+          <ToggleButtonGroup
+            color="primary"
+            value={alignment}
+            exclusive
+            onChange={handleChange}
+            style={{ marginTop: '16px', marginRight: '8px' }}
+            fullWidth
+          >
+            <ToggleButton value="donation">Donation</ToggleButton>
+            <ToggleButton value="sponsorship">Sponsorship</ToggleButton>
+            <ToggleButton value="grant">Grant</ToggleButton>
+          </ToggleButtonGroup>
+
+          <Button
+            onClick={() => {
+              handleClick();
+            }}
+            style={{
+              background: 'grey',
+              color: 'white',
+              marginRight: '16px',
+              width: '200px',
+              marginLeft: '100px',
+              height: '44px',
+              marginTop: '16px',
+              marginBottom: '16px',
+              boxShadow:
+                '0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)',
+            }}
+          >
+            View Report
+          </Button>
+        </div>
+        {/* <Box
         display="flex"
         flexDirection="row"
         alignItems="center"
         justifyContent="space-between" // Align items at start and end of the box
         width="100%" // Set box width to 100% of its container
         marginBottom={2}
-        paddingRight={3}
-      >
-        <ToggleButtonGroup
-          color="primary"
-          value={alignment}
-          exclusive
-          onChange={handleChange}
-        >
-          <ToggleButton value="donation">Donation</ToggleButton>
-          <ToggleButton value="sponsorship">Sponsorship</ToggleButton>
-          <ToggleButton value="grant">Grant</ToggleButton>
-        </ToggleButtonGroup>
+        marginLeft={2} // Added marginLeft to align with the left edge
+      ></Box> */}
+        <Box marginBottom={0} marginLeft={2}>
+          {/* Add a Typography for the title "Summary" */}
+          <Typography variant="h4" style={{ marginTop: '30px' }}>
+            Summary
+          </Typography>
+        </Box>
+
+        {/* Render the BasicTable component with the alignment prop */}
+        <BasicTable alignment={alignment} />
+
+        <p style={{ marginTop: '16px', marginLeft: '16px' }}>
+          There are{' '}
+          <span className="redcircle">
+            <span className="redcirclenumber">3</span>
+          </span>{' '}
+          unacknowledged {alignment}s.
+        </p>
 
         <Button
           onClick={() => {
             handleClick();
           }}
           style={{
-            background: 'grey',
+            marginLeft: '16px',
+            background: '#24a0ed',
             color: 'white',
             marginRight: '16px',
             marginTop: '16px',
             padding: '15px',
           }}
         >
-          View Report
+          Send them a message now{' '}
+          <i
+            className="fa fa-arrow-right"
+            aria-hidden="true"
+            style={{ marginLeft: '10px' }}
+          />
         </Button>
-      </Box>
+<!--   START    </Box>
 
       <Box width="100%" marginBottom={4}>
         {/* Add a Typography for the title "Summary" */}
@@ -225,7 +271,18 @@ function HomeDashboard() {
         </Typography>
         <DonationsTable alignment={alignment} />
       </Box>
-    </Box>
+    </Box> END -->
+
+        <Box marginBottom={2} marginLeft={2} marginTop={5}>
+          <Typography variant="h4" gutterBottom>
+            {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
+          </Typography>
+        </Box>
+      </div>
+    </div>
+    // <Box display="flex" flexDirection="column" alignItems="flex-start">
+
+    // </Box>
   );
 }
 

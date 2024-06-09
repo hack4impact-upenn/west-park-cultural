@@ -1,29 +1,57 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import BoxWithShadow from './BoxWithShadow'; // Assuming you have exported it from the file above
+import IDonor from '../util/types/donor';
 
-function DateInfoBox() {
+interface ProfileInfoProps {
+  donatorData: IDonor | null;
+}
+
+function DateInfoBox({ donatorData }: ProfileInfoProps) {
+  const formatDate = (time: Date | undefined | null | string): string => {
+    if (time instanceof Date) {
+      const year = time.getFullYear().toString();
+      const month = (time.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so add 1
+      const day = time.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    if (typeof time === 'string') {
+      const date = new Date(time);
+      const year = date.getFullYear().toString();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so add 1
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    return '';
+  };
+
   return (
-    <BoxWithShadow>
-      <Typography variant="body1" gutterBottom>
-        REGISTERED DATE
+    <Box
+      sx={{
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        borderRadius: 2,
+        p: 2,
+      }}
+    >
+      <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Registered Date
       </Typography>
       <Typography variant="body1" gutterBottom>
-        09/05/2023
+        {formatDate(donatorData?.registered_date)}
+      </Typography>
+      <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Recent Donation
       </Typography>
       <Typography variant="body1" gutterBottom>
-        RECENT DONATION
+        {formatDate(donatorData?.last_donation_date)}
+      </Typography>
+      <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Last Communication
       </Typography>
       <Typography variant="body1" gutterBottom>
-        10/30/2023
+        {formatDate(donatorData?.last_communication_date)}
       </Typography>
-      <Typography variant="body1" gutterBottom>
-        LAST COMMUNICATION
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        11/02/2023
-      </Typography>
-    </BoxWithShadow>
+    </Box>
   );
 }
 

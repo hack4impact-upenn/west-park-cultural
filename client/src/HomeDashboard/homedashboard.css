@@ -1,0 +1,36 @@
+.max-width-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin:auto;
+}
+
+.home-dashboard {
+    
+}
+
+.home-dashboard-header {
+    margin-left: 16px;
+    display: flex;
+    justify-content: space-between;
+    height: 60px;
+}
+
+.basic-table {
+    border: none;
+    border-radius: 4px;
+    padding: 16px;
+}
+.redcircle {
+    background-color: rgb(246, 73, 73);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    text-align: center;
+}
+
+.redcirclenumber {
+    color: white;
+    font-size: 17px;
+    display: inline-block;
+}

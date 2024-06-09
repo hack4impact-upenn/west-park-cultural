@@ -88,7 +88,8 @@ function DonationInfoPage() {
   const [purpose, setPurpose] = useState('');
 
   // Fetch donation data from API
-  const donationID = '65ff8dae78febaeaa6e02651';
+
+  const donationID = '65ff8dd5ef350bba76ecaaa6';
   const donation = useData(`donation/${donationID}`);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -132,7 +133,7 @@ function DonationInfoPage() {
         if (donation.data.donor_id) {
           try {
             const res = await axios.get(
-              `http://localhost:4000/api/donor/${donation.data.donor_id}`,
+              `http://localhost:4000/api/donor/id/${donation.data.donor_id}`,
             );
             setDonorName(res.data.contact_name);
             setDonator(res.data);
@@ -397,7 +398,6 @@ function DonationInfoPage() {
 
       <Box width="100%">
         <BasicTable customRows={customRows} />
-
         {!donationData.acknowledged && (
           <p style={{ marginTop: '16px', marginLeft: '16px' }}>
             This donation has not been acknowledged.
@@ -447,8 +447,8 @@ function DonationInfoPage() {
             </Button>
             <ConfirmModal
               buttonText="Delete"
-              title="Are you sure you want to delete this donation?"
-              body=""
+              title="Deleting"
+              body="Are you sure you want to delete this donation?"
               onConfirm={handleDelete}
             />
           </Box>

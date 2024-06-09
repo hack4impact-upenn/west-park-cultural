@@ -31,6 +31,29 @@ const getDonorById = async (id: string) => {
   return donor;
 };
 
+const editDonorById = async (_id: string, newDonorInfo: IDonor) => {
+  try {
+    const donor = await Donor.updateOne({ _id }, newDonorInfo).exec();
+    return donor;
+  } catch (error) {
+    throw new Error('Error updating donation');
+  }
+};
+
+const updateNote = async (id: string, note: string) => {
+  try {
+    const donor = await Donor.findOneAndUpdate(
+      { _id: id },
+      { $set: { [`note`]: note } }, // Update the 'note' field with the new value
+      { new: true },
+    ).exec();
+    return donor;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export {
   getAllDonors,
   getAllDonorsTypeDonor,
@@ -38,4 +61,6 @@ export {
   getAllDonorsTypeGrant,
   createDonor,
   getDonorById,
+  editDonorById,
+  updateNote,
 };
