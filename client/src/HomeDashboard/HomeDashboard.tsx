@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Typography,
   Box,
@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../util/redux/hooks';
+import { useData } from '../util/api';
+import DonationsTable from '../components/tables/DonationsTable';
 import './homedashboard.css';
 
 interface BasicTableProps {
@@ -22,26 +24,90 @@ interface BasicTableProps {
 
 function BasicTable({ alignment }: BasicTableProps) {
   let customRows: { label: string; value: string }[] = [];
+  const donations = useData('donation/all');
+  const [donationsData, setDonationsData] = useState<any>([]);
+
+  useEffect(() => {
+    const data = donations?.data || [];
+    const filteredData = data.filter(
+      (donation: any) => donation.type === alignment,
+    );
+    setDonationsData(filteredData);
+  }, [donations?.data, alignment]);
+
+  // calculate summary stats
+  const totalDonated = donationsData.reduce(
+    (total: number, donation: any) => total + donation.amount,
+    0,
+  );
+  const sortedDonationsData = [...donationsData].sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+  const lastDate =
+    sortedDonationsData.length > 0
+      ? new Date(sortedDonationsData[0].date)
+      : null;
+  let last = 'N/A';
+
+  if (lastDate) {
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - lastDate.getTime();
+    const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    if (daysDifference > 30) {
+      const day = lastDate.getDate();
+      const month = lastDate.toLocaleString('default', { month: 'long' });
+      const year = lastDate.getFullYear();
+      last = `${month} ${day}, ${year}`;
+    } else if (daysDifference > 0) {
+      last = `${daysDifference} days ago`;
+    } else {
+      const hoursDifference = Math.floor(timeDifference / (1000 * 3600));
+      last = `${hoursDifference} hours ago`;
+    }
+  }
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const donatedInLast90Days = donationsData.reduce(
+    (total: number, donation: any) => {
+      const donationDate = new Date(donation.date);
+      return donationDate >= ninetyDaysAgo ? total + donation.amount : total;
+    },
+    0,
+  );
 
   if (alignment === 'donation') {
     customRows = [
-      { label: 'Total Donated', value: '$1350' },
-      { label: 'Last Donation', value: '18 Hours Ago' },
-      { label: 'Donated in last 90 Days', value: '$42' },
+      { label: 'Total Donated', value: `$${totalDonated.toLocaleString()}` },
+      { label: 'Last Donation', value: last },
+      {
+        label: 'Donated in last 90 Days',
+        value: `$${donatedInLast90Days.toLocaleString()}`,
+      },
     ];
   } else if (alignment === 'sponsorship') {
     customRows = [
-      { label: 'Total Sponsored', value: '$1350' },
-      { label: 'Last Sponsorship', value: '18 Hours Ago' },
-      { label: 'Sponsored in last 90 Days', value: '$42' },
+      { label: 'Total Sponsored', value: `$${totalDonated.toLocaleString()}` },
+      { label: 'Last Sponsorship', value: last },
+      {
+        label: 'Sponsored in last 90 Days',
+        value: `$${donatedInLast90Days.toLocaleString()}`,
+      },
     ];
   } else if (alignment === 'grant') {
     customRows = [
-      { label: 'Total Granted', value: '$1350' },
-      { label: 'Last Grant', value: '18 Hours Ago' },
-      { label: 'Granted in last 90 Days', value: '$42' },
+      { label: 'Total Granted', value: `$${totalDonated.toLocaleString()}` },
+      { label: 'Last Grant', value: last },
+      {
+        label: 'Granted in last 90 Days',
+        value: `$${donatedInLast90Days.toLocaleString()}`,
+      },
     ];
   }
+
+  const numUnacknowledged = donationsData.filter(
+    (donation: any) => !donation.acknowledged,
+  ).length;
 
   return (
     <div className="basic-table">
@@ -65,6 +131,9 @@ function BasicTable({ alignment }: BasicTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
+      <p style={{ marginTop: '16px' }}>
+        There are {numUnacknowledged} unacknowledged {alignment}s.
+      </p>
       {/* </Box> */}
     </div>
   );
@@ -130,6 +199,8 @@ function HomeDashboard() {
         display="flex"
         flexDirection="row"
         alignItems="center"
+        justifyContent="space-between" // Align items at start and end of the box
+        width="100%" // Set box width to 100% of its container
         marginBottom={2}
         marginLeft={2} // Added marginLeft to align with the left edge
       ></Box> */}
@@ -159,7 +230,9 @@ function HomeDashboard() {
             marginLeft: '16px',
             background: '#24a0ed',
             color: 'white',
-            paddingRight: '20px',
+            marginRight: '16px',
+            marginTop: '16px',
+            padding: '15px',
           }}
         >
           Send them a message now{' '}
@@ -169,6 +242,36 @@ function HomeDashboard() {
             style={{ marginLeft: '10px' }}
           />
         </Button>
+<!--   START    </Box>
+
+      <Box width="100%" marginBottom={4}>
+        {/* Add a Typography for the title "Summary" */}
+        <Typography variant="h4" gutterBottom>
+          Summary
+        </Typography>
+        <BasicTable alignment={alignment} />
+        <Button
+          onClick={() => {
+            handleClick();
+          }}
+          style={{
+            background: '#0693e3',
+            color: 'white',
+            marginLeft: '15px',
+            paddingLeft: '15px',
+            paddingRight: '15px',
+          }}
+        >
+          Send them a message now
+        </Button>
+      </Box>
+      <Box width="100%" paddingRight={3}>
+        <Typography variant="h4" gutterBottom>
+          {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
+        </Typography>
+        <DonationsTable alignment={alignment} />
+      </Box>
+    </Box> END -->
 
         <Box marginBottom={2} marginLeft={2} marginTop={5}>
           <Typography variant="h4" gutterBottom>

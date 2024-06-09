@@ -17,7 +17,8 @@ import {
   SelectChangeEvent,
   Link,
 } from '@mui/material';
-//import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { getData, useData } from '../../util/api';
 
 interface Column {
   id: string;
@@ -26,9 +27,11 @@ interface Column {
 
 interface Row {
   [key: string]: number | string;
-  id: number;
-  name: string;
   date: string;
+  amount: number;
+  donor_id: string;
+  payment_type: string;
+  purpose_id: string;
 }
 
 interface FilteringTableProps {
@@ -80,7 +83,7 @@ function FilteringTable({
   };
 
   // Apply the search filter first
-  const searchedRows = rows.filter((row) => {
+  const searchedRows = initialRows.filter((row) => {
     // Convert all row values to string and lowercase, then check if they include the search term
     return Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchTerm),
@@ -124,7 +127,7 @@ function FilteringTable({
           borderRadius: '16px',
           overflow: 'hidden',
           boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-          maxWidth: '80%',
+          maxWidth: '100%',
           margin: 'auto',
           padding: '20px',
         }}
@@ -136,7 +139,7 @@ function FilteringTable({
           style={{ margin: '10px', width: `calc(100% / 4` }}
         />
         <IconButton onClick={toggleFilterVisible} style={{ margin: '20px' }}>
-          {/* <FilterAltIcon /> */}
+          <FilterAltIcon />
         </IconButton>
         <Table>
           <TableHead>
