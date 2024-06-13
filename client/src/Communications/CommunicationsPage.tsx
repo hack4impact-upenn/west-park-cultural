@@ -27,6 +27,7 @@ import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import IDonation from '../util/types/donation';
 import { useData } from '../util/api';
+import PopupPage from '../Popup/PopupPage'; 
 
 const BACKENDURL = process.env.PUBLIC_URL
   ? process.env.PUBLIC_URL
@@ -45,69 +46,6 @@ const modalStyle = {
   boxShadow: 24,
   p: 4,
 };
-
-const testDonors = [
-  {
-    _id: '65daa67d6c34e8adb9f2d2c4',
-    contact_name: 'John Smith',
-    contact_email: 'jsmith@gmail.com',
-    contact_address: '3820 Spruce',
-    contact_phone: '609-297-6873',
-    donor_group: 'Individual',
-    registered_date: { $date: { $numberLong: '1463587200000' } },
-    last_donation_date: { $date: { $numberLong: '1684425600000' } },
-    last_communication_date: '',
-    type: 'donor',
-    org_address: '',
-    org_email: '',
-    org_name: '',
-  },
-  {
-    _id: { $oid: '65daa7356c34e8adb9f2d2c5' },
-    contact_name: 'Jane Doe',
-    contact_email: 'jdoe@gmail.com',
-    contact_address: '',
-    contact_phone: '609-235-3525',
-    donor_group: 'corporate',
-    registered_date: { $date: { $numberLong: '1517673600000' } },
-    last_donation_date: { $date: { $numberLong: '1635955200000' } },
-    last_communication_date: '',
-    type: 'sponsor',
-    org_name: 'Company A',
-    org_email: 'compa@gmail.com',
-    org_address: '2934 Chestnut st',
-  },
-  {
-    _id: { $oid: '65daa8166c34e8adb9f2d2c6' },
-    contact_name: 'Lisa Webster',
-    contact_email: 'lwebster@gmail.com',
-    contact_address: '',
-    contact_phone: '235-582-5325',
-    donor_group: 'Government',
-    registered_date: { $date: { $numberLong: '1663516800000' } },
-    last_donation_date: { $date: { $numberLong: '1666540800000' } },
-    last_communication_date: '2022-10-24T16:00:00.000+00:00',
-    type: 'grant',
-    org_address: 'Philadelphia',
-    org_email: 'philly@gmail.com',
-    org_name: 'Philadelphia Gov ',
-  },
-];
-
-const testDataGroup = [
-  {
-    _id: { $oid: '65daa9ed6c34e8adb9f2d2cc' },
-    group_name: 'Group 1',
-    date_created: { $date: { $numberLong: '1708790400000' } },
-    donor_ids: ['65daa67d6c34e8adb9f2d2c4', '65daa7356c34e8adb9f2d2c5'],
-  },
-  {
-    _id: { $oid: '65daaa2c6c34e8adb9f2d2cd' },
-    group_name: 'Group 2',
-    date_created: { $date: { $numberLong: '1708790400000' } },
-    donor_ids: ['65daa7356c34e8adb9f2d2c5', '65daa8166c34e8adb9f2d2c6'],
-  },
-];
 
 const style = {
   position: 'absolute',
@@ -139,6 +77,9 @@ function CommunicationsPage() {
   const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
     [],
   );
+  const [openPopup, setOpenPopup] = useState(false);
+  const [selectedDonorID, setSelectedDonorID] = useState<string>('');
+
   const [groupSearchValue, setGroupSearchValue] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState<IGroup | null>(null);
   const [rows, setRows] = useState<RowItem[]>([]);
@@ -191,6 +132,11 @@ function CommunicationsPage() {
   const handleGroupModalClose = () => {
     setEditGroupModalOpen(false);
   };
+
+  const handlePopupClose = () => {
+    setOpenPopup(false);
+  };
+
 
   useEffect(() => {
     if (allDonors?.data) {
@@ -339,6 +285,12 @@ function CommunicationsPage() {
     });
   };
 
+  const handleViewDonor = (donorID: string) => {
+    setSelectedDonorID(donorID);
+    setOpenPopup(true);
+    console.log(donorID)
+  };  
+
   return (
     <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
       <Box>
@@ -410,6 +362,11 @@ function CommunicationsPage() {
           open={editGroupModalOpen}
           onClose={handleGroupModalClose}
         />
+        <PopupPage
+          open={openPopup}
+          onClose={handlePopupClose}
+          donorID={selectedDonorID}
+        />
         <Stack
           spacing={{ xs: 2 }}
           direction="row"
@@ -476,7 +433,7 @@ function CommunicationsPage() {
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <Link href="/">View</Link>
+                    <Link href="#" onClick={() => handleViewDonor(row.id)}>View</Link>
                   </TableCell>
                 </TableRow>
               ))}

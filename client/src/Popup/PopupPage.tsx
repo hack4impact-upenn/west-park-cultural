@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import {
   Button,
@@ -16,6 +15,7 @@ import {
 } from '@mui/material';
 import IDonor from '../util/types/donor';
 import { useData } from '../util/api';
+import axios from 'axios';
 
 interface BasicDonationStat {
   amount: number;
@@ -30,21 +30,16 @@ interface DonationStats {
   recentDonation: any;
 }
 
-function PopupPage() {
-  const [openPopup, setOpenPopup] = useState(false);
+interface PopupPageProps {
+  open: boolean;
+  onClose: () => void;
+  donorID: string;
+}
 
-  const handleOpenPopup = () => {
-    setOpenPopup(true);
-  };
-
-  const handleClosePopup = () => {
-    setOpenPopup(false);
-  };
-
-  const donorID = '65daa67d6c34e8adb9f2d2c4';
+function PopupPage({ open, onClose, donorID }: PopupPageProps) {
   const donations = useData(`donation/donor/${donorID}`);
-  const donor = useData(`donor/${donorID}`);
-  const [donorData, setDonatorData] = useState<IDonor | null>(null);
+  // const donor = useData(`donor/${donorID}`);
+  const [donorData, setDonorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
   const [purposeID, setPurposeID] = useState('');
@@ -53,16 +48,26 @@ function PopupPage() {
   const purposes = useData('purpose');
   const [purposesData, setPurposesData] = useState<PurposeType[]>([]);
 
+
   useEffect(() => {
     const data = purposes?.data || [];
     setPurposesData(data);
   }, [purposes]);
 
   useEffect(() => {
-    const data = donor?.data || null;
-    setDonatorData(data);
-    console.log(data);
-  }, [donor]);
+    const fetchDonor = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:4000/api/donor/id/${donorID}`,
+        );
+        setDonorData(res.data);
+      } catch (error) {
+        console.error('Failed to fetch donor:', error);
+      }
+    };
+
+    fetchDonor();
+  }, [donations?.data]);
 
   useEffect(() => {
     const data = donations?.data || [];
@@ -206,10 +211,7 @@ function PopupPage() {
 
   return (
     <div>
-      <Button onClick={handleOpenPopup}>Popup 1</Button>
-
-      {/* Popup */}
-      <Dialog open={openPopup} onClose={handleClosePopup}>
+      <Dialog open={open} onClose={onClose}>
         <DialogTitle> {donorData?.contact_name} Summary </DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
@@ -254,7 +256,7 @@ function PopupPage() {
           </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClosePopup}>Close</Button>
+          <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </div>
