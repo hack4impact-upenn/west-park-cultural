@@ -13,6 +13,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useAppDispatch } from '../util/redux/hooks';
 
 interface BasicTableProps {
@@ -134,10 +135,13 @@ function HomeDashboard() {
       </p>
 
       <Button
+        variant="contained"
+        color="primary"
+        endIcon={<ArrowForwardIcon />}
         onClick={() => {
           handleClick();
         }}
-        style={{ marginLeft: '16px', background: 'blue', color: 'white' }}
+        style={{ marginLeft: '16px', marginBottom: '20px' }}
       >
         Send them a message now
       </Button>
