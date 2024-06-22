@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { Navigate, NavigateFunction, useNavigate } from 'react-router-dom';
 import {
   Typography,
   Grid,
@@ -35,13 +35,16 @@ function NewDonationPage() {
   const [donationType, setDonationType] = useState<string | null>('donation');
   const [grantYear, setGrantYear] = useState('');
   const [donationAmount, setDonationAmount] = useState('');
+  const [successMessage, setSuccessMessage] = useState(false);
   const [donationDate, setDonationDate] = useState<Dayjs | null>(null);
   const [donator, setDonator] = useState<DonorType | null>(null);
   const [isNewDonator, setIsNewDonator] = useState(false);
   const [isNewPurpose, setIsNewPurpose] = useState(false);
   const [newDonatorEmail, setNewDonatorEmail] = useState('');
+  const [newDonatorPhone, setNewDonatorPhone] = useState('');
   const [newDonatorAddress, setNewDonatorAddress] = useState('');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
+  const [isValidInput, setIsValidInput] = useState(true);
   const [campaignPurpose, setCampaignPurpose] = useState<PurposeType | null>(
     null,
   );
@@ -60,7 +63,6 @@ function NewDonationPage() {
 
   useEffect(() => {
     const data = purposes?.data || [];
-    // console.log('purposes', data);
     setPurposesData(data);
   }, [purposes]);
 
@@ -83,6 +85,12 @@ function NewDonationPage() {
     setNewDonatorEmail(event.target.value);
   };
 
+  const handleNewDonatorPhoneChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setNewDonatorPhone(event.target.value);
+  };
+
   const handleNewDonatorAddressChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -101,64 +109,136 @@ function NewDonationPage() {
     setPaymentType(event.target.value);
   };
 
+  const checkValidInput = () => {
+    return (donationDate != null) &&
+         (paymentType !== '') &&
+         (donationAmount !== '') &&
+         (parseInt(donationAmount) >= 0) &&
+         (donator != null) &&
+         (campaignPurpose != null) &&
+         (donationType !== 'grant' || (grantYear != null && grantYear !== ''));
+}
+
+  const determineDonorType = () => {
+    switch (donationType) {
+      case 'donation':
+        return 'donor';
+      case 'sponsorship':
+        return 'sponsor';
+      case 'grant':
+        return 'grant';
+      default:
+        return 'donor';
+    }
+  };
+
+  const resetPage = () => {
+    setDonationAmount('');
+    setGrantYear('');
+    setDonationDate(null);
+    setDonator(null);
+    setNewDonatorEmail('');
+    setNewDonatorAddress('');
+    setNewDonatorPhone('');
+    setIsNewDonator(false);
+    setNewDonatorGroup('');
+    setCampaignPurpose(null);
+    setNotes('');
+    setPaymentType('');
+    setSuccessMessage(true)
+  }
+
   const handleSubmit = () => {
-    if (isNewDonator) {
-      const newDonator = {
-        contact_name: donator?.title,
-        contact_email: newDonatorEmail,
-        contact_address: newDonatorAddress,
-        contact_phone: '0', // no input field for this yet
-        donor_group: newDonatorGroup,
-        registered_date: new Date(), // no input field for this yet
-        last_donation_date: new Date(), // no input field for this yet
-        type: '0', // no input field for this yet
-        // comments: null,
-        // _id: null,
-      };
+    if (checkValidInput()) {
+      setIsValidInput(true)
+      if (isNewDonator) {
+        const newDonator = {
+          contact_name: donator?.title,
+          contact_email: newDonatorEmail,
+          contact_address: newDonatorAddress,
+          contact_phone: newDonatorPhone, 
+          donor_group: newDonatorGroup,
+          registered_date: new Date(), 
+          last_donation_date: new Date(), 
+          type: determineDonorType(),
+        };
 
-      postData('donor/create', newDonator)
-        .then((response) => {
-          setDonator(response.data);
+        postData('donor/create', newDonator)
+          .then((response) => {
+            setDonator(response.data);
+            if (isNewPurpose) {
+              const newPurpose = {
+                name: campaignPurpose?.title,
+                date_created: new Date(),
+              };
 
-          if (isNewPurpose) {
-            const newPurpose = {
-              name: campaignPurpose?.title,
-              date_created: new Date(),
-            };
+              postData('purpose', newPurpose)
+                .then((response1) => {
+                  setCampaignPurpose(response1.data);
+                  const newDonation = {
+                    donor_id: response.data._id,
+                    date: donationDate?.format('YYYY-MM-DD'),
+                    amount: donationAmount,
+                    purpose_id: response1.data._id,
+                    payment_type: paymentType,
+                    type: donationType,
+                    comments: notes,
+                  };
 
-            postData('purpose', newPurpose)
-              .then((response1) => {
-                setCampaignPurpose(response1.data);
-                const newDonation = {
-                  donor_id: response.data._id,
-                  date: donationDate?.format('YYYY-MM-DD'),
-                  amount: donationAmount,
-                  purpose_id: response1.data._id,
-                  payment_type: paymentType,
-                  type: donationType,
-                  comments: notes,
-                };
+                  postData('donation/new', newDonation)
+                    .then((response2) => {
+                      console.log(response2);
+                      resetPage()
+                    })
+                    .catch((error) => {
+                      // Handle the error here
+                      console.log(error);
+                    });
+                })
+                .catch((error) => {
+                  // Handle the error here
+                  console.log(error);
+                });
+            } else {
+              const newDonation = {
+                donor_id: response.data._id,
+                date: donationDate?.format('YYYY-MM-DD'),
+                amount: donationAmount,
+                purpose_id: campaignPurpose?._id,
+                payment_type: paymentType,
+                type: donationType,
+                comments: notes,
+              };
 
-                postData('donation/new', newDonation)
-                  .then((response2) => {
-                    // Handle the response here
-                    console.log(response2);
-                  })
-                  .catch((error) => {
-                    // Handle the error here
-                    console.log(error);
-                  });
-              })
-              .catch((error) => {
-                // Handle the error here
-                console.log(error);
-              });
-          } else {
+              postData('donation/new', newDonation)
+                .then((response2) => {
+                  resetPage()
+                  console.log(response2);
+                })
+                .catch((error) => {
+                  // Handle the error here
+                  console.log(error);
+                });
+            }
+          })
+          .catch((error) => {
+            // Handle the error here
+            console.log(error);
+          });
+      } else if (isNewPurpose) {
+        const newPurpose = {
+          name: campaignPurpose?.title,
+          date_created: new Date(),
+        };
+
+        postData('purpose', newPurpose)
+          .then((response1) => {
+            setCampaignPurpose(response1.data);
             const newDonation = {
-              donor_id: response.data._id,
+              donor_id: donator?._id,
               date: donationDate?.format('YYYY-MM-DD'),
               amount: donationAmount,
-              purpose_id: campaignPurpose?._id,
+              purpose_id: response1.data._id,
               payment_type: paymentType,
               type: donationType,
               comments: notes,
@@ -166,72 +246,44 @@ function NewDonationPage() {
 
             postData('donation/new', newDonation)
               .then((response2) => {
-                // Handle the response here
+                resetPage()
                 console.log(response2);
               })
               .catch((error) => {
                 // Handle the error here
                 console.log(error);
               });
-          }
-        })
-        .catch((error) => {
-          // Handle the error here
-          console.log(error);
-        });
-    } else if (isNewPurpose) {
-      const newPurpose = {
-        name: campaignPurpose?.title,
-        date_created: new Date(),
-      };
+          })
+          .catch((error) => {
+            // Handle the error here
+            console.log(error);
+          });
+      } else {
+        const newDonation = {
+          donor_id: donator?._id,
+          date: donationDate?.format('YYYY-MM-DD'),
+          amount: donationAmount,
+          purpose_id: campaignPurpose?._id,
+          payment_type: paymentType,
+          type: donationType,
+          comments: notes,
+        };
 
-      postData('purpose', newPurpose)
-        .then((response1) => {
-          setCampaignPurpose(response1.data);
-          const newDonation = {
-            donor_id: donator?._id,
-            date: donationDate?.format('YYYY-MM-DD'),
-            amount: donationAmount,
-            purpose_id: response1.data._id,
-            payment_type: paymentType,
-            type: donationType,
-            comments: notes,
-          };
+        postData('donation/new', newDonation)
+          .then((response) => {
+            resetPage()
+            console.log(response);
+          })
+          .catch((error) => {
+            // Handle the error here
+            console.log(error);
+          });
+        }
 
-          postData('donation/new', newDonation)
-            .then((response2) => {
-              // Handle the response here
-              console.log(response2);
-            })
-            .catch((error) => {
-              // Handle the error here
-              console.log(error);
-            });
-        })
-        .catch((error) => {
-          // Handle the error here
-          console.log(error);
-        });
+
     } else {
-      const newDonation = {
-        donor_id: donator?._id,
-        date: donationDate?.format('YYYY-MM-DD'),
-        amount: donationAmount,
-        purpose_id: campaignPurpose?._id,
-        payment_type: paymentType,
-        type: donationType,
-        comments: notes,
-      };
-
-      postData('donation/new', newDonation)
-        .then((response) => {
-          // Handle the response here
-          console.log(response);
-        })
-        .catch((error) => {
-          // Handle the error here
-          console.log(error);
-        });
+      setIsValidInput(false);
+      setSuccessMessage(false);
     }
   };
 
@@ -309,16 +361,17 @@ function NewDonationPage() {
           value={donator}
           onChange={(event, newValue) => {
             setIsNewDonator(false);
+  
             if (typeof newValue === 'string') {
-              setDonator({
-                title: newValue,
-              });
+                setDonator({
+                  title: newValue,
+                });
             } else if (newValue && newValue.inputValue) {
               // Create a new value from the user input
-              setIsNewDonator(true);
-              setDonator({
-                title: newValue.inputValue,
-              });
+                setIsNewDonator(true);
+                setDonator({
+                  title: newValue.inputValue,
+                });
             } else {
               setDonator(newValue);
             }
@@ -415,15 +468,27 @@ function NewDonationPage() {
       {isNewDonator && (
         <Grid item xs={12}>
           <TextField
+            label="New Donator Phone"
+            type="phone"
+            value={newDonatorPhone}
+            required={isNewDonator}
+            onChange={handleNewDonatorPhoneChange}
+            sx={{ width: '40%' }}
+          />
+        </Grid>
+      )}
+      {isNewDonator && (
+        <Grid item xs={12}>
+          <TextField
             label="New Donator Address"
             type="text"
             value={newDonatorAddress}
+            required={isNewDonator}
             onChange={handleNewDonatorAddressChange}
             sx={{ width: '40%' }}
           />
         </Grid>
       )}
-
       <Grid item xs={12}>
         <Autocomplete
           sx={{ width: '40%' }}
@@ -431,15 +496,14 @@ function NewDonationPage() {
           onChange={(event, newValue) => {
             setIsNewPurpose(false);
             if (typeof newValue === 'string') {
-              setCampaignPurpose({
-                title: newValue,
-              });
+                setCampaignPurpose({
+                  title: newValue,
+                }); 
             } else if (newValue && newValue.inputValue) {
-              // Create a new value from the user input
-              setIsNewPurpose(true);
-              setCampaignPurpose({
-                title: newValue.inputValue,
-              });
+                setIsNewPurpose(true);
+                setCampaignPurpose({
+                  title: newValue.inputValue,
+                });
             } else {
               setCampaignPurpose(newValue);
             }
@@ -450,7 +514,7 @@ function NewDonationPage() {
             const { inputValue } = params;
             // Suggest the creation of a new value
             const isExisting = options.some(
-              (option) => inputValue === option.title,
+              (option) => inputValue === option.name,
             );
             if (inputValue !== '' && !isExisting) {
               filtered.push({
@@ -514,6 +578,7 @@ function NewDonationPage() {
           <Select
             value={paymentType}
             label="Payment Type"
+            required
             onChange={handlePaymentTypeChange}
           >
             <MenuItem value="mail check">Mail Check</MenuItem>
@@ -522,19 +587,29 @@ function NewDonationPage() {
           </Select>
         </FormControl>
       </Grid>
+      {isValidInput === false && (
+        <Typography sx={{ color: 'error.main', ml: 2 }} variant="body2">
+          Please fill in and check all input fields
+        </Typography>
+      )}
+
+      {successMessage && (
+        <Typography sx={{ color: 'blue', ml: 2 }} variant="body2">
+          Successfully registered the donation.
+        </Typography>
+      )}
       <Grid item xs={12}>
         <Button
           variant="contained"
           color="primary"
           endIcon={<ArrowForwardIcon />}
           onClick={handleSubmit}
-          sx={{ width: '40%' }}
+          sx={{ width: '40%'}}
           size="large"
           style={{ justifyContent: 'flex-start' }}
         >
           Register Donation
         </Button>
-        <FormHelperText>Donation ID: #####</FormHelperText>
       </Grid>
     </Grid>
   );
