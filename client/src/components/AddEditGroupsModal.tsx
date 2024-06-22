@@ -84,12 +84,6 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
   }, [donors]);
 
   useEffect(() => {
-    const data = group?.data || [];
-    setGroups(data);
-    // console.log(data);
-  }, [group]);
-
-  useEffect(() => {
     if (selectedGroup) {
       const selected = allDonors.filter((donor) =>
         (selectedGroup.donor_ids || []).includes(donor._id),
@@ -109,6 +103,11 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGroup]);
 
+  useEffect(() => {
+    const data = group?.data || [];
+    setGroups(data);
+  }, [group]);
+  
   const handleAddDonor = () => {
     const donor = unselectedDonors.find(
       (d) => d.contact_name === selectedDonorName,
@@ -133,6 +132,7 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
       updateGroupDonorsAPI(selectedGroup, donorIds) // update group
         .then(() => {
           setSelectedDonorName(''); // Reset selected donor value after submit
+          onClose();
         })
         .catch((error) => {
           console.error('Error updating group donors:', error);
@@ -148,17 +148,17 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
         donor_ids: [],
       };
 
-      console.log('new');
       postData('group/create', newData)
         .then((response) => {
+          setGroups((prevGroups) => [...prevGroups, response.data]);
           setSelectedGroup(response.data);
-          console.log('set');
         })
         .catch((error) => {
           console.log(error);
         });
     }
   };
+
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
