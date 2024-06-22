@@ -162,21 +162,20 @@ function NewDonationPage() {
           last_donation_date: new Date(), 
           type: determineDonorType(),
         };
-
+        
         postData('donor/create', newDonator)
-          .then((response) => {
-            setDonator(response.data);
+          .then((donorResponse) => {
+            setDonator(donorResponse.data);
             if (isNewPurpose) {
               const newPurpose = {
                 name: campaignPurpose?.title,
                 date_created: new Date(),
               };
-
               postData('purpose', newPurpose)
                 .then((response1) => {
                   setCampaignPurpose(response1.data);
                   const newDonation = {
-                    donor_id: response.data._id,
+                    donor_id: donorResponse.data._id,
                     date: donationDate?.format('YYYY-MM-DD'),
                     amount: donationAmount,
                     purpose_id: response1.data._id,
@@ -184,7 +183,7 @@ function NewDonationPage() {
                     type: donationType,
                     comments: notes,
                   };
-
+                  
                   postData('donation/new', newDonation)
                     .then((response2) => {
                       console.log(response2);
@@ -201,7 +200,7 @@ function NewDonationPage() {
                 });
             } else {
               const newDonation = {
-                donor_id: response.data._id,
+                donor_id: donorResponse.data._id ,
                 date: donationDate?.format('YYYY-MM-DD'),
                 amount: donationAmount,
                 purpose_id: campaignPurpose?._id,
@@ -230,7 +229,6 @@ function NewDonationPage() {
           name: campaignPurpose?.title,
           date_created: new Date(),
         };
-
         postData('purpose', newPurpose)
           .then((response1) => {
             setCampaignPurpose(response1.data);
@@ -279,8 +277,6 @@ function NewDonationPage() {
             console.log(error);
           });
         }
-
-
     } else {
       setIsValidInput(false);
       setSuccessMessage(false);
@@ -361,7 +357,7 @@ function NewDonationPage() {
           value={donator}
           onChange={(event, newValue) => {
             setIsNewDonator(false);
-  
+            console.log(newValue);
             if (typeof newValue === 'string') {
                 setDonator({
                   title: newValue,
@@ -378,7 +374,6 @@ function NewDonationPage() {
           }}
           filterOptions={(options, params) => {
             const filtered = filterDonors(options, params);
-
             const { inputValue } = params;
             // Suggest the creation of a new value
             const isExisting = options.some(
@@ -391,7 +386,6 @@ function NewDonationPage() {
                 title: `Add "${inputValue}"`,
               });
             }
-
             return filtered;
           }}
           selectOnFocus

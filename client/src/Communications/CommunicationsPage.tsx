@@ -381,6 +381,7 @@ function CommunicationsPage() {
             getOptionLabel={(option) => option.group_name}
             value={groupSearchValue}
             onChange={handleGroupChange}
+            sx={{ width: '66%' }} 
             renderInput={(params) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="Search Name" />
@@ -389,10 +390,8 @@ function CommunicationsPage() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => {
-              addGroupItem();
-            }}
-            sx={{ flexGrow: 1 }}
+            onClick={addGroupItem}
+            sx={{ width: '30%' }} // Adjust the width as needed
           >
             Add Group
           </Button>

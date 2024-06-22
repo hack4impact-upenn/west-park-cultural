@@ -32,6 +32,7 @@ const getAllDonationsbyDonorId = async (donorId: string) => {
 
 const createDonation = async (donation: IDonation) => {
   const newDonation = new Donation(donation);
+  console.log(newDonation);
   const result = await newDonation.save();
   return result;
 };
