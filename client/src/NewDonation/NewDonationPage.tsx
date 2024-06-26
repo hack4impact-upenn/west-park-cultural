@@ -159,13 +159,14 @@ function NewDonationPage() {
           contact_phone: newDonatorPhone, 
           donor_group: newDonatorGroup,
           registered_date: new Date(), 
-          last_donation_date: new Date(), 
+          last_donation_date: donationDate, 
           type: determineDonorType(),
         };
         
         postData('donor/create', newDonator)
           .then((donorResponse) => {
             setDonator(donorResponse.data);
+            setDonorsData(prevDonators => [...prevDonators, donorResponse.data]);
             if (isNewPurpose) {
               const newPurpose = {
                 name: campaignPurpose?.title,
@@ -174,6 +175,7 @@ function NewDonationPage() {
               postData('purpose', newPurpose)
                 .then((response1) => {
                   setCampaignPurpose(response1.data);
+                  setPurposesData(prevPurposes => [...prevPurposes, response1.data])
                   const newDonation = {
                     donor_id: donorResponse.data._id,
                     date: donationDate?.format('YYYY-MM-DD'),

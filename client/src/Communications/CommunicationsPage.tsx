@@ -92,6 +92,24 @@ function CommunicationsPage() {
   const allDonations: any | null = useData('donation/all');
   const allGroups: any | null = useData('group/all');
 
+  useEffect(() => {
+    if (allDonors?.data) {
+      setDonors(allDonors.data);
+    }
+  }, [allDonors]);
+
+  useEffect(() => {
+    if (allDonations?.data) {
+      setDonations(allDonations.data);
+    }
+  }, [allDonations]);
+
+  useEffect(() => {
+    if (allGroups?.data) {
+      setGroups(allGroups.data);
+    }
+  }, [allGroups]);
+
   const handleUnackDonoModalOpen = async () => {
     try {
       console.log('opened');
@@ -137,25 +155,6 @@ function CommunicationsPage() {
     setOpenPopup(false);
   };
 
-
-  useEffect(() => {
-    if (allDonors?.data) {
-      setDonors(allDonors.data);
-    }
-  }, [allDonors]);
-
-  useEffect(() => {
-    if (allDonations?.data) {
-      setDonations(allDonations.data);
-    }
-  }, [allDonations]);
-
-  useEffect(() => {
-    if (allGroups?.data) {
-      setGroups(allGroups.data);
-    }
-  }, [allGroups]);
-
   // Define a function to extract the correct ID
   const extractId = (id: string | { $oid: string }) => {
     return typeof id === 'string' ? id : id.$oid;
@@ -186,19 +185,9 @@ function CommunicationsPage() {
     }
   };
 
-  const addItem = () => {
-    const newItem: RowItem = {
-      id: '65daa67d6c34e8adb9f2d2c4',
-      contact_name: 'John Smith',
-      contact_email: 'jsmith@gmail.com',
-    };
-    setRows((prevRows) => [...prevRows, newItem]);
-  };
-
   const addGroupItem = () => {
     // Retrieve the donors associated with the selected group
     if (selectedGroup != null) {
-      console.log(selectedGroup);
       const groupDonors = donors.filter((donor) =>
         selectedGroup.donor_ids.includes(extractId(donor._id)),
       );
@@ -279,7 +268,6 @@ function CommunicationsPage() {
     }
   }
   const handleFilteredDonors = (filteredDonors: DonorInfo[]) => {
-    console.log('Received filtered donors:', filteredDonors);
     filteredDonors.forEach((donor: DonorInfo) => {
       handleAddUnackDonation(donor.name, donor.email, donor._id);
     });
@@ -288,7 +276,6 @@ function CommunicationsPage() {
   const handleViewDonor = (donorID: string) => {
     setSelectedDonorID(donorID);
     setOpenPopup(true);
-    console.log(donorID)
   };  
 
   return (
@@ -503,7 +490,7 @@ function CommunicationsPage() {
                   )
                 }
               >
-                Select
+                Add
               </Button>
             </Box>
           ))}

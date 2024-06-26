@@ -38,7 +38,7 @@ interface PopupPageProps {
 }
 
 function PopupPage({ open, onClose, donorID }: PopupPageProps) {
-  const donations = useData(`donation/donor/${donorID}`);
+  // const donations = useData(`donation/donor/${donorID}`);
   const [donorData, setDonorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
@@ -75,9 +75,25 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
   }, [donorID, open]);
 
   useEffect(() => {
-    const data = donations?.data || [];
-    setDonationsData(data);
-  }, [donations?.data, donations]);
+    const fetchDonations = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:4000/api/donation/donor/${donorID}`,
+        );
+        setDonationsData(res.data);
+      } catch (error) {
+        console.error('Failed to fetch donation:', error);
+      } 
+    };
+    if (open) {
+      fetchDonations();
+    }
+  }, [donorID, open]);
+
+  // useEffect(() => {
+  //   const data = donations?.data || [];
+  //   setDonationsData(data);
+  // }, [donations?.data, donations]);
 
   useEffect(() => {
     const calculateDonationStats = (data: any) => {

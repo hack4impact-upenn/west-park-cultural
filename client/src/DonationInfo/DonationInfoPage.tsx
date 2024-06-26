@@ -101,6 +101,7 @@ function DonationInfoPage() {
   const [donator, setDonator] = useState<DonorType | null>(null);
   const [isNewDonator, setIsNewDonator] = useState(false);
   const [isNewPurpose, setIsNewPurpose] = useState(false);
+  const [newDonatorPhone, setNewDonatorPhone] = useState('');
   const [newDonatorEmail, setNewDonatorEmail] = useState('');
   const [newDonatorAddress, setNewDonatorAddress] = useState('');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
@@ -219,6 +220,12 @@ function DonationInfoPage() {
     setNewDonatorAddress(event.target.value);
   };
 
+  const handleNewDonatorPhoneChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setNewDonatorPhone(event.target.value);
+  };
+
   const handleNewDonatorGroupChange = (event: SelectChangeEvent) => {
     setNewDonatorGroup(event.target.value);
   };
@@ -237,6 +244,19 @@ function DonationInfoPage() {
         console.error('Failed to delete donation:', error);
       });
   };
+  
+  const determineDonorType = () => {
+    switch (donationType) {
+      case 'donation':
+        return 'donor';
+      case 'sponsorship':
+        return 'sponsor';
+      case 'grant':
+        return 'grant';
+      default:
+        return 'donor';
+    }
+  };
 
   const handleSubmit = () => {
     setIsEditModalOpen(false);
@@ -245,11 +265,11 @@ function DonationInfoPage() {
         contact_name: donator?.title,
         contact_email: newDonatorEmail,
         contact_address: newDonatorAddress,
-        contact_phone: '0', // no input field for this yet
+        contact_phone: newDonatorPhone, 
         donor_group: newDonatorGroup,
-        registered_date: new Date(), // no input field for this yet
-        last_donation_date: new Date(), // no input field for this yet
-        type: '0', // no input field for this yet
+        registered_date: new Date(), 
+        last_donation_date: donationDate, 
+        type: determineDonorType(),
         // comments: null,
         // _id: null,
       };
@@ -280,7 +300,8 @@ function DonationInfoPage() {
 
                 postData('donation/edit', newDonation)
                   .then((response2) => {
-                    // Handle the response here
+                    setDonorName(response.data.contact_name);
+                    setPurpose(response1.data.name);
                     console.log(response2);
                   })
                   .catch((error) => {
@@ -306,7 +327,8 @@ function DonationInfoPage() {
 
             postData('donation/edit', newDonation)
               .then((response2) => {
-                // Handle the response here
+                setDonorName(response.data.contact_name);
+                setPurpose(campaignPurpose?.name);
                 console.log(response2);
               })
               .catch((error) => {
@@ -341,7 +363,8 @@ function DonationInfoPage() {
 
           postData('donation/edit', newDonation)
             .then((response2) => {
-              // Handle the response here
+              setDonorName(donator?.contact_name);
+              setPurpose(response1.data.name);
               console.log(response2);
             })
             .catch((error) => {
@@ -367,7 +390,8 @@ function DonationInfoPage() {
 
       postData('donation/edit', newDonation)
         .then((response) => {
-          // Handle the response here
+          setDonorName(donator?.contact_name);
+          setPurpose(campaignPurpose?.name);
           console.log(response);
         })
         .catch((error) => {
@@ -625,12 +649,24 @@ function DonationInfoPage() {
                   label="New Donator Address"
                   type="text"
                   value={newDonatorAddress}
+                  required={isNewDonator}
                   onChange={handleNewDonatorAddressChange}
                   sx={{ width: '40%' }}
                 />
               </Grid>
             )}
-
+            {isNewDonator && (
+              <Grid item xs={12}>
+                <TextField
+                  label="New Donator Phone"
+                  type="phone"
+                  value={newDonatorPhone}
+                  required={isNewDonator}
+                  onChange={handleNewDonatorPhoneChange}
+                  sx={{ width: '40%' }}
+                />
+              </Grid>
+            )}
             <Grid item xs={12}>
               <Autocomplete
                 sx={{ width: '40%' }}

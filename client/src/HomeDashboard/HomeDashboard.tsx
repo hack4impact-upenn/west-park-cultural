@@ -31,7 +31,7 @@ function BasicTable({ alignment }: BasicTableProps) {
     ];
   } else if (alignment === 'sponsorship') {
     customRows = [
-      { label: 'Total Sponsored', value: '$1350' },
+      { label: 'Total Sponsored', value: '$1450' },
       { label: 'Last Sponsorship', value: '18 Hours Ago' },
       { label: 'Sponsored in last 90 Days', value: '$42' },
     ];

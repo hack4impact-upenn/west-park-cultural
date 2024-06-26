@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 /* eslint-disable import/no-unresolved */
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import {
   Typography,
   Grid,
@@ -20,6 +19,10 @@ import {
 } from '@mui/material';
 import { PieChart, LineChart, BarChart } from '@mui/x-charts';
 import { ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
+import { useData, postData } from '../util/api';
+import useDonationStatistics from './useDonationStatistics';
+import dayjs from 'dayjs'; 
+import IReports from '../util/types/reports';
 
 const style = {
   position: 'absolute',
@@ -43,31 +46,174 @@ function createData(
   return { title, value, hasChange, changeValue, changeSymbol };
 }
 
-const rows = [
-  createData('Total Donated', '$1350', true, '$12', true),
-  createData('Total Donations', '45', true, '2', true),
-  createData('Average Donation', '$12.30', true, '$1.50', false),
-  createData('Average Donations Per Person', '1.2', true, '$12', false),
-  createData('Top Donator', 'John Doe (15 donations, $32)', false, '', false),
-  createData('Largest Donation', '$451 (Jane Doe)', false, '', false),
-];
+interface BasicTableProps {
+  alignment: string;
+  report: IReports | undefined;
+}
+
+function BasicTable({ alignment, report }: BasicTableProps) {
+  let customRows: { title: string; value: string,  hasChange: boolean, changeValue: string, changeSymbol: boolean }[] = [];
+  if (report) {
+    let data;
+    switch (alignment) {
+      case 'last_all':
+        data = report.last_all;
+        break;
+      case 'last_fiscal':
+        data = report.last_fiscal;
+        break;
+      case 'last_calendar':
+        data = report.last_calendar;
+        break;
+      case 'last_90':
+        data = report.last_90;
+        break;
+      case 'last_30':
+        data = report.last_30;
+        break;
+      default:
+        data = report.last_all;
+    }
+
+    customRows = [
+      createData('Total Donated', `$${data.total_donated}`, false, '', false),
+      createData('Total Donations', `${data.total_donations}`, false, '', false),
+      createData('Average Donation', `$${data.average_donations.toFixed(2)}`, false, '', false),
+      createData('Average Donations Per Person', `$${data.average_donations_per_person.toFixed(2)}`, false, '', false),
+      createData('Top Donator', `${data.top_donator.donor_name}`, false, '', false),
+      createData('Largest Donation', `$${data.largest_donation.amount} (${data.largest_donation.donor_name})`, false, '', false),
+    ];
+  } else {
+    customRows = [
+      createData('Total Donated', 'No report data', false, '', false),
+      createData('Total Donations', 'No report data', false, '', false),
+      createData('Average Donation', 'No report data', false, '', false),
+      createData('Average Donations Per Person', 'No report data', false, '', false),
+      createData('Top Donator', 'No report data', false, '', false),
+      createData('Largest Donation', 'No report data', false, '', false),
+    ];
+  }
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="report table">
+        <TableBody>
+          {customRows.map((row) => (
+            <TableRow
+              key={row.title}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.title}
+              </TableCell>
+              <TableCell align="right">{row.value}</TableCell>
+              {row.hasChange ? (
+                <TableCell align="right">
+                  {row.changeSymbol ? (
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      style={{ color: 'green' }}
+                      justifyContent="end"
+                    >
+                      <ArrowUpward />
+                      {row.changeValue}
+                    </Stack>
+                  ) : (
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      style={{ color: 'red' }}
+                      justifyContent="end"
+                    >
+                      <ArrowDownward />
+                      {row.changeValue}
+                    </Stack>
+                  )}
+                </TableCell>
+              ) : (
+                <TableCell align="right">
+                  <Remove />
+                </TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
 
 function ReportsPage() {
-  const [timeInterval, setTimeInterval] = useState<string | null>('last90Days');
-  const [confirmationModalOpen, setConfirmationModalOpen] =
-    React.useState(false);
+  const {
+    getReportForDateRange,
+  } = useDonationStatistics();
+
+  const [alignment, setAlignment] = useState('last_all');
+  const [report, setReport] = useState<IReports>();
+  const [allReports, setAllReports] = useState<IReports[]>([]);
+  const [confirmationModalOpen, setConfirmationModalOpen] = React.useState(false);
   const handleConfirmationModalOpen = () => setConfirmationModalOpen(true);
   const handleConfirmationModalClose = () => setConfirmationModalOpen(false);
-
   const [pastReportsModalOpen, setPastReportsModalOpen] = React.useState(false);
   const handlePastReportsModalOpen = () => setPastReportsModalOpen(true);
   const handlePastReportsModalClose = () => setPastReportsModalOpen(false);
+  const reports = useData('reports/all');
+
+  useEffect(() => {
+    const data = reports?.data || [];
+    setAllReports(data);
+  }, [reports]);
 
   const handleTimeInterval = (
     event: React.MouseEvent<HTMLElement>,
-    newTimeInterval: string | null,
+    newTimeInterval: string,
   ) => {
-    setTimeInterval(newTimeInterval);
+    setAlignment(newTimeInterval);
+  };
+
+  const validateReportData = (data) => {
+    return data && data.totalAmountDonated != null && data.totalNumberOfDonations != null;
+  };
+
+  useEffect(() => {
+    if (allReports && allReports.length > 0) {
+      const sortedReports = allReports.sort((a, b) => new Date(b.date_generated).getTime() - new Date(a.date_generated).getTime());
+      const mostRecentReport = sortedReports[0];
+      setReport(mostRecentReport);
+    }
+  }, [allReports]);
+
+
+  const generateReport = (retries = 3, delay = 1000) => {
+    const now = dayjs();
+
+    const lastFiscalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().startOf('year'));
+    const lastCalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().endOf('year').subtract(1, 'year'));
+    const last90DaysReportData = getReportForDateRange(now.subtract(90, 'days'), now);
+    const last30DaysReportData = getReportForDateRange(now.subtract(30, 'days'), now);
+    const allReportData = getReportForDateRange(dayjs('1960-01-01'), now);
+
+    const newReportData = {
+      last_fiscal: lastFiscalYrReportData,
+      last_calendar: lastCalYrReportData,
+      last_90: last90DaysReportData,
+      last_30: last30DaysReportData,
+      last_all: allReportData,
+    };
+
+    if (validateReportData(newReportData.last_90) || retries <= 0) {
+      postData('reports/create', newReportData)
+        .then((response) => {
+          console.log(response);
+          setReport(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      } else {
+        setTimeout(() => generateReport(retries - 1, delay), delay);
+      }
   };
 
   return (
@@ -75,7 +221,7 @@ function ReportsPage() {
       <Grid container sx={{ m: 3 }} spacing={2}>
         <Grid item xs={8}>
           <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
-            Report on 12/31/2023
+            Report on {dayjs().format('MM/DD/YYYY')}
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -100,87 +246,42 @@ function ReportsPage() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => {
-              alert('generate new report clicked');
-            }}
+            onClick={() => generateReport()}
           >
             Generate New Report
           </Button>
         </Grid>
         <Grid item xs={12}>
           <ToggleButtonGroup
-            value={timeInterval}
+            value={alignment}
             exclusive
             onChange={handleTimeInterval}
             aria-label="time interval"
             size="large"
           >
-            <ToggleButton value="allTime" aria-label="allTime">
+            <ToggleButton value="last_all" aria-label="allTime">
               All Time
             </ToggleButton>
-            <ToggleButton value="lastFiscalYr" aria-label="lastFiscalYr">
+            <ToggleButton value="last_fiscal" aria-label="lastFiscalYr">
               Last Fiscal Yr
             </ToggleButton>
-            <ToggleButton value="lastCalYr" aria-label="lastCalYr">
+            <ToggleButton value="last_calendar" aria-label="lastCalYr">
               Last Cal Yr
             </ToggleButton>
-            <ToggleButton value="last90Days" aria-label="last90Days">
+            <ToggleButton value="last_90" aria-label="last90Days">
               Last 90 Days
             </ToggleButton>
-            <ToggleButton value="last30Days" aria-label="last30Days">
+            <ToggleButton value="last_30" aria-label="last30Days">
               Last 30 Days
             </ToggleButton>
           </ToggleButtonGroup>
         </Grid>
 
-        <Grid item xs={12}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="report table">
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    key={row.title}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row.title}
-                    </TableCell>
-                    <TableCell align="right">{row.value}</TableCell>
-                    {row.hasChange ? (
-                      <TableCell align="right">
-                        {row.changeSymbol ? (
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            style={{ color: 'green' }}
-                            justifyContent="end"
-                          >
-                            <ArrowUpward />
-                            {row.changeValue}
-                          </Stack>
-                        ) : (
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            style={{ color: 'red' }}
-                            justifyContent="end"
-                          >
-                            <ArrowDownward />
-                            {row.changeValue}
-                          </Stack>
-                        )}
-                      </TableCell>
-                    ) : (
-                      <TableCell align="right">
-                        <Remove />
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
+        <BasicTable alignment={alignment} report={report} />
+
+        {/* <Grid item xs={12}>
+          
+        </Grid> */}
 
         <Grid item xs={12}>
           <Stack direction="row" spacing={2}>
