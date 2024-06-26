@@ -145,7 +145,7 @@ function NewDonationPage() {
     setCampaignPurpose(null);
     setNotes('');
     setPaymentType('');
-    setSuccessMessage(true)
+    setSuccessMessage(true);
   }
 
   const handleSubmit = () => {

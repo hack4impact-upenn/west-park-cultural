@@ -75,14 +75,25 @@ function BasicTable({ alignment, report }: BasicTableProps) {
         data = report.last_all;
     }
 
-    customRows = [
-      createData('Total Donated', `$${data.total_donated}`, false, '', false),
-      createData('Total Donations', `${data.total_donations}`, false, '', false),
-      createData('Average Donation', `$${data.average_donations.toFixed(2)}`, false, '', false),
-      createData('Average Donations Per Person', `$${data.average_donations_per_person.toFixed(2)}`, false, '', false),
-      createData('Top Donator', `${data.top_donator.donor_name}`, false, '', false),
-      createData('Largest Donation', `$${data.largest_donation.amount} (${data.largest_donation.donor_name})`, false, '', false),
-    ];
+    if (data) {
+      customRows = [
+        createData('Total Donated', `$${data.total_donated}`, false, '', false),
+        createData('Total Donations', `${data.total_donations}`, false, '', false),
+        createData('Average Donation', `$${data.average_donations.toFixed(2)}`, false, '', false),
+        createData('Average Donations Per Person', `$${data.average_donations_per_person.toFixed(2)}`, false, '', false),
+        createData('Top Donator', `${data.top_donator.donor_name}`, false, '', false),
+        createData('Largest Donation', `$${data.largest_donation.amount} (${data.largest_donation.donor_name})`, false, '', false),
+      ];
+    } else {
+      customRows = [
+        createData('Total Donated', 'No report data', false, '', false),
+        createData('Total Donations', 'No report data', false, '', false),
+        createData('Average Donation', 'No report data', false, '', false),
+        createData('Average Donations Per Person', 'No report data', false, '', false),
+        createData('Top Donator', 'No report data', false, '', false),
+        createData('Largest Donation', 'No report data', false, '', false),
+      ];
+    }
   } else {
     customRows = [
       createData('Total Donated', 'No report data', false, '', false),
@@ -151,6 +162,7 @@ function ReportsPage() {
   const [alignment, setAlignment] = useState('last_all');
   const [report, setReport] = useState<IReports>();
   const [allReports, setAllReports] = useState<IReports[]>([]);
+  const [errorMessage, setErrorMessage] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = React.useState(false);
   const handleConfirmationModalOpen = () => setConfirmationModalOpen(true);
   const handleConfirmationModalClose = () => setConfirmationModalOpen(false);
@@ -171,10 +183,6 @@ function ReportsPage() {
     setAlignment(newTimeInterval);
   };
 
-  const validateReportData = (data) => {
-    return data && data.totalAmountDonated != null && data.totalNumberOfDonations != null;
-  };
-
   useEffect(() => {
     if (allReports && allReports.length > 0) {
       const sortedReports = allReports.sort((a, b) => new Date(b.date_generated).getTime() - new Date(a.date_generated).getTime());
@@ -184,36 +192,36 @@ function ReportsPage() {
   }, [allReports]);
 
 
-  const generateReport = (retries = 3, delay = 1000) => {
+  const generateReport = () => {
+    setErrorMessage(false);
     const now = dayjs();
-
     const lastFiscalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().startOf('year'));
     const lastCalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().endOf('year').subtract(1, 'year'));
     const last90DaysReportData = getReportForDateRange(now.subtract(90, 'days'), now);
     const last30DaysReportData = getReportForDateRange(now.subtract(30, 'days'), now);
     const allReportData = getReportForDateRange(dayjs('1960-01-01'), now);
 
-    const newReportData = {
-      last_fiscal: lastFiscalYrReportData,
-      last_calendar: lastCalYrReportData,
-      last_90: last90DaysReportData,
-      last_30: last30DaysReportData,
-      last_all: allReportData,
-    };
-
-    if (validateReportData(newReportData.last_90) || retries <= 0) {
+    if (allReportData || last30DaysReportData || last90DaysReportData || lastCalYrReportData || lastFiscalYrReportData) {
+      const newReportData = {
+        last_fiscal: lastFiscalYrReportData,
+        last_calendar: lastCalYrReportData,
+        last_90: last90DaysReportData,
+        last_30: last30DaysReportData,
+        last_all: allReportData,
+      };
+  
       postData('reports/create', newReportData)
-        .then((response) => {
-          console.log(response);
-          setReport(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      } else {
-        setTimeout(() => generateReport(retries - 1, delay), delay);
-      }
+      .then((response) => {
+        console.log(response);
+        setReport(response.data);
+      })
+      .catch((error) => { 
+        console.log(error); 
+      }); 
+    } else {
+      setErrorMessage(true);
+      console.log('could not make a report');
+    }
   };
 
   return (
@@ -221,7 +229,7 @@ function ReportsPage() {
       <Grid container sx={{ m: 3 }} spacing={2}>
         <Grid item xs={8}>
           <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
-            Report on {dayjs().format('MM/DD/YYYY')}
+            Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -251,6 +259,11 @@ function ReportsPage() {
             Generate New Report
           </Button>
         </Grid>
+        {errorMessage && (
+          <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
+            Error generating the report, please retry.
+          </Typography>
+        )}
         <Grid item xs={12}>
           <ToggleButtonGroup
             value={alignment}

@@ -29,7 +29,6 @@ const getAllReportsController = async (
     res: express.Response,
     next: express.NextFunction,
   ) => {
-    console.log('calling');
     const reports: IReports = req.body;
     return createReports(reports)
       .then((result: any) => {
