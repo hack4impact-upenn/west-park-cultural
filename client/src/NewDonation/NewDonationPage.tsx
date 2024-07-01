@@ -286,8 +286,8 @@ function NewDonationPage() {
   };
 
   return (
-    <Grid container sx={{ m: 3 }} spacing={2}>
-      <Grid item xs={12}>
+    <Grid container sx={{ m: 4}} spacing={2} direction="column">
+      <Grid item xs={12} sx={{ mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}> 
           Register New Donation
         </Typography>

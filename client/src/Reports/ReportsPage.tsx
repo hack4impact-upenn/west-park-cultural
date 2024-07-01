@@ -217,8 +217,15 @@ function ReportsPage() {
   const generateReport = () => {
     setErrorMessage(false);
     const now = dayjs();
-    const lastFiscalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().startOf('year'));
-    const lastCalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().endOf('year').subtract(1, 'year'));
+    let fiscalYrStart;
+    const julyFirstCurrentYear = dayjs().month(6).date(1); 
+    if (now.isBefore(julyFirstCurrentYear)) {
+      fiscalYrStart = julyFirstCurrentYear.subtract(1, 'year'); 
+    } else {
+      fiscalYrStart = julyFirstCurrentYear; 
+    }
+    const lastCalYrReportData = getReportForDateRange(dayjs().startOf('year'), dayjs().endOf('year'));
+    const lastFiscalYrReportData = getReportForDateRange(fiscalYrStart, now);
     const last90DaysReportData = getReportForDateRange(now.subtract(90, 'days'), now);
     const last30DaysReportData = getReportForDateRange(now.subtract(30, 'days'), now);
     const allReportData = getReportForDateRange(dayjs('1960-01-01'), now);
@@ -299,90 +306,88 @@ function ReportsPage() {
 
   return (
     <div>
-      <Grid container sx={{ m: 3 }} spacing={2}>
-        <Grid item xs={8}>
+      <Grid sx={{ m: 4 }} spacing={2}>
+        <Grid>
           <Typography variant="h4" gutterBottom>
             Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
           </Typography>
         </Grid>
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleConfirmationModalOpen}
-          >
-            Download / Share
-          </Button>
-        </Grid>
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={handlePastReportsModalOpen}
-          >
-            View Past Reports
-          </Button>
-        </Grid>
-        <Grid container direction="row" spacing={2}>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={handleLoadRecentReport}
-          >
-            View Recent Report
-          </Button>
-        </Grid>
-        {!viewingPastReport && (
+        <Grid container direction="row" spacing={2} alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => generateReport()}
-            >
-              Generate New Report
-            </Button>
+            <Box display="flex" gap={2}>
+              {viewingPastReport && (
+                <Button
+                  variant="contained"
+                  color="inherit"
+                  onClick={handleLoadRecentReport}
+                >
+                  View Recent Report
+                </Button>
+              )}
+              {!viewingPastReport && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => generateReport()}
+                >
+                  Generate New Report
+                </Button>
+              )}
+            </Box>
           </Grid>
-        )}
-      </Grid>
+          <Grid item>
+            <Box display="flex" gap={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleConfirmationModalOpen}
+              >
+                Download / Share
+              </Button>
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={handlePastReportsModalOpen}
+              >
+                View Past Reports
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
         {errorMessage && (
           <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
             Error generating the report, please retry.
           </Typography>
         )}
-        <Grid item xs={12} sx={{ mb: 2 }}>
-          <ToggleButtonGroup
-            value={alignment}
-            exclusive
-            onChange={handleTimeInterval}
-            aria-label="time interval"
-            size="large"
-          >
-            <ToggleButton value="last_all" aria-label="allTime">
-              All Time
-            </ToggleButton>
-            <ToggleButton value="last_fiscal" aria-label="lastFiscalYr">
-              Last Fiscal Yr
-            </ToggleButton>
-            <ToggleButton value="last_calendar" aria-label="lastCalYr">
-              Last Cal Yr
-            </ToggleButton>
-            <ToggleButton value="last_90" aria-label="last90Days">
-              Last 90 Days
-            </ToggleButton>
-            <ToggleButton value="last_30" aria-label="last30Days">
-              Last 30 Days
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Grid>
+          <Grid sx={{ mt: 2, mb: 2 }}>
+            <ToggleButtonGroup
+              value={alignment}
+              exclusive
+              onChange={handleTimeInterval}
+              aria-label="time interval"
+              size="large"
+            >
+              <ToggleButton value="last_all" aria-label="allTime">
+                All Time
+              </ToggleButton>
+              <ToggleButton value="last_fiscal" aria-label="lastFiscalYr">
+                Fiscal Yr
+              </ToggleButton>
+              <ToggleButton value="last_calendar" aria-label="lastCalYr">
+                Cal Yr
+              </ToggleButton>
+              <ToggleButton value="last_90" aria-label="last90Days">
+                Last 90 Days
+              </ToggleButton>
+              <ToggleButton value="last_30" aria-label="last30Days">
+                Last 30 Days
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Grid>
 
-        <BasicTable alignment={alignment} report={report} prevReport={prevReport} />
+        <BasicTable  alignment={alignment} report={report} prevReport={prevReport} />
 
-        {/* <Grid item xs={12}>
-          
-        </Grid> */}
-
-        <Grid item xs={12}>
+        <Grid>
           <Stack direction="row" spacing={2}>
             <Box>
               <Typography variant="h6" align="center">
@@ -398,7 +403,7 @@ function ReportsPage() {
                     ],
                   },
                 ]}
-                width={400}
+                width={300}
                 height={200}
               />
             </Box>
@@ -413,7 +418,7 @@ function ReportsPage() {
                     data: [2, 5.5, 2, 8.5, 1.5, 5],
                   },
                 ]}
-                width={500}
+                width={300}
                 height={300}
               />
             </Box>

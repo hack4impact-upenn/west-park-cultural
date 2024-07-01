@@ -62,7 +62,6 @@ const updateGroupDonorsAPI = (selectedGroup: Group, donorIds: string[]) => {
 };
 
 export default function AddEditGroupsModal({ open, onClose }: any) {
-  // const [open, setOpen] = React.useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedDonors, setSelectedDonors] = useState<Donor[]>([]);
@@ -106,6 +105,7 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
   useEffect(() => {
     const data = group?.data || [];
     setGroups(data);
+    console.log(data);
   }, [group]);
   
   const handleAddDonor = () => {
@@ -126,7 +126,6 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
 
   const handleSubmit = () => {
     if (selectedGroup) {
-      // console.log(selectedGroup);
       const donorIds = selectedDonors.map((donor) => donor._id);
 
       updateGroupDonorsAPI(selectedGroup, donorIds) // update group
