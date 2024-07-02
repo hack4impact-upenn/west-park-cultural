@@ -12,6 +12,7 @@ import {
   TableRow,
   TableCell,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import axios from 'axios';
 import IDonor from '../util/types/donor';
@@ -37,12 +38,13 @@ interface PopupPageProps {
 }
 
 function PopupPage({ open, onClose, donorID }: PopupPageProps) {
-  const donations = useData(`donation/donor/${donorID}`);
+  // const donations = useData(`donation/donor/${donorID}`);
   const [donorData, setDonorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
   const [purposeID, setPurposeID] = useState('');
   const [purpose, setPurpose] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const purposes = useData('purpose');
   const [purposesData, setPurposesData] = useState<PurposeType[]>([]);
@@ -54,6 +56,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
 
   useEffect(() => {
     const fetchDonor = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `http://localhost:4000/api/donor/id/${donorID}`,
@@ -61,17 +64,36 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
         setDonorData(res.data);
       } catch (error) {
         console.error('Failed to fetch donor:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchDonor();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [donations?.data]);
+    if (open) {
+      fetchDonor();
+    }
+  }, [donorID, open]);
 
   useEffect(() => {
-    const data = donations?.data || [];
-    setDonationsData(data);
-  }, [donations?.data, donations]);
+    const fetchDonations = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:4000/api/donation/donor/${donorID}`,
+        );
+        setDonationsData(res.data);
+      } catch (error) {
+        console.error('Failed to fetch donation:', error);
+      } 
+    };
+    if (open) {
+      fetchDonations();
+    }
+  }, [donorID, open]);
+
+  // useEffect(() => {
+  //   const data = donations?.data || [];
+  //   setDonationsData(data);
+  // }, [donations?.data, donations]);
 
   useEffect(() => {
     const calculateDonationStats = (data: any) => {
@@ -120,7 +142,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
         const calendarYearStart = new Date(currentDate.getFullYear(), 0, 1);
         const calendarYearEnd = new Date(currentDate.getFullYear(), 11, 31);
 
-        const calendarYearDonations = donationsData.filter((donation: any) => {
+        const calendarYearDonations = data.filter((donation: any) => {
           const donationDate = new Date(donation.date);
           return (
             donationDate >= calendarYearStart && donationDate <= calendarYearEnd
@@ -143,7 +165,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
 
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const donationsLast30Days = donationsData.filter(
+        const donationsLast30Days = data.filter(
           (donation: any) => new Date(donation.date) > thirtyDaysAgo,
         );
         const donationsAmount30 = donationsLast30Days.reduce(
@@ -157,7 +179,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
           count: donationCountLast30Days,
         };
 
-        const mostRecentDonation = donationsData.reduce(
+        const mostRecentDonation = data.reduce(
           (mostRecent: any, donation: any) => {
             const donationDate = new Date(donation.date);
             if (!mostRecent || donationDate > new Date(mostRecent.date)) {
@@ -181,7 +203,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
         const stats: DonationStats = {
           totalDonationAmount: {
             amount: totalDonationAmount,
-            count: donationsData.length,
+            count: data.length,
           },
           avDonationPerFiscal,
           avDonationPerCalendar,
@@ -209,12 +231,30 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
     }
   }, [donationsData, purposesData]);
 
+  useEffect(() => {
+    if (!open) {
+      setDonorData(null);
+      setDonationsData([]);
+      setDonationsStats(undefined);
+      setPurpose('');
+      setPurposeID('');
+    }
+  }, [open]);
+
   return (
     <div>
       <Dialog open={open} onClose={onClose}>
-        <DialogTitle> {donorData?.contact_name} Summary </DialogTitle>
+        <DialogTitle>
+          {loading ? (
+            <CircularProgress size={24} />
+          ) : (
+            <Typography variant="h6">{`${donorData?.contact_name}'s Donation Summary`}</Typography>
+          )}
+        </DialogTitle>
         <DialogContent>
-          {donationsStats && (
+          {(loading || !donationStats ? (
+            <Typography>Loading...</Typography>
+          ) : (
             <TableContainer component={Paper}>
               <Table>
                 <TableBody>

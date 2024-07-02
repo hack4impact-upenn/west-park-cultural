@@ -140,10 +140,9 @@ const createNewDonation = async (
     );
     return;
   }
-  // const newDonation: IDonation | null = req.body.donation as IDonation;
-  const newDonation: IDonation | null = req.body as IDonation;
+  const newDonation: IDonation = req.body;
   return createDonation(newDonation)
-    .then((donation: any) => {
+    .then((donation: IDonation) => {
       res.status(StatusCode.CREATED).send(donation);
     })
     .catch(() => {

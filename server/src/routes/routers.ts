@@ -14,6 +14,7 @@ import donorRouter from './donor.route';
 import groupRouter from './group.route';
 import purposeRouter from './purpose.route';
 import communicationRouter from './communication.route';
+import reportsRouter from './reports.route';
 
 const prefixToRouterMap: { prefix: string; router: Router }[] = [
   {
@@ -43,6 +44,10 @@ const prefixToRouterMap: { prefix: string; router: Router }[] = [
   {
     prefix: '/api/communication',
     router: communicationRouter,
+  },
+  {
+    prefix: '/api/reports',
+    router: reportsRouter,
   },
 ];
 
