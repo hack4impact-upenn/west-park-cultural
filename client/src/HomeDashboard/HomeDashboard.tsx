@@ -158,11 +158,11 @@ function BasicTable({ alignment }: BasicTableProps) {
             color="primary"
           >
             Send them a message now{' '}
-            <i
+            {/* <i
               className="fa fa-arrow-right"
               aria-hidden="true"
               style={{ marginLeft: '10px' }}
-            />
+            /> */}
           </Button>
         </div>
       )}
@@ -240,7 +240,6 @@ function HomeDashboard() {
         </Box>
       </div>
     </div>
-
   );
 }
 

@@ -13,9 +13,9 @@ import {
   TableCell,
   Typography,
 } from '@mui/material';
+import axios from 'axios';
 import IDonor from '../util/types/donor';
 import { useData } from '../util/api';
-import axios from 'axios';
 
 interface BasicDonationStat {
   amount: number;
@@ -65,6 +65,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
     };
 
     fetchDonor();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [donations?.data]);
 
   useEffect(() => {
@@ -107,7 +108,11 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
 
         const avDonationPerFiscal: BasicDonationStat = {
           amount: fiscalYearDonations.length
-            ? (totalFiscalYearDonationAmount / fiscalYearDonations.length).toFixed(2)
+            ? Number(
+                (
+                  totalFiscalYearDonationAmount / fiscalYearDonations.length
+                ).toFixed(2),
+              )
             : 0,
           count: fiscalYearDonations.length,
         };
@@ -165,6 +170,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
 
         setPurposeID(mostRecentDonation.purpose_id || '');
         const purposeObject = purposesData.find(
+          // eslint-disable-next-line no-underscore-dangle
           (p) => p._id === mostRecentDonation.purpose_id,
         );
 
@@ -208,56 +214,58 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
       <Dialog open={open} onClose={onClose}>
         <DialogTitle> {donorData?.contact_name} Summary </DialogTitle>
         <DialogContent>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableCell>Total Donation Amount</TableCell>
-                  <TableCell>
-                    {donationsStats?.totalDonationAmount.count > 0
-                      ? `$${donationsStats.totalDonationAmount.amount}`
-                      : 'no history'}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Average Donation (Fiscal)</TableCell>
-                  <TableCell>
-                    {donationsStats?.avDonationPerFiscal.count > 0
-                      ? `$${donationsStats.avDonationPerFiscal.amount}`
-                      : 'no history'}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Average Donation (Calendar)</TableCell>
-                  <TableCell>
-                    {donationsStats?.avDonationPerCalendar.count > 0
-                      ? `$${donationsStats.avDonationPerCalendar.amount}`
-                      : 'no history'}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Average Donation (Past 30 Days)</TableCell>
-                  <TableCell>
-                    {donationsStats?.donationThirtyDays.count > 0
-                      ? `$${donationsStats.donationThirtyDays.amount}`
-                      : 'no history'}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Recent Donation</TableCell>
-                  <TableCell>
-                    {donationsStats?.recentDonation.amount > 0
-                      ? `$${donationsStats.recentDonation.amount}`
-                      : 'no history'}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Recent Campaign</TableCell>
-                  <TableCell>{purpose}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {donationsStats && (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Total Donation Amount</TableCell>
+                    <TableCell>
+                      {donationsStats?.totalDonationAmount.count > 0
+                        ? `$${donationsStats.totalDonationAmount.amount}`
+                        : 'no history'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Average Donation (Fiscal)</TableCell>
+                    <TableCell>
+                      {donationsStats?.avDonationPerFiscal.count > 0
+                        ? `$${donationsStats.avDonationPerFiscal.amount}`
+                        : 'no history'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Average Donation (Calendar)</TableCell>
+                    <TableCell>
+                      {donationsStats?.avDonationPerCalendar.count > 0
+                        ? `$${donationsStats.avDonationPerCalendar.amount}`
+                        : 'no history'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Average Donation (Past 30 Days)</TableCell>
+                    <TableCell>
+                      {donationsStats?.donationThirtyDays.count > 0
+                        ? `$${donationsStats.donationThirtyDays.amount}`
+                        : 'no history'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Recent Donation</TableCell>
+                    <TableCell>
+                      {donationsStats?.recentDonation.amount > 0
+                        ? `$${donationsStats.recentDonation.amount}`
+                        : 'no history'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Recent Campaign</TableCell>
+                    <TableCell>{purpose}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Close</Button>
