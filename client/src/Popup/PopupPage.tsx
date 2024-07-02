@@ -14,9 +14,9 @@ import {
   Typography,
   CircularProgress,
 } from '@mui/material';
+import axios from 'axios';
 import IDonor from '../util/types/donor';
 import { useData } from '../util/api';
-import axios from 'axios';
 
 interface BasicDonationStat {
   amount: number;
@@ -130,7 +130,11 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
 
         const avDonationPerFiscal: BasicDonationStat = {
           amount: fiscalYearDonations.length
-            ? (totalFiscalYearDonationAmount / fiscalYearDonations.length).toFixed(2)
+            ? Number(
+                (
+                  totalFiscalYearDonationAmount / fiscalYearDonations.length
+                ).toFixed(2),
+              )
             : 0,
           count: fiscalYearDonations.length,
         };
@@ -188,6 +192,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
 
         setPurposeID(mostRecentDonation.purpose_id || '');
         const purposeObject = purposesData.find(
+          // eslint-disable-next-line no-underscore-dangle
           (p) => p._id === mostRecentDonation.purpose_id,
         );
 
@@ -247,7 +252,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
           )}
         </DialogTitle>
         <DialogContent>
-          {loading ? (
+          {(loading || !donationStats ? (
             <Typography>Loading...</Typography>
           ) : (
             <TableContainer component={Paper}>
