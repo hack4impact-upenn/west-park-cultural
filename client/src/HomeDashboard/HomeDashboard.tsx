@@ -13,6 +13,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useAppDispatch } from '../util/redux/hooks';
 import { useData } from '../util/api';
 import DonationsTable from '../components/tables/DonationsTable';
@@ -152,6 +153,9 @@ function BasicTable({ alignment }: BasicTableProps) {
               padding: '15px',
               marginBottom: '0',
             }}
+            endIcon={<ArrowForwardIcon />}
+            variant="contained"
+            color="primary"
           >
             Send them a message now{' '}
             <i
@@ -236,6 +240,7 @@ function HomeDashboard() {
         </Box>
       </div>
     </div>
+
   );
 }
 

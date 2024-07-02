@@ -71,7 +71,7 @@ function App() {
                         path="/new-donation"
                         element={<NewDonationPage />}
                       />
-                      <Route path="/popup" element={<PopupPage />} />
+                      {/* <Route path="/popup" element={<PopupPage />} /> */}
                       <Route
                         path="/invite/:token"
                         element={<InviteRegisterPage />}

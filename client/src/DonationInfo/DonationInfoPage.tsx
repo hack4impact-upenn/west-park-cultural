@@ -449,12 +449,13 @@ function DonationInfoPage() {
             }}
           >
             <Button
-              onClick={() => navigate('/home')}
-              style={{
-                marginLeft: '16px',
-                background: '#417FED',
-                color: 'white',
+              variant="contained"
+              color="primary"
+              endIcon={<ArrowForwardIcon />}
+              onClick={() => {
+                navigate('/communications');
               }}
+              sx={{ marginLeft: '16px' }}
             >
               {donationData.acknowledged
                 ? 'Send them a message'

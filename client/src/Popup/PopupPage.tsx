@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import {
   Button,
@@ -16,6 +15,7 @@ import {
 } from '@mui/material';
 import IDonor from '../util/types/donor';
 import { useData } from '../util/api';
+import axios from 'axios';
 
 interface BasicDonationStat {
   amount: number;
@@ -30,21 +30,15 @@ interface DonationStats {
   recentDonation: any;
 }
 
-function PopupPage() {
-  const [openPopup, setOpenPopup] = useState(false);
+interface PopupPageProps {
+  open: boolean;
+  onClose: () => void;
+  donorID: string;
+}
 
-  const handleOpenPopup = () => {
-    setOpenPopup(true);
-  };
-
-  const handleClosePopup = () => {
-    setOpenPopup(false);
-  };
-
-  const donorID = '65daa67d6c34e8adb9f2d2c4';
+function PopupPage({ open, onClose, donorID }: PopupPageProps) {
   const donations = useData(`donation/donor/${donorID}`);
-  const donor = useData(`donor/${donorID}`);
-  const [donorData, setDonatorData] = useState<IDonor | null>(null);
+  const [donorData, setDonorData] = useState<IDonor | null>(null);
   const [donationsData, setDonationsData] = useState<any>([]);
   const [donationsStats, setDonationsStats] = useState<DonationStats>();
   const [purposeID, setPurposeID] = useState('');
@@ -59,10 +53,19 @@ function PopupPage() {
   }, [purposes]);
 
   useEffect(() => {
-    const data = donor?.data || null;
-    setDonatorData(data);
-    console.log(data);
-  }, [donor]);
+    const fetchDonor = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:4000/api/donor/id/${donorID}`,
+        );
+        setDonorData(res.data);
+      } catch (error) {
+        console.error('Failed to fetch donor:', error);
+      }
+    };
+
+    fetchDonor();
+  }, [donations?.data]);
 
   useEffect(() => {
     const data = donations?.data || [];
@@ -72,29 +75,24 @@ function PopupPage() {
   useEffect(() => {
     const calculateDonationStats = (data: any) => {
       if (data.length) {
-        // Calculate Total Donation Amount
         const totalDonationAmount = data.reduce(
           (total: number, donation: any) => total + donation.amount,
           0,
         );
 
-        // Get the current date
         let fiscalYearStart: Date;
         let fiscalYearEnd: Date;
 
         const currentDate = new Date();
 
         if (currentDate.getMonth() < 6) {
-          // If the current date is before July 1, the fiscal year starts on July 1 of the previous year
           fiscalYearStart = new Date(currentDate.getFullYear() - 1, 6, 1);
           fiscalYearEnd = new Date(currentDate.getFullYear(), 5, 30);
         } else {
-          // If the current date is on or after July 1, the fiscal year starts on July 1 of the current year
           fiscalYearStart = new Date(currentDate.getFullYear(), 6, 1);
           fiscalYearEnd = new Date(currentDate.getFullYear() + 1, 5, 30);
         }
 
-        // Filter out the donations that were made during the current fiscal year
         const fiscalYearDonations = data.filter((donation: any) => {
           const donationDate = new Date(donation.date);
           return (
@@ -102,25 +100,21 @@ function PopupPage() {
           );
         });
 
-        // Calculate the total amount of donations made during the current fiscal year
         const totalFiscalYearDonationAmount = fiscalYearDonations.reduce(
           (total: number, donation: any) => total + donation.amount,
           0,
         );
 
-        // Calculate the average donation per fiscal year
         const avDonationPerFiscal: BasicDonationStat = {
           amount: fiscalYearDonations.length
-            ? totalFiscalYearDonationAmount / fiscalYearDonations.length
+            ? (totalFiscalYearDonationAmount / fiscalYearDonations.length).toFixed(2)
             : 0,
           count: fiscalYearDonations.length,
         };
 
-        // Define the start and end dates of the current calendar year
         const calendarYearStart = new Date(currentDate.getFullYear(), 0, 1);
         const calendarYearEnd = new Date(currentDate.getFullYear(), 11, 31);
 
-        // Filter out the donations that were made during the current calendar year
         const calendarYearDonations = donationsData.filter((donation: any) => {
           const donationDate = new Date(donation.date);
           return (
@@ -128,13 +122,11 @@ function PopupPage() {
           );
         });
 
-        // Calculate the total amount of donations made during the current calendar year
         const totalCalendarYearDonationAmount = calendarYearDonations.reduce(
           (total: number, donation: any) => total + donation.amount,
           0,
         );
 
-        // Calculate the average donation per calendar year
         const avDonationPerCalendar: BasicDonationStat = {
           amount: calendarYearDonations.length
             ? +(
@@ -144,7 +136,6 @@ function PopupPage() {
           count: calendarYearDonations.length,
         };
 
-        // Calculate Donation (in past 30 days)
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         const donationsLast30Days = donationsData.filter(
@@ -161,7 +152,6 @@ function PopupPage() {
           count: donationCountLast30Days,
         };
 
-        // Find the most recent donation
         const mostRecentDonation = donationsData.reduce(
           (mostRecent: any, donation: any) => {
             const donationDate = new Date(donation.date);
@@ -201,15 +191,21 @@ function PopupPage() {
 
     if (donationsData.length > 0) {
       calculateDonationStats(donationsData);
+    } else {
+      setDonationsStats({
+        totalDonationAmount: { amount: 0, count: 0 },
+        avDonationPerFiscal: { amount: 0, count: 0 },
+        avDonationPerCalendar: { amount: 0, count: 0 },
+        donationThirtyDays: { amount: 0, count: 0 },
+        recentDonation: { amount: 0, date: 'no history' },
+      });
+      setPurpose('no history');
     }
   }, [donationsData, purposesData]);
 
   return (
     <div>
-      <Button onClick={handleOpenPopup}>Popup 1</Button>
-
-      {/* Popup */}
-      <Dialog open={openPopup} onClose={handleClosePopup}>
+      <Dialog open={open} onClose={onClose}>
         <DialogTitle> {donorData?.contact_name} Summary </DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
@@ -218,31 +214,41 @@ function PopupPage() {
                 <TableRow>
                   <TableCell>Total Donation Amount</TableCell>
                   <TableCell>
-                    ${donationsStats?.totalDonationAmount.amount}
+                    {donationsStats?.totalDonationAmount.count > 0
+                      ? `$${donationsStats.totalDonationAmount.amount}`
+                      : 'no history'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Average Donation (Fiscal)</TableCell>
                   <TableCell>
-                    ${donationsStats?.avDonationPerFiscal.amount}
+                    {donationsStats?.avDonationPerFiscal.count > 0
+                      ? `$${donationsStats.avDonationPerFiscal.amount}`
+                      : 'no history'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Average Donation (Calendar)</TableCell>
                   <TableCell>
-                    ${donationsStats?.avDonationPerCalendar.amount}
+                    {donationsStats?.avDonationPerCalendar.count > 0
+                      ? `$${donationsStats.avDonationPerCalendar.amount}`
+                      : 'no history'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Average Donation (Past 30 Days)</TableCell>
                   <TableCell>
-                    ${donationsStats?.donationThirtyDays.amount}
+                    {donationsStats?.donationThirtyDays.count > 0
+                      ? `$${donationsStats.donationThirtyDays.amount}`
+                      : 'no history'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Recent Donation</TableCell>
                   <TableCell>
-                    ${donationsStats?.recentDonation.amount}
+                    {donationsStats?.recentDonation.amount > 0
+                      ? `$${donationsStats.recentDonation.amount}`
+                      : 'no history'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -254,7 +260,7 @@ function PopupPage() {
           </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClosePopup}>Close</Button>
+          <Button onClick={onClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </div>
