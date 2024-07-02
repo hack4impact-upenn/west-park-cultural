@@ -47,15 +47,9 @@ const acknowledgeDonation = async (id: string) => {
   return null;
 };
 
-const editDonationById = async (
-  _id: string,
-  newDonationInfo: IDonation,
-) => {
+const editDonationById = async (_id: string, newDonationInfo: IDonation) => {
   try {
-    const donation = await Donation.updateOne(
-      { _id },
-      newDonationInfo,
-    ).exec();
+    const donation = await Donation.updateOne({ _id }, newDonationInfo).exec();
     return donation;
   } catch (error) {
     throw new Error('Error updating donation');

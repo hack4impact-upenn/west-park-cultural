@@ -40,7 +40,7 @@ function Sidebar(props: any) {
                       </div>
                       <div
                         className="sidebar-link"
-                        onClick={() => navto('/donationInfo')}
+                        onClick={() => navto('/donorDashboard')}
                       >
                         <i className="fa-solid fa-table-columns" /> &nbsp; Donor
                         Dashboard
