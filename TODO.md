@@ -1,0 +1,15 @@
+- Make Donor Delete Work
+- Fix Recent Donation for a donor profile
+- Add Last Communication for Donors
+- Add Acknowledge Field
+- Add Organization Details for a User
+- Fix Donation / Grant / Sponsor for all visible text
+- Animations (on like alert close)
+- TableSortLabel
+- Add All category for donations + sponsorships + grants?
+- Fix Donations sometimes storing ObjectRef and sometimes storing Objectid as stirng
+  for donor_id
+- have alert dissapear for a second AND FIX BLUE ALERT
+- Fix purposeID being string and not object ID
+- FIX red circle for unack not exactly center
+- Change Yes/No to checkmark

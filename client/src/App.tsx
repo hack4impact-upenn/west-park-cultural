@@ -33,6 +33,7 @@ import NewDonationPage from './NewDonation/NewDonationPage';
 import Sidebar from './Sidebar/Sidebar';
 import DonationInfoPage from './DonationInfo/DonationInfoPage';
 import PopupPage from './Popup/PopupPage';
+import DonationDahsboard from './DonorDashboard/DonorDahsboard';
 
 function App() {
   return (
@@ -85,8 +86,12 @@ function App() {
                       <Route element={<ProtectedRoutesWrapper />}>
                         <Route path="/home" element={<HomePage />} />
                         <Route
-                          path="/donationInfo"
+                          path="/donationInfo/:donationId"
                           element={<DonationInfoPage />}
+                        />
+                        <Route
+                          path="/donorDashboard"
+                          element={<DonationDahsboard />}
                         />
                         <Route path="/reports" element={<ReportsPage />} />
                         <Route

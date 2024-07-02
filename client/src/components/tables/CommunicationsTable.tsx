@@ -11,7 +11,6 @@ function CommunicationsTable() {
   //   { id: 'group_name', label: 'Added Groups' },
   //   // Add more columns as needed
   // ];
-
   // // Generate the rows
   // const rows = [];
   // const startDate = new Date('2023-01-01');
@@ -24,7 +23,6 @@ function CommunicationsTable() {
   //     // Add more data as needed
   //   });
   // }
-
   // return <FilteringTable columns={columns} rows={rows} />;
 }
 

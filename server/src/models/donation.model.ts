@@ -30,10 +30,12 @@ const DonationSchema = new mongoose.Schema({
     default: false,
   },
   donor_id: {
-    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Donor',
   },
   purpose_id: {
-    type: { type: mongoose.Schema.Types.ObjectId, ref: 'Purpose' },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Purpose',
   },
   comments: {
     type: String,

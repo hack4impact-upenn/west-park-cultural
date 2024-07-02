@@ -1,12 +1,26 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, MenuItem, Popover, Grid } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  TextField,
+  MenuItem,
+  Popover,
+  Grid,
+  Alert,
+} from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import Collapse from '@mui/material/Collapse';
+import { useNavigate, useParams } from 'react-router-dom';
 import ProfileInfo from './ProfileInfo';
 import DateInfoBox from './DateInfoBox';
 import DonorNoteBox from './DonorNoteBox';
 import IDonor from '../util/types/donor';
-import { useData, postData } from '../util/api';
+import { useData, postData, getData } from '../util/api';
+import DonationHistoryTable from '../components/tables/DonationHistoryTable';
+import ConfirmModal from '../components/ConfirmationModal';
 
 function DonorProfilePage() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -21,22 +35,43 @@ function DonorProfilePage() {
   const [selectedDonorType, setSelectedDonorType] = useState('');
   const [confirmDisabled, setConfirmDisabled] = useState(true);
   const { donatorId } = useParams();
+  const [numAck, setNumAck] = useState(0);
 
   const donator = useData(`donor/id/${donatorId}`);
   const [donatorData, setDonatorData] = useState<IDonor | null>(null);
 
+  const donationsMade = useData(`donation/donor/${donatorId}`);
+  const [alert, setAlert] = useState('');
+
+  const navigate = useNavigate();
+
+  const updateDonorAfterChange = (donorDataArg?: any) => {
+    const donorDataInner = donorDataArg;
+    if (donorDataInner) {
+      setDonatorData(donorDataInner);
+      setName(donorDataInner?.contact_name);
+      setEmail(donorDataInner?.contact_email);
+      setPhone(donorDataInner?.contact_phone);
+      setAddress(donorDataInner?.contact_address);
+      setSelectedDonorGroup(donorDataInner?.donor_group);
+      setOrgName(donorDataInner?.org_name);
+      setOrgEmail(donorDataInner?.org_email);
+      setOrgAddress(donorDataInner?.org_address);
+    }
+  };
+
   useEffect(() => {
-    const data = donator?.data || null;
-    setDonatorData(data);
-    setName(data?.contact_name);
-    setEmail(data?.contact_email);
-    setPhone(data?.contact_phone);
-    setAddress(data?.contact_address);
-    setSelectedDonorGroup(data?.donor_group);
-    setOrgName(data?.org_name);
-    setOrgEmail(data?.org_email);
-    setOrgAddress(data?.org_address);
+    updateDonorAfterChange(donator?.data);
   }, [donator]);
+
+  useEffect(() => {
+    if (donationsMade?.data) {
+      setNumAck(
+        donationsMade.data.filter((donation: any) => !donation.acknowledged)
+          .length,
+      );
+    }
+  }, [donationsMade?.data]);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -89,11 +124,14 @@ function DonorProfilePage() {
     postData('donor/edit', updateDonor)
       .then((response2) => {
         // Handle the response here
-        console.log(response2);
+        getData(`donor/id/${donatorId}`).then((response) => {
+          updateDonorAfterChange(response.data);
+          setAlert('1Donor updated successfully');
+        });
       })
       .catch((error) => {
         // Handle the error here
-        console.log(error);
+        setAlert('0Error updating donor');
       });
     handleClose(); // Close the popover after confirming changes
   };
@@ -115,8 +153,30 @@ function DonorProfilePage() {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  const handleDelete = () => {
+    console.log();
+  };
+
   return (
     <Box sx={{ p: 3 }}>
+      <Collapse in={alert !== ''}>
+        <div style={{ marginTop: '10px', marginBottom: '20px' }}>
+          <Alert
+            severity={
+              alert.charAt(0) === '1'
+                ? 'success'
+                : alert.charAt(0) === '0'
+                ? 'error'
+                : 'info'
+            }
+            onClose={() => {
+              setAlert('');
+            }}
+          >
+            {alert.substring(1)}
+          </Alert>
+        </div>
+      </Collapse>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <ProfileInfo donatorData={donatorData} />
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
@@ -269,17 +329,68 @@ function DonorProfilePage() {
         </Button>
       </Box>
 
-      {/* Placeholder for Donation History Table */}
-      <Box
-        sx={{
-          height: 300,
-          bgcolor: '#e0e0e0',
-          borderRadius: 2,
-          boxShadow: 3,
-        }}
-      >
-        {/* Donation history will go here */}
-      </Box>
+      <DonationHistoryTable donorId={donatorId || ''} />
+      <div style={{ marginTop: '20px' }}>
+        {' '}
+        {numAck > 0 && (
+          <p style={{ marginTop: '16px', marginLeft: '16px', color: 'red' }}>
+            {numAck} donation{numAck > 1 ? 's have' : ' has'} not been
+            acknowledged.
+          </p>
+        )}
+        {numAck === 0 && (
+          <p style={{ marginTop: '16px', marginLeft: '16px', color: 'green' }}>
+            All donations have been acknowledged.
+          </p>
+        )}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+            paddingRight: '16px',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              width: '50%',
+            }}
+          >
+            {numAck > 0 && (
+              <Button
+                onClick={() => navigate('/home')}
+                style={{
+                  marginLeft: '16px',
+                  background: '#417FED',
+                  color: 'white',
+                }}
+              >
+                Acknowledge their donations
+              </Button>
+            )}
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              width: '50%',
+              gap: '16px',
+            }}
+          >
+            <ConfirmModal
+              buttonText="Delete"
+              title="Deleting"
+              body="Are you sure you want to delete this donor? This will delete ALL information associated with this donor AND ALL 
+            donations made by this donor."
+              onConfirm={handleDelete}
+            />
+          </Box>
+        </Box>
+      </div>
     </Box>
   );
 }

@@ -23,7 +23,7 @@ interface BasicTableProps {
 }
 
 function BasicTable({ alignment }: BasicTableProps) {
-  let customRows: { label: string; value: string }[] = [];
+  let customRows: { label: string; value: any }[] = [];
   const donations = useData('donation/all');
   const [donationsData, setDonationsData] = useState<any>([]);
 
@@ -43,11 +43,11 @@ function BasicTable({ alignment }: BasicTableProps) {
   const sortedDonationsData = [...donationsData].sort(
     (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
-  const lastDate =
-    sortedDonationsData.length > 0
-      ? new Date(sortedDonationsData[0].date)
-      : null;
-  let last = 'N/A';
+  const lastDonation =
+    sortedDonationsData.length > 0 ? sortedDonationsData[0] : null;
+  const lastDate = lastDonation ? new Date(lastDonation.date) : null;
+  const LAST_DEFAULT = 'N/A';
+  let last = LAST_DEFAULT;
 
   if (lastDate) {
     const currentDate = new Date();
@@ -66,6 +66,12 @@ function BasicTable({ alignment }: BasicTableProps) {
       last = `${hoursDifference} hours ago`;
     }
   }
+  let lastElement = <span>{last}</span>;
+  if (last !== LAST_DEFAULT) {
+    // eslint-disable-next-line no-underscore-dangle
+    lastElement = <a href={`/donationInfo/${lastDonation._id}`}>{last}</a>;
+  }
+
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
   const donatedInLast90Days = donationsData.reduce(
@@ -79,7 +85,7 @@ function BasicTable({ alignment }: BasicTableProps) {
   if (alignment === 'donation') {
     customRows = [
       { label: 'Total Donated', value: `$${totalDonated.toLocaleString()}` },
-      { label: 'Last Donation', value: last },
+      { label: 'Last Donation', value: lastElement },
       {
         label: 'Donated in last 90 Days',
         value: `$${donatedInLast90Days.toLocaleString()}`,
@@ -88,7 +94,7 @@ function BasicTable({ alignment }: BasicTableProps) {
   } else if (alignment === 'sponsorship') {
     customRows = [
       { label: 'Total Sponsored', value: `$${totalDonated.toLocaleString()}` },
-      { label: 'Last Sponsorship', value: last },
+      { label: 'Last Sponsorship', value: lastElement },
       {
         label: 'Sponsored in last 90 Days',
         value: `$${donatedInLast90Days.toLocaleString()}`,
@@ -97,7 +103,7 @@ function BasicTable({ alignment }: BasicTableProps) {
   } else if (alignment === 'grant') {
     customRows = [
       { label: 'Total Granted', value: `$${totalDonated.toLocaleString()}` },
-      { label: 'Last Grant', value: last },
+      { label: 'Last Grant', value: lastElement },
       {
         label: 'Granted in last 90 Days',
         value: `$${donatedInLast90Days.toLocaleString()}`,
@@ -111,12 +117,6 @@ function BasicTable({ alignment }: BasicTableProps) {
 
   return (
     <div className="basic-table">
-      {/* <Box
-      border="none"
-      borderRadius={4}
-      p={2}
-      sx={{ width: 'min(500px, 100%)' }}
-    > */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 300 }} aria-label="simple table">
           <TableBody>
@@ -131,10 +131,37 @@ function BasicTable({ alignment }: BasicTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
-      <p style={{ marginTop: '16px' }}>
-        There are {numUnacknowledged} unacknowledged {alignment}s.
-      </p>
-      {/* </Box> */}
+      {numUnacknowledged > 0 && (
+        <div>
+          <p style={{ marginTop: '16px' }}>
+            There are{' '}
+            <span className="redcircle">
+              <span className="redcirclenumber">{numUnacknowledged}</span>
+            </span>{' '}
+            unacknowledged {alignment}s.
+          </p>
+          <Button
+            onClick={() => {
+              console.log('');
+            }}
+            style={{
+              background: '#24a0ed',
+              color: 'white',
+              marginRight: '16px',
+              marginTop: '0px',
+              padding: '15px',
+              marginBottom: '0',
+            }}
+          >
+            Send them a message now{' '}
+            <i
+              className="fa fa-arrow-right"
+              aria-hidden="true"
+              style={{ marginLeft: '10px' }}
+            />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -152,11 +179,6 @@ function HomeDashboard() {
       setAlignment(newAlignment);
     }
   };
-
-  function handleClick() {
-    const s = `/home`;
-    navigator(s);
-  }
 
   return (
     <div className="max-width-wrapper">
@@ -177,7 +199,7 @@ function HomeDashboard() {
 
           <Button
             onClick={() => {
-              handleClick();
+              console.log('');
             }}
             style={{
               background: 'grey',
@@ -195,16 +217,8 @@ function HomeDashboard() {
             View Report
           </Button>
         </div>
-        {/* <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="space-between" // Align items at start and end of the box
-        width="100%" // Set box width to 100% of its container
-        marginBottom={2}
-        marginLeft={2} // Added marginLeft to align with the left edge
-      ></Box> */}
-        <Box marginBottom={0} marginLeft={2}>
+
+        <Box marginBottom={1}>
           {/* Add a Typography for the title "Summary" */}
           <Typography variant="h4" style={{ marginTop: '30px' }}>
             Summary
@@ -214,75 +228,14 @@ function HomeDashboard() {
         {/* Render the BasicTable component with the alignment prop */}
         <BasicTable alignment={alignment} />
 
-        <p style={{ marginTop: '16px', marginLeft: '16px' }}>
-          There are{' '}
-          <span className="redcircle">
-            <span className="redcirclenumber">3</span>
-          </span>{' '}
-          unacknowledged {alignment}s.
-        </p>
-
-        <Button
-          onClick={() => {
-            handleClick();
-          }}
-          style={{
-            marginLeft: '16px',
-            background: '#24a0ed',
-            color: 'white',
-            marginRight: '16px',
-            marginTop: '16px',
-            padding: '15px',
-          }}
-        >
-          Send them a message now{' '}
-          <i
-            className="fa fa-arrow-right"
-            aria-hidden="true"
-            style={{ marginLeft: '10px' }}
-          />
-        </Button>
-<!--   START    </Box>
-
-      <Box width="100%" marginBottom={4}>
-        {/* Add a Typography for the title "Summary" */}
-        <Typography variant="h4" gutterBottom>
-          Summary
-        </Typography>
-        <BasicTable alignment={alignment} />
-        <Button
-          onClick={() => {
-            handleClick();
-          }}
-          style={{
-            background: '#0693e3',
-            color: 'white',
-            marginLeft: '15px',
-            paddingLeft: '15px',
-            paddingRight: '15px',
-          }}
-        >
-          Send them a message now
-        </Button>
-      </Box>
-      <Box width="100%" paddingRight={3}>
-        <Typography variant="h4" gutterBottom>
-          {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
-        </Typography>
-        <DonationsTable alignment={alignment} />
-      </Box>
-    </Box> END -->
-
-        <Box marginBottom={2} marginLeft={2} marginTop={5}>
+        <Box width="100%" marginBottom={10} marginTop={5}>
           <Typography variant="h4" gutterBottom>
             {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
           </Typography>
+          <DonationsTable alignment={alignment} />
         </Box>
       </div>
     </div>
-    // <Box display="flex" flexDirection="column" alignItems="flex-start">
-
-    // </Box>
   );
 }
 

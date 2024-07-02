@@ -167,7 +167,7 @@ function NewDonationPage() {
             postData('donation/new', newDonation)
               .then((response2) => {
                 // Handle the response here
-                console.log(response2);
+                // console.log(response2);
               })
               .catch((error) => {
                 // Handle the error here

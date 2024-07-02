@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import {
@@ -22,8 +23,11 @@ import {
   TextField,
   SelectChangeEvent,
   Divider,
+  Alert,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import CheckIcon from '@mui/icons-material/Check';
+import Collapse from '@mui/material/Collapse';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { borderRadius, width } from '@mui/system';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -32,7 +36,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import dayjs, { Dayjs } from 'dayjs';
-import { useData, postData } from '../util/api';
+import { useData, getData, postData } from '../util/api';
 import { useAppDispatch } from '../util/redux/hooks';
 import ConfirmModal from '../components/ConfirmationModal';
 
@@ -89,8 +93,10 @@ function DonationInfoPage() {
 
   // Fetch donation data from API
 
-  const donationID = '65ff8dd5ef350bba76ecaaa6';
-  const donation = useData(`donation/${donationID}`);
+  // const donationID = '65ff8dd5ef350bba76ecaaa6';
+  const { donationId } = useParams();
+  const donationID = donationId;
+  let donation = useData(`donation/${donationID}`);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -109,6 +115,9 @@ function DonationInfoPage() {
   );
   const [notes, setNotes] = useState('');
   const [paymentType, setPaymentType] = useState('');
+  const [acknowledged, setAcknowledge] = useState(false);
+
+  const [alert, setAlert] = useState('');
 
   const donors = useData('donor/all');
   const [donorsData, setDonorsData] = useState<DonorType[]>([]);
@@ -126,37 +135,48 @@ function DonationInfoPage() {
     setPurposesData(data);
   }, [purposes]);
 
-  useEffect(() => {
-    const fetchDonorAndPurpose = async () => {
-      if (donation?.data) {
-        setDonationData(donation.data);
-        if (donation.data.donor_id) {
-          try {
-            const res = await axios.get(
-              `http://localhost:4000/api/donor/id/${donation.data.donor_id}`,
-            );
-            setDonorName(res.data.contact_name);
-            setDonator(res.data);
-          } catch (error) {
-            console.error('Failed to fetch donor name:', error);
-          }
-        }
-
-        if (donation.data.purpose_id) {
-          try {
-            const res = await axios.get(
-              `http://localhost:4000/api/purpose/${donation.data.purpose_id}`,
-            );
-            setPurpose(res.data.name);
-            setCampaignPurpose(res.data);
-          } catch (error) {
-            console.error('Failed to fetch donor name:', error);
-          }
+  const fetchDonorAndPurpose = async () => {
+    console.log('HIT');
+    console.log(donation);
+    if (donation?.data) {
+      setDonationData(donation.data);
+      if (donation.data.donor_id) {
+        try {
+          const res = await axios.get(
+            `http://localhost:4000/api/donor/id/${donation.data.donor_id}`,
+          );
+          setDonorName(res.data.contact_name);
+          setDonator(res.data);
+        } catch (error) {
+          console.error('Failed to fetch donor name:', error);
         }
       }
-    };
 
+      if (donation.data.purpose_id) {
+        try {
+          const res = await axios.get(
+            `http://localhost:4000/api/purpose/${donation.data.purpose_id}`,
+          );
+          setPurpose(res.data.name);
+          setCampaignPurpose(res.data);
+        } catch (error) {
+          console.error('Failed to fetch donor name:', error);
+        }
+      }
+    }
+  };
+
+  const update = () => {
+    getData(`donation/${donationID}`).then((res) => {
+      donation = res;
+      fetchDonorAndPurpose();
+    });
+  };
+
+  useEffect(() => {
+    console.log('donation', donation);
     fetchDonorAndPurpose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [donation?.data]);
 
   function formatDateString(dateString: string): string {
@@ -179,12 +199,20 @@ function DonationInfoPage() {
           label: 'Date Donated',
           value: formatDateString(donationData.date) || 'N/A',
         },
-        { label: 'Donor', value: donorName || 'N/A' },
+        {
+          label: 'Donor',
+          value:
+            (
+              <a href={`/donor-profile/${donationData.donor_id}`}>
+                {donorName}
+              </a>
+            ) || 'N/A',
+        },
         {
           label: 'Payment Information',
           value: donationData.payment_type || 'N/A',
         },
-        { label: 'Campaign Category', value: purpose || 'N/A' },
+        { label: 'Purpose', value: purpose || 'N/A' },
         {
           label: 'Acknowledged?',
           value: donationData.acknowledged ? 'Yes' : 'No',
@@ -194,6 +222,7 @@ function DonationInfoPage() {
       setDonationAmount(donationData.amount);
       setDonationDate(dayjs(donationData.date));
       setPaymentType(donationData.payment_type);
+      setAcknowledge(donationData.acknowledged);
     }
   }, [donationData, donorName, purpose]);
 
@@ -227,6 +256,15 @@ function DonationInfoPage() {
     setPaymentType(event.target.value);
   };
 
+  const handleAcknowledgeChange = (event: SelectChangeEvent) => {
+    setAcknowledge(event.target.value === 'true');
+  };
+  const setAlertHelper = (msg: string) => {
+    setAlert('');
+    setTimeout(() => {
+      setAlert(msg);
+    }, 100);
+  };
   const handleDelete = () => {
     const body = { donation_id: donationData._id };
     postData('donation/delete', body)
@@ -234,11 +272,23 @@ function DonationInfoPage() {
         navigate('/home');
       })
       .catch((error) => {
-        console.error('Failed to delete donation:', error);
+        setAlertHelper('0Failed to delete donation');
       });
   };
 
   const handleSubmit = () => {
+    const newDonation = {
+      donation_id: donationData._id,
+      donor_id: donator?._id,
+      date: donationDate?.format('YYYY-MM-DD'),
+      amount: donationAmount,
+      purpose_id: campaignPurpose?._id,
+      payment_type: paymentType,
+      type: donationType,
+      comments: notes,
+      acknowledged,
+    };
+
     setIsEditModalOpen(false);
     if (isNewDonator) {
       const newDonator = {
@@ -267,51 +317,32 @@ function DonationInfoPage() {
             postData('purpose', newPurpose)
               .then((response1) => {
                 setCampaignPurpose(response1.data);
-                const newDonation = {
-                  donation_id: donationData._id,
-                  donor_id: response.data._id,
-                  date: donationDate?.format('YYYY-MM-DD'),
-                  amount: donationAmount,
-                  purpose_id: response1.data._id,
-                  payment_type: paymentType,
-                  type: donationType,
-                  comments: notes,
-                };
+                newDonation.donor_id = response.data._id;
+                newDonation.purpose_id = response1.data._id;
 
                 postData('donation/edit', newDonation)
                   .then((response2) => {
-                    // Handle the response here
-                    console.log(response2);
+                    setAlertHelper('1Updated successfully.');
+                    update();
                   })
                   .catch((error) => {
-                    // Handle the error here
-                    console.log(error);
+                    setAlertHelper('0Update failed. Please Try again.');
                   });
               })
               .catch((error) => {
-                // Handle the error here
-                console.log(error);
+                setAlertHelper('0Update failed. Please Try again.');
               });
           } else {
-            const newDonation = {
-              donation_id: donationData._id,
-              donor_id: response.data._id,
-              date: donationDate?.format('YYYY-MM-DD'),
-              amount: donationAmount,
-              purpose_id: campaignPurpose?._id,
-              payment_type: paymentType,
-              type: donationType,
-              comments: notes,
-            };
+            newDonation.donor_id = response.data._id;
 
             postData('donation/edit', newDonation)
               .then((response2) => {
-                // Handle the response here
-                console.log(response2);
+                setAlertHelper('1Updated successfully.');
+                update();
               })
               .catch((error) => {
                 // Handle the error here
-                console.log(error);
+                setAlertHelper('0Update failed. Please Try again.');
               });
           }
         })
@@ -328,51 +359,29 @@ function DonationInfoPage() {
       postData('purpose', newPurpose)
         .then((response1) => {
           setCampaignPurpose(response1.data);
-          const newDonation = {
-            donation_id: donationData._id,
-            donor_id: donator?._id,
-            date: donationDate?.format('YYYY-MM-DD'),
-            amount: donationAmount,
-            purpose_id: response1.data._id,
-            payment_type: paymentType,
-            type: donationType,
-            comments: notes,
-          };
+          newDonation.purpose_id = response1.data._id;
 
           postData('donation/edit', newDonation)
             .then((response2) => {
-              // Handle the response here
-              console.log(response2);
+              setAlertHelper('1Updated successfully.');
+              update();
             })
             .catch((error) => {
-              // Handle the error here
-              console.log(error);
+              setAlertHelper('0Update failed. Please Try again.');
             });
         })
         .catch((error) => {
-          // Handle the error here
-          console.log(error);
+          setAlertHelper('0Update failed. Please Try again.');
         });
     } else {
-      const newDonation = {
-        donation_id: donationData._id,
-        donor_id: donator?._id,
-        date: donationDate?.format('YYYY-MM-DD'),
-        amount: donationAmount,
-        purpose_id: campaignPurpose?._id,
-        payment_type: paymentType,
-        type: donationType,
-        comments: notes,
-      };
-
       postData('donation/edit', newDonation)
         .then((response) => {
           // Handle the response here
-          console.log(response);
+          setAlertHelper('1Updated successfully.');
+          update();
         })
         .catch((error) => {
-          // Handle the error here
-          console.log(error);
+          setAlertHelper('0Update failed. Please Try again.');
         });
     }
   };
@@ -395,12 +404,32 @@ function DonationInfoPage() {
           Donation Information
         </Typography>
       </Box>
-
       <Box width="100%">
+        <Collapse in={alert !== ''}>
+          <Alert
+            severity={
+              alert.charAt(0) === '1'
+                ? 'success'
+                : alert.charAt(0) === '0'
+                ? 'error'
+                : 'info'
+            }
+            onClose={() => {
+              setAlertHelper('');
+            }}
+          >
+            {alert.substring(1)}
+          </Alert>
+        </Collapse>
         <BasicTable customRows={customRows} />
         {!donationData.acknowledged && (
-          <p style={{ marginTop: '16px', marginLeft: '16px' }}>
+          <p style={{ marginTop: '16px', marginLeft: '16px', color: 'red' }}>
             This donation has not been acknowledged.
+          </p>
+        )}
+        {donationData.acknowledged && (
+          <p style={{ marginTop: '16px', marginLeft: '16px', color: 'green' }}>
+            This donation has been acknowledged.
           </p>
         )}
         <Box
@@ -427,7 +456,9 @@ function DonationInfoPage() {
                 color: 'white',
               }}
             >
-              Send them a message now
+              {donationData.acknowledged
+                ? 'Send them a message'
+                : 'Acknowledge this donation'}
             </Button>
           </Box>
           <Box
@@ -718,6 +749,23 @@ function DonationInfoPage() {
                   <MenuItem value="Credit">Credit</MenuItem>
                   <MenuItem value="Paypal">Paypal</MenuItem>
                 </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl sx={{ width: '40%' }}>
+                <InputLabel>Acknowledged</InputLabel>
+                <Select
+                  value={acknowledged ? 'true' : 'false'}
+                  label="Acknowledged"
+                  onChange={handleAcknowledgeChange}
+                >
+                  <MenuItem value="true">Yes</MenuItem>
+                  <MenuItem value="false">No</MenuItem>
+                </Select>
+                <span className="css-1fe8l0x-MuiFormHelperText-root">
+                  Edit the Acknowledged field above only if the donor was
+                  previously acknowledged but it was not recorded.
+                </span>
               </FormControl>
             </Grid>
             <Grid item xs={12}>

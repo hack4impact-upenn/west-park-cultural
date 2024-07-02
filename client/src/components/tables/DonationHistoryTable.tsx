@@ -6,10 +6,10 @@ import { useData } from '../../util/api';
 import FilteringTable from './FilteringTable';
 
 interface BasicTableProps {
-  alignment: string;
+  donorId: string;
 }
 
-function DonationsTable({ alignment }: BasicTableProps) {
+function DonationHistoryTable({ donorId }: BasicTableProps) {
   const donors = useData('donor/all');
   const donations = useData('donation/all');
   const purposes = useData('purpose/all');
@@ -30,9 +30,8 @@ function DonationsTable({ alignment }: BasicTableProps) {
       // eslint-disable-next-line no-underscore-dangle
       purposeIdToName.set(purpose._id, purpose.name);
     });
-    console.log(purposeData);
     const filteredData = data
-      .filter((donation: any) => donation.type === alignment)
+      .filter((donation: any) => donation.donor_id === donorId)
       .map((donation: any) => ({
         ...donation,
         donor_name: donorIdToName.get(donation.donor_id),
@@ -40,15 +39,15 @@ function DonationsTable({ alignment }: BasicTableProps) {
           purposeIdToName.get(donation.purpose_id) || 'No Purpose (General)',
       }));
     setDonationsData(filteredData);
-  }, [donations?.data, donors?.data, alignment]);
+  }, [donations?.data, donors?.data, donorId]);
 
   // columns: <Date>, <Amount>, <Donor>, <Payment Type>, <Purpose>
   const columns = [
     { id: 'date', label: 'Date' },
     { id: 'amount', label: 'Amount' },
-    { id: 'donor_id', label: 'Donor' },
     { id: 'payment_type', label: 'Payment Type' },
     { id: 'purpose_id', label: 'Purpose' },
+    { id: 'type', label: 'Type' },
     { id: 'acknowledged', label: 'Acknowledged' },
     { id: 'more', label: 'More Information' },
   ];
@@ -59,31 +58,17 @@ function DonationsTable({ alignment }: BasicTableProps) {
       id: index + 1,
       date: new Date(donation.date).toISOString().split('T')[0],
       amount: donation.amount,
-      donor_id: (
-        <a href={`/donor-profile/${donation.donor_id}`}>
-          {donation.donor_name}
-        </a>
-      ),
       payment_type: donation.payment_type,
       purpose_id: <span>{donation.purpose_name}</span>,
+      type: donation.type,
       acknowledged: (
-        <span
-          style={{
-            color: donation.acknowledged ? 'green' : 'red',
-            textAlign: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
+        <span style={{ color: donation.acknowledged ? 'green' : 'red' }}>
           {donation.acknowledged ? 'Yes' : 'No'}
         </span>
       ),
       more: (
-        <div
-          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-        >
-          <a href={`donationInfo/${donation._id}`}>View</a>
+        <div style={{ width: '100%', display: 'flex' }}>
+          <a href={`/donationInfo/${donation._id}`}>More Info</a>
         </div>
       ),
     });
@@ -92,4 +77,4 @@ function DonationsTable({ alignment }: BasicTableProps) {
   return <FilteringTable columns={columns} rows={rows} />;
 }
 
-export default DonationsTable;
+export default DonationHistoryTable;

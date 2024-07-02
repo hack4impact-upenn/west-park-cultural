@@ -1,5 +1,4 @@
 import express from 'express';
-import { isAuthenticated } from '../controllers/auth.middleware';
 
 import {
   createPurposeController,
@@ -13,7 +12,9 @@ const router = express.Router();
 // For testing:
 router.post('/', createPurposeController);
 
-// router.get('/:id', isAuthenticated, getPurposeByIdController);
+router.get('/all', getAllPurposesController);
+
+// // router.get('/:id', isAuthenticated, getPurposeByIdController);
 router.get('/:id', getPurposeByIdController);
 
 router.get('/', getAllPurposesController);

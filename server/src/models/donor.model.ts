@@ -11,7 +11,7 @@ const DonorSchema = new mongoose.Schema({
   },
   contact_address: {
     type: String,
-    required: true,
+    required: false,
   },
   contact_phone: {
     type: String,
@@ -37,10 +37,10 @@ const DonorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-//   comments: {
-//     type: String,
-//     required: false,
-//   },
+  comments: {
+    type: String,
+    required: false,
+  },
   org_address: {
     type: String,
     required: false,
