@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-alert */
 /* eslint-disable import/no-unresolved */
 import React, { useEffect, useState } from 'react';
@@ -17,11 +18,13 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+// TODO: check if fixed
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { PieChart, LineChart, BarChart } from '@mui/x-charts';
 import { ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
+import dayjs from 'dayjs';
 import { useData, postData } from '../util/api';
 import useDonationStatistics from './useDonationStatistics';
-import dayjs from 'dayjs'; 
 import IReports from '../util/types/reports';
 
 const style = {
@@ -64,6 +67,7 @@ const getDifference = (newValue: number | null, oldValue: number | null) => {
 };
 
 function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const getReportData = (report: IReports | undefined, alignment: string) => {
     if (!report || report === undefined) return null;
     switch (alignment) {
@@ -85,13 +89,20 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
   const data = getReportData(report, alignment);
   const prevData = getReportData(prevReport, alignment);
 
-  const createRows = (data, prevData) => {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const createRows = (data: any, prevData: any) => {
     if (!data) {
       return [
         createData('Total Donated', 'No report data', false, '', false),
         createData('Total Donations', 'No report data', false, '', false),
         createData('Average Donation', 'No report data', false, '', false),
-        createData('Average Donations Per Person', 'No report data', false, '', false),
+        createData(
+          'Average Donations Per Person',
+          'No report data',
+          false,
+          '',
+          false,
+        ),
         createData('Top Donator', 'No report data', false, '', false),
         createData('Largest Donation', 'No report data', false, '', false),
       ];
@@ -100,21 +111,105 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
     if (!prevData) {
       return [
         createData('Total Donated', `$${data.total_donated}`, false, '', false),
-        createData('Total Donations', `${data.total_donations}`, false, '', false),
-        createData('Average Donation', `$${data.average_donations?.toFixed(2)}`, false, '', false),
-        createData('Average Donations Per Person', `$${data.average_donations_per_person?.toFixed(2)}`, false, '', false),
-        createData('Top Donator', `${data.top_donator?.donor_name}`, false, '', false),
-        createData('Largest Donation', `$${data.largest_donation?.amount} (${data.largest_donation?.donor_name})`, false, '', false),
+        createData(
+          'Total Donations',
+          `${data.total_donations}`,
+          false,
+          '',
+          false,
+        ),
+        createData(
+          'Average Donation',
+          `$${data.average_donations?.toFixed(2)}`,
+          false,
+          '',
+          false,
+        ),
+        createData(
+          'Average Donations Per Person',
+          `$${data.average_donations_per_person?.toFixed(2)}`,
+          false,
+          '',
+          false,
+        ),
+        createData(
+          'Top Donator',
+          `${data.top_donator?.donor_name}`,
+          false,
+          '',
+          false,
+        ),
+        createData(
+          'Largest Donation',
+          `$${data.largest_donation?.amount} (${data.largest_donation?.donor_name})`,
+          false,
+          '',
+          false,
+        ),
       ];
     }
 
     return [
-      createData('Total Donated', `$${data.total_donated}`, true, getDifference(data.total_donated, prevData.total_donated).changeValue, getDifference(data.total_donated, prevData.total_donated).changeSymbol),
-      createData('Total Donations', `${data.total_donations}`, true, getDifference(data.total_donations, prevData.total_donations).changeValue, getDifference(data.total_donations, prevData.total_donations).changeSymbol),
-      createData('Average Donation', `$${data.average_donations?.toFixed(2)}`, true, getDifference(data.average_donations, prevData.average_donations).changeValue, getDifference(data.average_donations, prevData.average_donations).changeSymbol),
-      createData('Average Donations Per Person', `$${data.average_donations_per_person?.toFixed(2)}`, true, getDifference(data.average_donations_per_person, prevData.average_donations_per_person).changeValue, getDifference(data.average_donations_per_person, prevData.average_donations_per_person).changeSymbol),
-      createData('Top Donator', `${data.top_donator?.donor_name}`, true, getDifference(data.top_donator?.amount, prevData.top_donator?.amount).changeValue, getDifference(data.top_donator?.amount, prevData.top_donator?.amount).changeSymbol),
-      createData('Largest Donation', `$${data.largest_donation?.amount} (${data.largest_donation?.donor_name})`, true, getDifference(data.largest_donation?.amount, prevData.largest_donation?.amount).changeValue, getDifference(data.largest_donation?.amount, prevData.largest_donation?.amount).changeSymbol),
+      createData(
+        'Total Donated',
+        `$${data.total_donated}`,
+        true,
+        getDifference(data.total_donated, prevData.total_donated).changeValue,
+        getDifference(data.total_donated, prevData.total_donated).changeSymbol,
+      ),
+      createData(
+        'Total Donations',
+        `${data.total_donations}`,
+        true,
+        getDifference(data.total_donations, prevData.total_donations)
+          .changeValue,
+        getDifference(data.total_donations, prevData.total_donations)
+          .changeSymbol,
+      ),
+      createData(
+        'Average Donation',
+        `$${data.average_donations?.toFixed(2)}`,
+        true,
+        getDifference(data.average_donations, prevData.average_donations)
+          .changeValue,
+        getDifference(data.average_donations, prevData.average_donations)
+          .changeSymbol,
+      ),
+      createData(
+        'Average Donations Per Person',
+        `$${data.average_donations_per_person?.toFixed(2)}`,
+        true,
+        getDifference(
+          data.average_donations_per_person,
+          prevData.average_donations_per_person,
+        ).changeValue,
+        getDifference(
+          data.average_donations_per_person,
+          prevData.average_donations_per_person,
+        ).changeSymbol,
+      ),
+      createData(
+        'Top Donator',
+        `${data.top_donator?.donor_name}`,
+        true,
+        getDifference(data.top_donator?.amount, prevData.top_donator?.amount)
+          .changeValue,
+        getDifference(data.top_donator?.amount, prevData.top_donator?.amount)
+          .changeSymbol,
+      ),
+      createData(
+        'Largest Donation',
+        `$${data.largest_donation?.amount} (${data.largest_donation?.donor_name})`,
+        true,
+        getDifference(
+          data.largest_donation?.amount,
+          prevData.largest_donation?.amount,
+        ).changeValue,
+        getDifference(
+          data.largest_donation?.amount,
+          prevData.largest_donation?.amount,
+        ).changeSymbol,
+      ),
     ];
   };
 
@@ -171,9 +266,7 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
 }
 
 function ReportsPage() {
-  const {
-    getReportForDateRange,
-  } = useDonationStatistics();
+  const { getReportForDateRange } = useDonationStatistics();
 
   const [alignment, setAlignment] = useState('last_all');
   const [report, setReport] = useState<IReports | undefined>();
@@ -181,7 +274,8 @@ function ReportsPage() {
   const [allReports, setAllReports] = useState<IReports[]>([]);
   const [errorMessage, setErrorMessage] = useState(false);
   const [viewingPastReport, setViewingPastReport] = useState(false);
-  const [confirmationModalOpen, setConfirmationModalOpen] = React.useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] =
+    React.useState(false);
   const handleConfirmationModalOpen = () => setConfirmationModalOpen(true);
   const handleConfirmationModalClose = () => setConfirmationModalOpen(false);
   const [pastReportsModalOpen, setPastReportsModalOpen] = React.useState(false);
@@ -205,25 +299,46 @@ function ReportsPage() {
 
   useEffect(() => {
     if (allReports && allReports.length > 0) {
-      const sortedReports = allReports.sort((a, b) => new Date(b.date_generated).getTime() - new Date(a.date_generated).getTime());
+      const sortedReports = allReports.sort(
+        (a, b) =>
+          new Date(b.date_generated).getTime() -
+          new Date(a.date_generated).getTime(),
+      );
       const mostRecentReport = sortedReports[0];
-      const secondMostRecentReport = sortedReports[1] || null; 
+      const secondMostRecentReport = sortedReports[1] || null;
       setReport(mostRecentReport);
       setPrevReport(secondMostRecentReport);
     }
   }, [allReports]);
 
-
   const generateReport = () => {
     setErrorMessage(false);
     const now = dayjs();
-    const lastFiscalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().startOf('year'));
-    const lastCalYrReportData = getReportForDateRange(dayjs().startOf('year').subtract(1, 'year'), dayjs().endOf('year').subtract(1, 'year'));
-    const last90DaysReportData = getReportForDateRange(now.subtract(90, 'days'), now);
-    const last30DaysReportData = getReportForDateRange(now.subtract(30, 'days'), now);
+    const lastFiscalYrReportData = getReportForDateRange(
+      dayjs().startOf('year').subtract(1, 'year'),
+      dayjs().startOf('year'),
+    );
+    const lastCalYrReportData = getReportForDateRange(
+      dayjs().startOf('year').subtract(1, 'year'),
+      dayjs().endOf('year').subtract(1, 'year'),
+    );
+    const last90DaysReportData = getReportForDateRange(
+      now.subtract(90, 'days'),
+      now,
+    );
+    const last30DaysReportData = getReportForDateRange(
+      now.subtract(30, 'days'),
+      now,
+    );
     const allReportData = getReportForDateRange(dayjs('1960-01-01'), now);
 
-    if (allReportData || last30DaysReportData || last90DaysReportData || lastCalYrReportData || lastFiscalYrReportData) {
+    if (
+      allReportData ||
+      last30DaysReportData ||
+      last90DaysReportData ||
+      lastCalYrReportData ||
+      lastFiscalYrReportData
+    ) {
       const newReportData = {
         last_fiscal: lastFiscalYrReportData,
         last_calendar: lastCalYrReportData,
@@ -231,34 +346,45 @@ function ReportsPage() {
         last_30: last30DaysReportData,
         last_all: allReportData,
       };
-  
+
       postData('reports/create', newReportData)
-      .then((response) => {
-        console.log(response);
-        setPrevReport(report);
-        setReport(response.data);
-        setAllReports(prevAllReports => [...prevAllReports, response.data]);
-      })
-      .catch((error) => { 
-        console.log(error); 
-      }); 
+        .then((response) => {
+          console.log(response);
+          setPrevReport(report);
+          setReport(response.data);
+          setAllReports((prevAllReports) => [...prevAllReports, response.data]);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } else {
       setErrorMessage(true);
       console.log('could not make a report');
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleViewReport = (report: IReports) => {
     setReport(report);
-    setPrevReport(allReports.find(r => new Date(r.date_generated).getTime() < new Date(report.date_generated).getTime()) || undefined);
+    setPrevReport(
+      allReports.find(
+        (r) =>
+          new Date(r.date_generated).getTime() <
+          new Date(report.date_generated).getTime(),
+      ) || undefined,
+    );
     handlePastReportsModalClose();
     handleViewingPastReportsOpen();
   };
 
   const handleLoadRecentReport = () => {
-    const sortedReports = allReports.sort((a, b) => new Date(b.date_generated).getTime() - new Date(a.date_generated).getTime());
+    const sortedReports = allReports.sort(
+      (a, b) =>
+        new Date(b.date_generated).getTime() -
+        new Date(a.date_generated).getTime(),
+    );
     const mostRecentReport = sortedReports[0];
-    const secondMostRecentReport = sortedReports[1] || null; 
+    const secondMostRecentReport = sortedReports[1] || null;
     setReport(mostRecentReport);
     setPrevReport(secondMostRecentReport);
     handleViewingPastReportsClose();
@@ -266,19 +392,20 @@ function ReportsPage() {
 
   const renderPastReports = () => {
     if (allReports.length === 0) {
-      return (
-        <Typography sx={{ mt: 2 }}>No past reports available.</Typography>
-      );
+      return <Typography sx={{ mt: 2 }}>No past reports available.</Typography>;
     }
-  
+
     return (
       <TableContainer component={Paper} sx={{ maxHeight: 300 }}>
         <Table stickyHeader aria-label="past reports table">
           <TableBody>
             {allReports.map((report, index) => (
+              // eslint-disable-next-line no-underscore-dangle
               <TableRow key={report._id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{dayjs(report.date_generated).format('MM/DD/YYYY')}</TableCell>
+                <TableCell>
+                  {dayjs(report.date_generated).format('MM/DD/YYYY')}
+                </TableCell>
                 <TableCell>
                   <Button
                     variant="contained"
@@ -294,8 +421,7 @@ function ReportsPage() {
         </Table>
       </TableContainer>
     );
-  };  
-  
+  };
 
   return (
     <div>
@@ -306,6 +432,7 @@ function ReportsPage() {
           </Typography>
         </Grid>
         <Grid item xs={2}>
+          {/* // SPACING ISSUE HERE */}
           <Button
             variant="contained"
             color="primary"
@@ -324,27 +451,27 @@ function ReportsPage() {
           </Button>
         </Grid>
         <Grid container direction="row" spacing={2}>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={handleLoadRecentReport}
-          >
-            View Recent Report
-          </Button>
-        </Grid>
-        {!viewingPastReport && (
           <Grid item>
             <Button
               variant="contained"
-              color="primary"
-              onClick={() => generateReport()}
+              color="inherit"
+              onClick={handleLoadRecentReport}
             >
-              Generate New Report
+              View Recent Report
             </Button>
           </Grid>
-        )}
-      </Grid>
+          {!viewingPastReport && (
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => generateReport()}
+              >
+                Generate New Report
+              </Button>
+            </Grid>
+          )}
+        </Grid>
         {errorMessage && (
           <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
             Error generating the report, please retry.
@@ -376,7 +503,11 @@ function ReportsPage() {
           </ToggleButtonGroup>
         </Grid>
 
-        <BasicTable alignment={alignment} report={report} prevReport={prevReport} />
+        <BasicTable
+          alignment={alignment}
+          report={report}
+          prevReport={prevReport}
+        />
 
         {/* <Grid item xs={12}>
           
@@ -463,7 +594,9 @@ function ReportsPage() {
         aria-labelledby="Past Reports Modal"
         aria-describedby="View Past Reports"
       >
-        <Box sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}>
+        <Box
+          sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}
+        >
           <Typography variant="h6" component="h2">
             Past Reports
           </Typography>

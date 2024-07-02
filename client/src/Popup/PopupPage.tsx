@@ -83,7 +83,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
         setDonationsData(res.data);
       } catch (error) {
         console.error('Failed to fetch donation:', error);
-      } 
+      }
     };
     if (open) {
       fetchDonations();
@@ -252,7 +252,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
           )}
         </DialogTitle>
         <DialogContent>
-          {(loading || !donationStats ? (
+          {loading || !donationsStats ? (
             <Typography>Loading...</Typography>
           ) : (
             <TableContainer component={Paper}>
