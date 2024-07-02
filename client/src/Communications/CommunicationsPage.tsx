@@ -226,7 +226,19 @@ function CommunicationsPage() {
   };
 
   const copyEmails = () => {
-    rows.forEach((row) => console.log(row.contact_email));
+    let emailAsPasteFormat = '';
+    rows.forEach((row) => {
+      emailAsPasteFormat += `${row.contact_email}, `;
+    });
+    // TODO: add a toast message to indicate that the emails have been copied
+    navigator.clipboard.writeText(emailAsPasteFormat).then(
+      function () {
+        console.log('Async: Copying to clipboard was successful!');
+      },
+      function (err) {
+        console.error('Async: Could not copy text: ', err);
+      },
+    );
   };
 
   const handleRemovePerson = (idToRemove: string) => {

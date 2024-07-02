@@ -1,6 +1,8 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
 import { useState, useEffect } from 'react';
-import { useData, postData } from '../util/api';
 import dayjs from 'dayjs'; // Import dayjs for date manipulation
+import { useData, postData } from '../util/api';
 import IDonation from '../util/types/donation';
 import IDonor from '../util/types/donor';
 
@@ -91,9 +93,8 @@ const useDonationStatistics = () => {
         top_donator,
         largest_donation: largestDonationWithDonor,
       };
-    } else {
-      return null;
     }
+    return null;
   };
 
   return {
