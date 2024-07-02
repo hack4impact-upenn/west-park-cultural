@@ -25,5 +25,9 @@ const editGroupById = async (_id: string, newGroupInfo: IGroup) => {
   }
 };
 
-
-export { createCommunicationGroup, getCommunicationGroupById, getAllGroups, editGroupById};
+export {
+  createCommunicationGroup,
+  getCommunicationGroupById,
+  getAllGroups,
+  editGroupById,
+};

@@ -247,7 +247,7 @@ function NewDonationPage() {
             postData('donation/new', newDonation)
               .then((response2) => {
                 resetPage()
-                console.log(response2);
+                // console.log(response2);
               })
               .catch((error) => {
                 // Handle the error here

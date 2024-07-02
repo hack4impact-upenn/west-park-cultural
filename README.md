@@ -124,3 +124,10 @@ The engine "node" is incompatible with this module. Expected version ">=12.0.0".
 ```
 
 This means you are using the wrong node version. This boilerplate relies on using node version 14.8. If you are using any other version of node, please use `nvm` to set node version to `14.8.3` as referenced [here](https://blog.logrocket.com/how-switch-node-js-versions-nvm/).
+
+## TODO
+
+TODO: Make sidebar go to icons only on smaller window
+TODO: Success / Error on Donation Creation
+TODO: Give email in donator new person dropdown
+TODO: Check referneces (yeon changed)

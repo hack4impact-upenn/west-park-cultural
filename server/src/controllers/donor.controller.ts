@@ -75,8 +75,9 @@ const createDonorController = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
+
   ) => {
-  const donor: IDonor = req.body;
+  const donor: IDonor | null = req.body asI;
   console.log(req.body);
     if (!donor) {
       next(ApiError.missingFields(['donor']));
