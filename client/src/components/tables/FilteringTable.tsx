@@ -48,11 +48,13 @@ interface Row {
 interface FilteringTableProps {
   columns: Column[];
   rows: Row[];
+  showAll?: boolean;
 }
 
 function FilteringTable({
   columns: initialColumns,
   rows: initialRows,
+  showAll: showAllRows,
 }: FilteringTableProps) {
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [columns, setColumns] = useState<Column[]>(initialColumns);
@@ -60,7 +62,7 @@ function FilteringTable({
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [filterVisible, setFilterVisible] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(showAllRows ? 1000000 : 10);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRows, setFilteredRows] = useState<Row[]>([]);
 

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-alert */
 /* eslint-disable import/no-unresolved */
@@ -20,12 +21,24 @@ import {
 } from '@mui/material';
 // TODO: check if fixed
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { PieChart, LineChart, BarChart } from '@mui/x-charts';
+import {
+  PieChart,
+  LineChart,
+  BarChart,
+  pieArcLabelClasses,
+} from '@mui/x-charts';
 import { ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
 import dayjs from 'dayjs';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import html2canvas from 'html2canvas';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import jsPDF from 'jspdf';
 import { useData, postData } from '../util/api';
 import useDonationStatistics from './useDonationStatistics';
 import IReports from '../util/types/reports';
+import IDonation from '../util/types/donation';
+import DonationsTable from '../components/tables/DonationsTable';
+import DonorsTable from '../components/tables/DonorsTable';
 
 const style = {
   position: 'absolute',
@@ -41,7 +54,7 @@ const style = {
 
 function createData(
   title: string,
-  value: string,
+  value: any,
   hasChange: boolean,
   changeValue: string,
   changeSymbol: boolean, // true for up, false for down
@@ -103,7 +116,7 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
           '',
           false,
         ),
-        createData('Top Donator', 'No report data', false, '', false),
+        createData('Top Donor', 'No report data', false, '', false),
         createData('Largest Donation', 'No report data', false, '', false),
       ];
     }
@@ -133,8 +146,10 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
           false,
         ),
         createData(
-          'Top Donator',
-          `${data.top_donator?.donor_name}`,
+          'Top Donor',
+          <a href={`/donationInfo/${data.top_donator?.donor_id}`}>
+            {data.top_donator?.donor_name}
+          </a>,
           false,
           '',
           false,
@@ -189,8 +204,10 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
         ).changeSymbol,
       ),
       createData(
-        'Top Donator',
-        `${data.top_donator?.donor_name}`,
+        'Top Donor',
+        <a href={`/donor-profile/${data.top_donator?.donor_id}`}>
+          {data.top_donator?.donor_name}
+        </a>,
         true,
         getDifference(data.top_donator?.amount, prevData.top_donator?.amount)
           .changeValue,
@@ -199,7 +216,17 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
       ),
       createData(
         'Largest Donation',
-        `$${data.largest_donation?.amount} (${data.largest_donation?.donor_name})`,
+        <span>
+          <a href={`/donor-profile/${data.top_donator?.donor_id}`}>
+            {data.top_donator?.donor_name}
+          </a>
+          (
+          <a href={`/donationInfo/${data.largest_donation?.donation_id}`}>
+            ${data.largest_donation?.amount}
+          </a>
+          )
+        </span>,
+        // `$${data.largest_donation?.amount} (${data.largest_donation?.donor_name})`,
         true,
         getDifference(
           data.largest_donation?.amount,
@@ -217,7 +244,7 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="report table">
+      <Table sx={{}} aria-label="report table">
         <TableBody>
           {customRows.map((row) => (
             <TableRow
@@ -349,13 +376,13 @@ function ReportsPage() {
 
       postData('reports/create', newReportData)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           setPrevReport(report);
           setReport(response.data);
           setAllReports((prevAllReports) => [...prevAllReports, response.data]);
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error);
         });
     } else {
       setErrorMessage(true);
@@ -390,6 +417,248 @@ function ReportsPage() {
     handleViewingPastReportsClose();
   };
 
+  const allDonations = useData('donation/all');
+  const allPurposes = useData('purpose/all');
+  const allDonors = useData('donor/all');
+
+  const [timefilteredDonations, setTimefilteredDonations] = React.useState<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    IDonation[]
+  >([]);
+
+  React.useEffect(() => {
+    if (allDonations?.data) {
+      // console.log('allDonations', allDonations.data);
+      const donations = allDonations.data;
+      const filteredDonations = donations.filter((donation: any) => {
+        const donationDate = dayjs(donation.date);
+        const reportDate = dayjs(report?.date_generated);
+        if (alignment === 'last_all') {
+          return true;
+        }
+        if (alignment === 'last_30') {
+          return donationDate.isAfter(reportDate.subtract(30, 'days'));
+        }
+        if (alignment === 'last_90') {
+          return donationDate.isAfter(reportDate.subtract(90, 'days'));
+        }
+        if (alignment === 'last_calendar') {
+          return donationDate.isAfter(reportDate.subtract(1, 'year'));
+        }
+        if (alignment === 'last_fiscal') {
+          return donationDate.isAfter(
+            reportDate.subtract(1, 'year').startOf('year'),
+          );
+        }
+        return false;
+      });
+      setTimefilteredDonations(filteredDonations);
+    }
+  }, [alignment, allDonations, report]);
+
+  const [purposeData, setPurposeData] = React.useState<any[]>([
+    {
+      data: [],
+    },
+  ]);
+
+  const [donationByTime, setDonationByTime] = React.useState<any[]>([]);
+  const [donationsTimeLabels, setDonationsTimeLabels] = React.useState<any[]>(
+    [],
+  );
+
+  const [donorGroupLabels, setDonorGroupLabels] = React.useState<any[]>([]);
+  const [donorGroupData, setDonorGroupData] = React.useState<any[]>([]);
+
+  interface SumByType {
+    type: string;
+    data: number[];
+  }
+
+  const genDonorGroupData = () => {
+    // console.log(timefilteredDonations);
+    if (!timefilteredDonations || !allDonors?.data) return;
+
+    const donations: IDonation[] = timefilteredDonations as IDonation[];
+    const donors = allDonors.data;
+    // Create a map to quickly lookup donor_group by donor_id
+    const donorGroupMap = new Map<string, string>();
+    donors.forEach((donor: { _id: string; donor_group: string }) => {
+      // eslint-disable-next-line no-underscore-dangle
+      donorGroupMap.set(donor._id, donor.donor_group);
+    });
+
+    // Create a map to store unique donor_groups and their indices
+    const donorGroupIndices = new Map<string, number>();
+    let index = 0;
+    donations.forEach((donation: { donor_id: string }) => {
+      const donorGroup = donorGroupMap.get(donation.donor_id);
+      if (donorGroup && !donorGroupIndices.has(donorGroup)) {
+        // eslint-disable-next-line no-plusplus
+        donorGroupIndices.set(donorGroup, index++);
+      }
+    });
+
+    // Create uniq_groups array
+    const uniq_groups = Array.from(donorGroupIndices.keys());
+
+    // Create a map to store sums by type and donor_group index
+    const sumsByType = new Map<string, number[]>();
+    donations.forEach(
+      (donation: { donor_id: string; type: string; amount: number }) => {
+        const donorGroup = donorGroupMap.get(donation.donor_id);
+        if (donorGroup) {
+          const groupIndex = donorGroupIndices.get(donorGroup);
+          if (groupIndex !== undefined) {
+            if (!sumsByType.has(donation.type)) {
+              sumsByType.set(
+                donation.type,
+                new Array(uniq_groups.length).fill(0),
+              );
+            }
+            sumsByType.get(donation.type)![groupIndex] += donation.amount;
+          }
+        }
+      },
+    );
+
+    // Create the array of objects representing sums by type
+    const sumByTypeArray: SumByType[] = Array.from(sumsByType.entries()).map(
+      ([type, data]) => ({
+        type,
+        data,
+      }),
+    );
+
+    setDonorGroupLabels(uniq_groups);
+    const finalData: any[] = [];
+    sumByTypeArray.forEach((sumByType) => {
+      finalData.push({
+        data: sumByType.data,
+        // make first letter uppercase and add "s" to the end of the label
+        label:
+          // eslint-disable-next-line prefer-template
+          sumByType.type.charAt(0).toUpperCase() +
+          sumByType.type.slice(1) +
+          's',
+        valueFormatter: (value: number) => `$${value.toFixed(2)}`,
+      });
+    });
+    setDonorGroupData(finalData);
+  };
+
+  const genDonationByTimeData = () => {
+    if (!timefilteredDonations) return;
+    {
+      const donoData: IDonation[] = timefilteredDonations;
+      const timeseriesdata: number[] = [];
+      const timeserieslabels: number[] = [];
+
+      // Sort donations by date
+      const sortedData = donoData.sort(
+        (
+          a: { date: string | number | Date },
+          b: { date: string | number | Date },
+        ) => {
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        },
+      );
+      // console.log(sortedData);
+      if (sortedData.length > 0) {
+        const startDate = new Date(sortedData[0].date);
+        const endDate = new Date(sortedData[sortedData.length - 1].date);
+        const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+        // Determine the number of groups (at most 10)
+        const numGroups = Math.min(10, sortedData.length);
+        const groupSize = Math.ceil(diffDays / numGroups);
+
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < numGroups; i++) {
+          const groupStartDate = new Date(
+            startDate.getTime() + i * groupSize * 24 * 60 * 60 * 1000,
+          );
+          const groupEndDate = new Date(
+            groupStartDate.getTime() + groupSize * 24 * 60 * 60 * 1000,
+          );
+
+          let total = 0;
+          sortedData.forEach(
+            (donation: { date: string | number | Date; amount: number }) => {
+              const donationDate = new Date(donation.date);
+              if (
+                donationDate >= groupStartDate &&
+                donationDate < groupEndDate
+              ) {
+                total += donation.amount;
+              }
+            },
+          );
+          timeseriesdata.push(total);
+          timeserieslabels.push(i + 1);
+        }
+        setDonationByTime(timeseriesdata);
+        setDonationsTimeLabels(timeserieslabels);
+      }
+    }
+  };
+
+  const genPurposeData = () => {
+    const purpose_to_id_map: any = {};
+    if (!(allPurposes?.data && allDonations?.data)) return;
+    allPurposes.data.forEach((purpose: { _id: string; name: any }) => {
+      // eslint-disable-next-line no-underscore-dangle
+      purpose_to_id_map[purpose._id] = purpose.name;
+    });
+
+    const donationData: IDonation[] = timefilteredDonations;
+    let index = 0;
+    const purpose_to_count_map: any = {};
+    donationData.forEach((donation: { purpose_id: any; amount: number }) => {
+      if (donation.purpose_id in purpose_to_count_map) {
+        purpose_to_count_map[donation.purpose_id] += donation.amount;
+      } else {
+        purpose_to_count_map[donation.purpose_id] = donation.amount;
+      }
+    });
+
+    const data: any[] = [];
+    const keys = Object.keys(purpose_to_count_map);
+    keys.forEach((key) => {
+      data.push({
+        id: index,
+        label: purpose_to_id_map[key],
+        value: purpose_to_count_map[key],
+        purpose_id: key,
+      });
+      index += 1;
+    });
+
+    const series = [
+      {
+        arcLabel: (item: any) => `$${item.value.toFixed(2)}`,
+        arcLabelMinAngle: 20,
+        data,
+        valueFormatter: (value: any) => `$${value.value.toFixed(2)}`,
+      },
+    ];
+
+    setPurposeData(series);
+  };
+
+  React.useEffect(() => {
+    if (allDonations?.data && allPurposes?.data) {
+      genPurposeData();
+      genDonationByTimeData();
+
+      if (allDonors?.data) {
+        genDonorGroupData();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [report, allDonations, allPurposes, alignment, timefilteredDonations]);
+
   const renderPastReports = () => {
     if (allReports.length === 0) {
       return <Typography sx={{ mt: 2 }}>No past reports available.</Typography>;
@@ -423,8 +692,87 @@ function ReportsPage() {
     );
   };
 
+  const downloadPDF = () => {
+    // eslint-disable-next-line new-cap
+    const doc = new jsPDF();
+    const element: HTMLElement = document.getElementById(
+      'report-content',
+    ) as HTMLElement;
+    const hiddenElement: HTMLElement = document.getElementById(
+      'hiddenDataForFileDownload',
+    ) as HTMLElement;
+
+    // Temporarily make hidden content visible but off-screen
+    hiddenElement.style.display = 'block';
+    hiddenElement.style.visibility = 'visible';
+    hiddenElement.style.position = 'absolute';
+    hiddenElement.style.left = '-9999px';
+
+    html2canvas(element).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 190;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+      doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      html2canvas(hiddenElement).then((hiddenCanvas) => {
+        const hiddenImgData = hiddenCanvas.toDataURL('image/png');
+        const hiddenImgHeight =
+          (hiddenCanvas.height * imgWidth) / hiddenCanvas.width;
+        let hiddenHeightLeft = hiddenImgHeight;
+        let hiddenPosition = 0;
+
+        doc.addPage();
+        doc.addImage(
+          hiddenImgData,
+          'PNG',
+          10,
+          hiddenPosition,
+          imgWidth,
+          hiddenImgHeight,
+        );
+        hiddenHeightLeft -= pageHeight;
+
+        while (hiddenHeightLeft >= 0) {
+          hiddenPosition = hiddenHeightLeft - hiddenImgHeight;
+          doc.addPage();
+          doc.addImage(
+            hiddenImgData,
+            'PNG',
+            10,
+            hiddenPosition,
+            imgWidth,
+            hiddenImgHeight,
+          );
+          hiddenHeightLeft -= pageHeight;
+        }
+
+        // Hide the hidden content again
+        hiddenElement.style.display = 'none';
+
+        doc.save('report.pdf');
+      });
+    });
+  };
+
+  const handleConfirmDownload = () => {
+    downloadPDF();
+    handleConfirmationModalClose();
+  };
+
   return (
-    <div>
+    <div id="report-content">
       <Grid container sx={{ m: 3 }} spacing={2}>
         <Grid item xs={8}>
           <Typography variant="h4" gutterBottom>
@@ -517,31 +865,42 @@ function ReportsPage() {
           <Stack direction="row" spacing={2}>
             <Box>
               <Typography variant="h6" align="center">
-                Campaign Breakdown
+                Purpose Breakdown
               </Typography>
               <PieChart
-                series={[
-                  {
-                    data: [
-                      { id: 0, value: 10, label: 'series A' },
-                      { id: 1, value: 15, label: 'series B' },
-                      { id: 2, value: 20, label: 'series C' },
-                    ],
-                  },
-                ]}
+                series={purposeData}
                 width={400}
                 height={200}
+                sx={{
+                  [`& .${pieArcLabelClasses.root}`]: {
+                    fill: 'white',
+                    fontWeight: 'bold',
+                    fontSize: 11,
+                  },
+                }}
               />
             </Box>
             <Box>
               <Typography variant="h6" align="center">
-                Donation Category
+                Donations over Time
+              </Typography>
+              <Typography variant="body2" align="center">
+                Donations are split into 10 equal time intervals.
               </Typography>
               <LineChart
-                xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+                xAxis={[
+                  {
+                    data: donationsTimeLabels,
+                    // valueFormatter: (value) =>
+                    //   // context.location === 'tick' ? 'code' : `May`,
+                    //   // 'may',
+                    //   value,
+                  },
+                ]}
                 series={[
                   {
-                    data: [2, 5.5, 2, 8.5, 1.5, 5],
+                    data: donationByTime,
+                    valueFormatter: (value: number) => `$${value.toFixed(2)}`,
                   },
                 ]}
                 width={500}
@@ -550,26 +909,40 @@ function ReportsPage() {
             </Box>
             <Box>
               <Typography variant="h6" align="center">
-                Communication Categories
+                Donation Breakdown
               </Typography>
               <BarChart
                 xAxis={[
                   {
                     scaleType: 'band',
-                    data: ['group A', 'group B', 'group C'],
+                    data: donorGroupLabels,
                   },
                 ]}
-                series={[
-                  { data: [4, 3, 5] },
-                  { data: [1, 6, 3] },
-                  { data: [2, 5, 6] },
-                ]}
+                series={donorGroupData}
                 width={500}
                 height={300}
               />
             </Box>
           </Stack>
         </Grid>
+        <div id="hiddenDataForFileDownload" style={{ display: 'none' }}>
+          <Typography
+            variant="h3"
+            align="center"
+            style={{ marginBottom: '30px' }}
+          >
+            All Donations
+          </Typography>
+          <DonationsTable alignment="all" />
+          <Typography
+            variant="h3"
+            align="center"
+            style={{ marginBottom: '30px', marginTop: '50px' }}
+          >
+            All Donors
+          </Typography>
+          <DonorsTable alignment="all" />
+        </div>
       </Grid>
 
       <Modal
@@ -584,7 +957,7 @@ function ReportsPage() {
           </Typography>
           <Typography sx={{ mt: 2 }}>If so, click Confirm below.</Typography>
           <Button onClick={handleConfirmationModalClose}>Cancel</Button>
-          <Button onClick={handleConfirmationModalClose}>Confirm</Button>
+          <Button onClick={handleConfirmDownload}>Confirm</Button>
         </Box>
       </Modal>
 
