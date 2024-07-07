@@ -220,7 +220,7 @@ function SearchDonorsButton({ onConfirm }: SearchDonorsButtonProps) {
         sx={{ marginBottom: '10px' }}
         style={{ justifyContent: 'flex-start' }}
       >
-        Search Donor
+        Search Donors
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>

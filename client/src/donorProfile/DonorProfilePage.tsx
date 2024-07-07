@@ -71,10 +71,14 @@ function DonorProfilePage() {
         donationsMade.data.filter((donation: any) => !donation.acknowledged)
           .length,
       );
-      const totalDonation = donationsMade.data.reduce((total, donation) => {
-        return total + donation.amount;
-      }, 0);
-      setTotalDonation(totalDonation); 
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      const totalDonation = donationsMade.data.reduce(
+        (total: any, donation: any) => {
+          return total + donation.amount;
+        },
+        0,
+      );
+      setTotalDonation(totalDonation);
     }
   }, [donationsMade?.data]);
 
@@ -164,7 +168,7 @@ function DonorProfilePage() {
 
   const goCommunication = () => {
     navigate('/communications');
-  }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -190,7 +194,7 @@ function DonorProfilePage() {
         <ProfileInfo donatorData={donatorData} />
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
           <DonorNoteBox donatorData={donatorData} />
-          <DateInfoBox donatorData={donatorData} totalAmount = {totalDonation}/>
+          <DateInfoBox donatorData={donatorData} totalAmount={totalDonation} />
         </Box>
       </Box>
 
@@ -370,7 +374,7 @@ function DonorProfilePage() {
           >
             {numAck > 0 && (
               <Button
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/communications')}
                 style={{
                   marginLeft: '16px',
                   background: '#417FED',

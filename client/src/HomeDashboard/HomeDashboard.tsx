@@ -15,7 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useAppDispatch } from '../util/redux/hooks';
-import { useData } from '../util/api';
+import { postData, useData } from '../util/api';
 import DonationsTable from '../components/tables/DonationsTable';
 import './homedashboard.css';
 
@@ -27,6 +27,17 @@ function BasicTable({ alignment }: BasicTableProps) {
   let customRows: { label: string; value: any }[] = [];
   const donations = useData('donation/all');
   const [donationsData, setDonationsData] = useState<any>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // if not logged in, go to /login
+    postData('auth/isLoggedIn').then((res) => {
+      // if (res.status === 401) {
+      if (!(res && res?.data && res.data.loggedIn)) {
+        navigate('/login');
+      }
+    });
+  });
 
   useEffect(() => {
     const data = donations?.data || [];
@@ -71,11 +82,14 @@ function BasicTable({ alignment }: BasicTableProps) {
   if (last !== LAST_DEFAULT) {
     // eslint-disable-next-line no-underscore-dangle
     lastElement = (
-      <a href={`/donationInfo/${lastDonation._id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>
+      <a
+        // eslint-disable-next-line no-underscore-dangle
+        href={`/donationInfo/${lastDonation._id}`}
+        style={{ textDecoration: 'none', color: '#0883ff' }}
+      >
         {last}
       </a>
     );
-  
   }
 
   const ninetyDaysAgo = new Date();
@@ -178,7 +192,7 @@ function HomeDashboard() {
 
   const goReport = () => {
     navigator('/reports');
-  }
+  };
 
   return (
     <div className="max-width-wrapper">

@@ -291,227 +291,240 @@ function CommunicationsPage() {
   };
 
   return (
-    <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
-      <Box>
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: 'bold', marginBottom: '15px' }}
-        >
-          Communications
-        </Typography>
-        <p style={{ color: '#7C7C7C', marginBottom: '20px', maxWidth: '75%' }}>
-          Send emails to individual users, groups of individuals, and mailing
-          lists. Clicking the “email” button, will open a popup with the
-          respective emails, which you can then copy and paste into your email
-          application (i.e. Gmail or Outlook)
-        </p>
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
-        >
-          Individual Person
-        </Typography>
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={donors.map((option) => ({
-            name: option.contact_name,
-            id: option._id,
-          }))}
-          getOptionLabel={(option) => option.name}
-          sx={{ width: 300, marginBottom: '15px' }}
-          onChange={handleNameChange}
-          renderInput={(params) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <TextField {...params} label="Search Name" />
-          )}
-        />
-      </Box>
-      <Box sx={{ width: '40%' }}>
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
-        >
-          Groups
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleUnackDonoModalOpen}
-          size="large"
-          sx={{ marginBottom: '5px' }}
-          endIcon={<ArrowForwardIcon />}
-          fullWidth
-          style={{ justifyContent: 'flex-start' }}
-        >
-          Email Unacknowledged Donations
-        </Button>
-
-        <SearchDonorsButton onConfirm={handleFilteredDonors} />
-        <Button
-          variant="contained"
-          color="inherit"
-          sx={{ marginBottom: '5px' }}
-          fullWidth
-          onClick={handleGroupModalOpen}
-        >
-          Add / Edit Groups
-        </Button>
-        <AddEditGroupsModal
-          open={editGroupModalOpen}
-          onClose={handleGroupModalClose}
-        />
-        <PopupPage
-          open={openPopup}
-          onClose={handlePopupClose}
-          donorID={selectedDonorID}
-        />
-        <Stack
-          spacing={{ xs: 2 }}
-          direction="row"
-          useFlexGap
-          flexWrap="wrap"
-          sx={{ marginBottom: '10px' }}
-        >
+    <div className="max-width-wrapper">
+      <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
+        <Box>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 'bold', marginBottom: '15px' }}
+          >
+            Communications
+          </Typography>
+          <p
+            style={{ color: '#7C7C7C', marginBottom: '20px', maxWidth: '100%' }}
+          >
+            Send emails to individual users, groups of individuals, and mailing
+            lists. Clicking the “email” button, will open a popup with the
+            respective emails, which you can then copy and paste into your email
+            application (i.e. Gmail or Outlook)
+          </p>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+          >
+            Individual Person
+          </Typography>
           <Autocomplete
             disablePortal
-            id="group-search"
-            options={groups}
-            getOptionLabel={(option) => option.group_name}
-            value={groupSearchValue}
-            onChange={handleGroupChange}
-            sx={{ width: '66%' }}
+            id="combo-box-demo"
+            options={donors.map((option) => ({
+              name: option.contact_name,
+              id: option._id,
+            }))}
+            getOptionLabel={(option) => option.name}
+            sx={{ width: '100%', marginBottom: '15px' }}
+            onChange={handleNameChange}
             renderInput={(params) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="Search Name" />
             )}
           />
+        </Box>
+        <Box sx={{ width: '100%', marginTop: '50px' }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+          >
+            Groups
+          </Typography>
           <Button
             variant="contained"
             color="primary"
-            onClick={addGroupItem}
-            sx={{ width: '30%' }} // Adjust the width as needed
+            onClick={handleUnackDonoModalOpen}
+            size="large"
+            sx={{ marginBottom: '5px' }}
+            endIcon={<ArrowForwardIcon />}
+            fullWidth
+            style={{ justifyContent: 'flex-start' }}
           >
-            Add Group
+            Email Unacknowledged Donations
           </Button>
-        </Stack>
-      </Box>
-      <Box sx={{ width: '80%' }}>
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 'bold', marginBottom: '10px' }}
-        >
-          Emails
-        </Typography>
-        <TableContainer component={Paper} sx={{ marginBottom: '20px' }}>
-          <Table sx={{ minWidth: 650 }} aria-label="communications table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Remove</TableCell>
-                <TableCell>View Summary</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  sx={{
-                    '&:last-child td, &:last-child th': { border: 0 },
-                  }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.contact_name}
-                  </TableCell>
-                  <TableCell>{row.contact_email}</TableCell>
-                  <TableCell>
-                    <Link href="#" onClick={() => handleRemovePerson(row.id)}>
-                      Remove {row.contact_name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Link href="#" style={{ textDecoration: 'none', color: '#0883ff'  }} onClick={() => handleViewDonor(row.id)}>
-                      View
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Box display="flex" justifyContent="space-between" marginBottom={2}>
+
+          <SearchDonorsButton onConfirm={handleFilteredDonors} />
           <Button
             variant="contained"
             color="inherit"
-            onClick={clearItems}
-            size="large"
+            sx={{ marginBottom: '5px', marginTop: '30px' }}
+            fullWidth
+            onClick={handleGroupModalOpen}
           >
-            Clear
+            Add / Edit Groups
           </Button>
-          <Button
-            onClick={copyEmails}
-            variant="contained"
-            color="primary"
-            size="large"
-            style={{ marginLeft: 'auto' }} // This will push the button to the right end
+          <AddEditGroupsModal
+            open={editGroupModalOpen}
+            onClose={handleGroupModalClose}
+          />
+          <PopupPage
+            open={openPopup}
+            onClose={handlePopupClose}
+            donorID={selectedDonorID}
+          />
+          <Stack
+            spacing={{ xs: 2 }}
+            direction="row"
+            useFlexGap
+            flexWrap="wrap"
+            sx={{ marginBottom: '10px' }}
           >
-            Copy All Emails
-          </Button>
-        </Box>
-      </Box>
-
-      <Modal
-        open={unackDonoModalOpen}
-        onClose={handleUnackDonoModalClose}
-        aria-labelledby="Email Unacknowledged Donations Modal"
-        aria-describedby="Email Unacknowledged Donations Modal"
-      >
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h6">
-            Contact Unacknowledged Donations
-          </Typography>
-          {unacknowledgedDonations.map((donation) => (
-            <Box
-              key={donation._id}
-              sx={{
-                p: 2,
-                my: 1,
-                borderRadius: 2,
-                boxShadow: 3,
-              }}
+            <Autocomplete
+              disablePortal
+              id="group-search"
+              options={groups}
+              getOptionLabel={(option) => option.group_name}
+              value={groupSearchValue}
+              onChange={handleGroupChange}
+              sx={{ width: '66%' }}
+              renderInput={(params) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <TextField {...params} label="Search Name" />
+              )}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={addGroupItem}
+              sx={{ width: '32%' }} // Adjust the width as needed
             >
-              <Typography variant="body1">Amount: {donation.amount}</Typography>
-              <Typography variant="body1">
-                Date: {formatDateString(donation.date) || 'N/A'}
-              </Typography>
-              <Typography variant="body1">
-                Donor Name: {donation.donorName}
-              </Typography>
-              <Typography variant="body1">
-                Donor Email: {donation.donorEmail}
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                size="medium"
-                style={{ marginTop: '10px' }}
-                onClick={() =>
-                  handleAddUnackDonation(
-                    donation.donorName,
-                    donation.donorEmail,
-                    donation.donorId,
-                  )
-                }
-              >
-                Add
-              </Button>
-            </Box>
-          ))}
-          <Button onClick={handleUnackDonoModalClose}>Close</Button>
+              Add Group
+            </Button>
+          </Stack>
         </Box>
-      </Modal>
-    </Box>
+        <Box sx={{ width: '100%', marginTop: '75px' }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 'bold', marginBottom: '10px' }}
+          >
+            Emails
+          </Typography>
+          <TableContainer component={Paper} sx={{ marginBottom: '20px' }}>
+            <Table
+              sx={{ minWidth: 650, width: '100%' }}
+              aria-label="communications table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Remove</TableCell>
+                  <TableCell>View Summary</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    sx={{
+                      '&:last-child td, &:last-child th': { border: 0 },
+                    }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.contact_name}
+                    </TableCell>
+                    <TableCell>{row.contact_email}</TableCell>
+                    <TableCell>
+                      <Link href="#" onClick={() => handleRemovePerson(row.id)}>
+                        Remove {row.contact_name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <Link
+                        href="#"
+                        style={{ textDecoration: 'none', color: '#0883ff' }}
+                        onClick={() => handleViewDonor(row.id)}
+                      >
+                        View
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Box display="flex" justifyContent="space-between" marginBottom={2}>
+            <Button
+              variant="contained"
+              color="inherit"
+              onClick={clearItems}
+              size="large"
+            >
+              Clear
+            </Button>
+            <Button
+              onClick={copyEmails}
+              variant="contained"
+              color="primary"
+              size="large"
+              style={{ marginLeft: 'auto' }} // This will push the button to the right end
+            >
+              Copy All Emails
+            </Button>
+          </Box>
+        </Box>
+
+        <Modal
+          open={unackDonoModalOpen}
+          onClose={handleUnackDonoModalClose}
+          aria-labelledby="Email Unacknowledged Donations Modal"
+          aria-describedby="Email Unacknowledged Donations Modal"
+        >
+          <Box sx={modalStyle}>
+            <Typography variant="h6" component="h6">
+              Contact Unacknowledged Donations
+            </Typography>
+            {unacknowledgedDonations.map((donation) => (
+              <Box
+                key={donation._id}
+                sx={{
+                  p: 2,
+                  my: 1,
+                  borderRadius: 2,
+                  boxShadow: 3,
+                }}
+              >
+                <Typography variant="body1">
+                  Amount: {donation.amount}
+                </Typography>
+                <Typography variant="body1">
+                  Date: {formatDateString(donation.date) || 'N/A'}
+                </Typography>
+                <Typography variant="body1">
+                  Donor Name: {donation.donorName}
+                </Typography>
+                <Typography variant="body1">
+                  Donor Email: {donation.donorEmail}
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="medium"
+                  style={{ marginTop: '10px' }}
+                  onClick={() =>
+                    handleAddUnackDonation(
+                      donation.donorName,
+                      donation.donorEmail,
+                      donation.donorId,
+                    )
+                  }
+                >
+                  Add
+                </Button>
+              </Box>
+            ))}
+            <Button onClick={handleUnackDonoModalClose}>Close</Button>
+          </Box>
+        </Modal>
+      </Box>
+    </div>
   );
 }
 

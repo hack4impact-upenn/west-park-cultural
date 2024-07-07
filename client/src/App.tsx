@@ -2,7 +2,7 @@
 import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import theme from './assets/theme';
@@ -36,6 +36,14 @@ import PopupPage from './Popup/PopupPage';
 import DonationDahsboard from './DonorDashboard/DonorDahsboard';
 
 function App() {
+  const showSidebarRoutes = [
+    '/login',
+    '/register',
+    '/verify-account/:token',
+    '/email-reset',
+    '/reset-password/:token',
+  ];
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -64,6 +72,7 @@ function App() {
                   </Route>
                 </Routes>
                 <Sidebar
+                  routesShown={showSidebarRoutes}
                   side={
                     <Routes>
                       <Route path="/test-sidebar" element={<Sidebar />} />

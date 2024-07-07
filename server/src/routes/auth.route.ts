@@ -12,6 +12,7 @@ import {
   resetPassword,
   verifyAccount,
   registerInvite,
+  checkIfLoggedIn,
 } from '../controllers/auth.controller';
 import { isAuthenticated } from '../controllers/auth.middleware';
 import 'dotenv/config';
@@ -72,5 +73,7 @@ router.get('/authstatus', isAuthenticated, approve);
  * a new account is created. Otherwise a 400 bad request error is returned
  */
 router.post('/register-invite', registerInvite);
+
+router.post('/isLoggedIn', checkIfLoggedIn);
 
 export default router;

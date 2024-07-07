@@ -134,15 +134,17 @@ function LoginPage() {
       <FormGrid>
         <FormCol>
           <Grid item container justifyContent="center">
-            <Grid item container justifyContent="center">
+            <Grid item container justifyContent="center" flexDirection="row">
               <img width="70%" src={westPark} alt="West Park Logo" />
             </Grid>
-            <Typography variant="h5" textAlign="center">
-              Donor Management System
-            </Typography>
-            <Typography variant="h2" textAlign="center">
-              Login
-            </Typography>
+            <div>
+              <Typography variant="h5" textAlign="center" color="#3B7A2E">
+                Donor Management System
+              </Typography>
+              <Typography variant="h2" textAlign="center" color="#495057">
+                Login
+              </Typography>
+            </div>
           </Grid>
           <Grid item width="1">
             <TextField

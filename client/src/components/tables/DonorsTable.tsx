@@ -47,7 +47,12 @@ function DonorsTable({ alignment }: BasicTableProps) {
     rows.push({
       id: index + 1,
       contact_name: (
-        <a href={`/donor-profile/${donor._id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>{donor.contact_name}</a>
+        <a
+          href={`/donor-profile/${donor._id}`}
+          style={{ textDecoration: 'none', color: '#0883ff' }}
+        >
+          {donor.contact_name}
+        </a>
       ),
       donor_group: donor.donor_group,
       last_donation_date: new Date(donor.last_donation_date)
