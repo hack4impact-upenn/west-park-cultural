@@ -431,7 +431,7 @@ function CommunicationsPage() {
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <Link href="#" onClick={() => handleViewDonor(row.id)}>
+                    <Link href="#" style={{ textDecoration: 'none', color: '#0883ff'  }} onClick={() => handleViewDonor(row.id)}>
                       View
                     </Link>
                   </TableCell>

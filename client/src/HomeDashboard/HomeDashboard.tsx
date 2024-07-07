@@ -70,7 +70,12 @@ function BasicTable({ alignment }: BasicTableProps) {
   let lastElement = <span>{last}</span>;
   if (last !== LAST_DEFAULT) {
     // eslint-disable-next-line no-underscore-dangle
-    lastElement = <a href={`/donationInfo/${lastDonation._id}`}>{last}</a>;
+    lastElement = (
+      <a href={`/donationInfo/${lastDonation._id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>
+        {last}
+      </a>
+    );
+  
   }
 
   const ninetyDaysAgo = new Date();
@@ -184,6 +189,10 @@ function HomeDashboard() {
     }
   };
 
+  const goReport = () => {
+    navigator('/reports');
+  }
+
   return (
     <div className="max-width-wrapper">
       <div className="home-dashboard">
@@ -203,7 +212,7 @@ function HomeDashboard() {
 
           <Button
             onClick={() => {
-              console.log('');
+              goReport();
             }}
             style={{
               background: 'grey',

@@ -147,7 +147,7 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
         ),
         createData(
           'Top Donor',
-          <a href={`/donationInfo/${data.top_donator?.donor_id}`}>
+          <a href={`/donationInfo/${data.top_donator?.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff'  }} >
             {data.top_donator?.donor_name}
           </a>,
           false,
@@ -205,7 +205,7 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
       ),
       createData(
         'Top Donor',
-        <a href={`/donor-profile/${data.top_donator?.donor_id}`}>
+        <a href={`/donor-profile/${data.top_donator?.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff' }}>
           {data.top_donator?.donor_name}
         </a>,
         true,
@@ -217,11 +217,11 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
       createData(
         'Largest Donation',
         <span>
-          <a href={`/donor-profile/${data.top_donator?.donor_id}`}>
+          <a href={`/donor-profile/${data.top_donator?.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff' }}>
             {data.top_donator?.donor_name}
           </a>
           (
-          <a href={`/donationInfo/${data.largest_donation?.donation_id}`}>
+          <a href={`/donationInfo/${data.largest_donation?.donation_id}`}  style={{ textDecoration: 'none', color: '#0883ff' }}>
             ${data.largest_donation?.amount}
           </a>
           )
