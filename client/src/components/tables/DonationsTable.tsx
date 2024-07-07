@@ -30,9 +30,11 @@ function DonationsTable({ alignment }: BasicTableProps) {
       // eslint-disable-next-line no-underscore-dangle
       purposeIdToName.set(purpose._id, purpose.name);
     });
-    console.log(purposeData);
+
     const filteredData = data
-      .filter((donation: any) => donation.type === alignment)
+      .filter(
+        (donation: any) => donation.type === alignment || alignment === 'all',
+      )
       .map((donation: any) => ({
         ...donation,
         donor_name: donorIdToName.get(donation.donor_id),
@@ -89,7 +91,13 @@ function DonationsTable({ alignment }: BasicTableProps) {
     });
   });
 
-  return <FilteringTable columns={columns} rows={rows} />;
+  return (
+    <FilteringTable
+      columns={columns}
+      rows={rows}
+      showAll={alignment === 'all'}
+    />
+  );
 }
 
 export default DonationsTable;

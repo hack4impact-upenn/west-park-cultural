@@ -282,7 +282,7 @@ function DonationInfoPage() {
         setAlertHelper('0Failed to delete donation');
       });
   };
-  
+
   const determineDonorType = () => {
     switch (donationType) {
       case 'donation':
@@ -315,10 +315,10 @@ function DonationInfoPage() {
         contact_name: donator?.title,
         contact_email: newDonatorEmail,
         contact_address: newDonatorAddress,
-        contact_phone: newDonatorPhone, 
+        contact_phone: newDonatorPhone,
         donor_group: newDonatorGroup,
-        registered_date: new Date(), 
-        last_donation_date: donationDate, 
+        registered_date: new Date(),
+        last_donation_date: donationDate,
         type: determineDonorType(),
         // comments: null,
         // _id: null,
@@ -342,14 +342,12 @@ function DonationInfoPage() {
 
                 postData('donation/edit', newDonation)
                   .then((response2) => {
-
-//                     setDonorName(response.data.contact_name);
-//                     setPurpose(response1.data.name);
-//                     console.log(response2);
+                    //                     setDonorName(response.data.contact_name);
+                    //                     setPurpose(response1.data.name);
+                    //                     console.log(response2);
 
                     setAlertHelper('1Updated successfully.');
                     update();
-
                   })
                   .catch((error) => {
                     setAlertHelper('0Update failed. Please Try again.');
@@ -363,14 +361,12 @@ function DonationInfoPage() {
 
             postData('donation/edit', newDonation)
               .then((response2) => {
-
-//                 setDonorName(response.data.contact_name);
-//                 setPurpose(campaignPurpose?.name);
-//                 console.log(response2);
+                //                 setDonorName(response.data.contact_name);
+                //                 setPurpose(campaignPurpose?.name);
+                //                 console.log(response2);
 
                 setAlertHelper('1Updated successfully.');
                 update();
-
               })
               .catch((error) => {
                 // Handle the error here
@@ -395,14 +391,12 @@ function DonationInfoPage() {
 
           postData('donation/edit', newDonation)
             .then((response2) => {
-
-//               setDonorName(donator?.contact_name);
-//               setPurpose(response1.data.name);
-//               console.log(response2);
+              //               setDonorName(donator?.contact_name);
+              //               setPurpose(response1.data.name);
+              //               console.log(response2);
 
               setAlertHelper('1Updated successfully.');
               update();
-
             })
             .catch((error) => {
               setAlertHelper('0Update failed. Please Try again.');
@@ -414,13 +408,12 @@ function DonationInfoPage() {
     } else {
       postData('donation/edit', newDonation)
         .then((response) => {
-//           setDonorName(donator?.contact_name);
-//           setPurpose(campaignPurpose?.name);
-//           console.log(response);
+          //           setDonorName(donator?.contact_name);
+          //           setPurpose(campaignPurpose?.name);
+          //           console.log(response);
           // Handle the response here
           setAlertHelper('1Updated successfully.');
           update();
-
         })
         .catch((error) => {
           setAlertHelper('0Update failed. Please Try again.');

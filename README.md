@@ -131,3 +131,19 @@ TODO: Make sidebar go to icons only on smaller window
 TODO: Success / Error on Donation Creation
 TODO: Give email in donator new person dropdown
 TODO: Check referneces (yeon changed)
+TODO: Add Current Fiscal Year / Current Calendar Yr
+TODO: Fix popup menu CSS
+TODO: Add Communication Confirmation Popup
+TODO: Add Confirmation Past History
+TODO: Fix Reports Sidebar
+TOOD: Add Login Ability
+TODO: Add Forgot password ability
+TODO: fix lanague (donor / donator vs sposor, etc...)
+#TODO: Report Page, add sponsor vs donor vs grant
+TODO: Add All Donors to Reports
+TOOD: FOr Reports ALl Donations add type (ie donation vs grant vs)
+TODO: For Reports all Donations, fix css
+TODO: For Reports all donations, only show donations + donors in range
+TODO: make Text Bigger on reports
+TODO: compress pdf
+TODO: Fix bug with double cliking time interval

@@ -18,7 +18,7 @@ function DonorsTable({ alignment }: BasicTableProps) {
 
     // Filter the data
     const filteredDonations = donationData.filter(
-      (e: any) => e.type === alignment,
+      (e: any) => e.type === alignment || alignment === 'all',
     );
     const uniquePeople = new Set(filteredDonations.map((e: any) => e.donor_id));
     const filteredDonors = donorData.filter((e: any) =>
@@ -57,7 +57,13 @@ function DonorsTable({ alignment }: BasicTableProps) {
     });
   });
 
-  return <FilteringTable columns={columns} rows={rows} />;
+  return (
+    <FilteringTable
+      columns={columns}
+      rows={rows}
+      showAll={alignment === 'all'}
+    />
+  );
 }
 
 export default DonorsTable;

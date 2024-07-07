@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DonorSchema = new mongoose.Schema({
   _id: String,
   contact_name: String,
@@ -26,8 +27,8 @@ const ReportDataSchema = new mongoose.Schema({
       type: String,
     },
     donor_id: {
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Donor' ,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Donor',
     },
   },
   largest_donation: {
@@ -41,10 +42,10 @@ const ReportDataSchema = new mongoose.Schema({
       type: String,
     },
     donor_id: {
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Donor' ,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Donor',
     },
-  }
+  },
 });
 
 const ReportsSchema = new mongoose.Schema({

@@ -27,7 +27,7 @@ import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import IDonation from '../util/types/donation';
 import { useData } from '../util/api';
-import PopupPage from '../Popup/PopupPage'; 
+import PopupPage from '../Popup/PopupPage';
 
 const BACKENDURL = process.env.PUBLIC_URL
   ? process.env.PUBLIC_URL
@@ -226,7 +226,19 @@ function CommunicationsPage() {
   };
 
   const copyEmails = () => {
-    rows.forEach((row) => console.log(row.contact_email));
+    let emailAsPasteFormat = '';
+    rows.forEach((row) => {
+      emailAsPasteFormat += `${row.contact_email}, `;
+    });
+    // TODO: add a toast message to indicate that the emails have been copied
+    navigator.clipboard.writeText(emailAsPasteFormat).then(
+      function () {
+        console.log('Async: Copying to clipboard was successful!');
+      },
+      function (err) {
+        console.error('Async: Could not copy text: ', err);
+      },
+    );
   };
 
   const handleRemovePerson = (idToRemove: string) => {
@@ -276,7 +288,7 @@ function CommunicationsPage() {
   const handleViewDonor = (donorID: string) => {
     setSelectedDonorID(donorID);
     setOpenPopup(true);
-  };  
+  };
 
   return (
     <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
@@ -368,7 +380,7 @@ function CommunicationsPage() {
             getOptionLabel={(option) => option.group_name}
             value={groupSearchValue}
             onChange={handleGroupChange}
-            sx={{ width: '66%' }} 
+            sx={{ width: '66%' }}
             renderInput={(params) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="Search Name" />
@@ -419,7 +431,9 @@ function CommunicationsPage() {
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <Link href="#" onClick={() => handleViewDonor(row.id)}>View</Link>
+                    <Link href="#" onClick={() => handleViewDonor(row.id)}>
+                      View
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
