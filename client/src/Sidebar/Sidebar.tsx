@@ -55,35 +55,36 @@ function Sidebar(props: any) {
                             className="sidebar-link"
                             onClick={() => navto('/')}
                           >
-                            <i className="fa-solid fa-house" /> &nbsp; Home
+                            <i className="fa-solid fa-house" /> &nbsp;{' '}
+                            <span className="sidebartext">Home</span>
                           </div>
                           <div
                             className="sidebar-link"
                             onClick={() => navto('/donorDashboard')}
                           >
-                            <i className="fa-solid fa-table-columns" /> &nbsp;
-                            Donor Dashboard
+                            <i className="fa-solid fa-table-columns" /> &nbsp;{' '}
+                            <span className="sidebartext">Donor Dashboard</span>
                           </div>
                           <div
                             className="sidebar-link"
                             onClick={() => navto('/communications')}
                           >
-                            <i className="fa-solid fa-envelope" /> &nbsp;
-                            Communications
+                            <i className="fa-solid fa-envelope" /> &nbsp;{' '}
+                            <span className="sidebartext">Communications</span>
                           </div>
                           <div
                             className="sidebar-link"
                             onClick={() => navto('/new-donation')}
                           >
-                            <i className="fa-solid fa-plus" /> &nbsp; New
-                            Donation
+                            <i className="fa-solid fa-plus" /> &nbsp;{' '}
+                            <span className="sidebartext">NewDonation</span>
                           </div>
                           <div
                             className="sidebar-link"
                             onClick={() => navto('/reports')}
                           >
-                            <i className="fa-solid fa-sheet-plastic" /> &nbsp;
-                            Reports
+                            <i className="fa-solid fa-sheet-plastic" /> &nbsp;{' '}
+                            <span className="sidebartext">Reports</span>
                           </div>
                         </div>
                       </div>
@@ -97,7 +98,8 @@ function Sidebar(props: any) {
                           onClick={() => logout()}
                         >
                           <i className="fa-solid fa-right-from-bracket" />{' '}
-                          &nbsp; Log Out
+                          &nbsp;
+                          <span className="sidebartext">Log Out</span>
                         </a>
                       </div>
                     </div>
