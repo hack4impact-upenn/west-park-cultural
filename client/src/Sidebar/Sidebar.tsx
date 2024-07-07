@@ -88,6 +88,7 @@ function Sidebar(props: any) {
                         </div>
                       </div>
                     </div>
+                    {/* <div className="sidebar-wrapper-container"> */}
                     <div className="sidebar-bottom">
                       <div className="sidebar-bottom-links">
                         <a
@@ -100,6 +101,7 @@ function Sidebar(props: any) {
                         </a>
                       </div>
                     </div>
+                    {/* </div> */}
                   </div>
                 </div>
               </div>
