@@ -885,7 +885,7 @@ function ReportsPage() {
                 Donations over Time
               </Typography>
               <Typography variant="body2" align="center">
-                Donations are split into 10 equal time intervals.
+                Donations are split into at most 10 equal time intervals.
               </Typography>
               <LineChart
                 xAxis={[

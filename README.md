@@ -146,3 +146,4 @@ TODO: For Reports all Donations, fix css
 TODO: For Reports all donations, only show donations + donors in range
 TODO: make Text Bigger on reports
 TODO: compress pdf
+TODO: Fix bug with double cliking time interval
