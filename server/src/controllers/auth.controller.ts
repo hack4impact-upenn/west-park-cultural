@@ -371,6 +371,14 @@ const registerInvite = async (
   }
 };
 
+const checkIfLoggedIn = async (req: express.Request, res: express.Response) => {
+  if (req.isAuthenticated()) {
+    res.status(StatusCode.OK).send({ loggedIn: true });
+  } else {
+    res.status(StatusCode.OK).send({ loggedIn: false });
+  }
+};
+
 export {
   login,
   logout,
@@ -380,4 +388,5 @@ export {
   sendResetPasswordEmail,
   resetPassword,
   registerInvite,
+  checkIfLoggedIn,
 };

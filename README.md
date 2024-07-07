@@ -148,3 +148,6 @@ TODO: make Text Bigger on reports
 TODO: compress pdf
 TODO: Fix bug with double cliking time interval
 TODO: Dont visit pages when not logged in
+TODO: Remove Console.logs
+TOOD: Move Logout button to at most height of window
+TODO: enter to login
