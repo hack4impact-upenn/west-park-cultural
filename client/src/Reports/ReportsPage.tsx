@@ -783,244 +783,248 @@ function ReportsPage() {
   };
 
   return (
-    <div id="report-content">
-      <Grid sx={{ m: 4 }} spacing={2}>
-        <Grid>
-          <Typography variant="h4" gutterBottom>
-            Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
-          </Typography>
-        </Grid>
-        <Grid
-          container
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Grid item>
-            <Box display="flex" gap={2}>
-              {viewingPastReport && (
-                <Button
-                  variant="contained"
-                  color="inherit"
-                  onClick={handleLoadRecentReport}
-                >
-                  View Recent Report
-                </Button>
-              )}
-              {!viewingPastReport && (
+    <div className="max-width-wrapper">
+      <div id="report-content" style={{ width: '100%' }}>
+        <Grid sx={{ m: 4, width: '100%' }} spacing={2}>
+          <Grid>
+            <Typography variant="h4" gutterBottom>
+              Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
+            </Typography>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Grid item>
+              <Box display="flex" gap={2}>
+                {viewingPastReport && (
+                  <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={handleLoadRecentReport}
+                  >
+                    View Recent Report
+                  </Button>
+                )}
+                {!viewingPastReport && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => generateReport()}
+                  >
+                    Generate New Report
+                  </Button>
+                )}
+              </Box>
+            </Grid>
+            <Grid item>
+              <Box display="flex" gap={2}>
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => generateReport()}
+                  onClick={handleConfirmationModalOpen}
                 >
-                  Generate New Report
+                  Download / Share
                 </Button>
-              )}
-            </Box>
+                <Button
+                  variant="contained"
+                  color="inherit"
+                  onClick={handlePastReportsModalOpen}
+                >
+                  View Past Reports
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Box display="flex" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleConfirmationModalOpen}
-              >
-                Download / Share
-              </Button>
-              <Button
-                variant="contained"
-                color="inherit"
-                onClick={handlePastReportsModalOpen}
-              >
-                View Past Reports
-              </Button>
-            </Box>
+          {errorMessage && (
+            <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
+              Error generating the report, please retry.
+            </Typography>
+          )}
+          <Grid sx={{ mt: 2, mb: 2 }}>
+            <ToggleButtonGroup
+              value={alignment}
+              exclusive
+              onChange={handleTimeInterval}
+              aria-label="time interval"
+              size="large"
+            >
+              <ToggleButton value="last_all" aria-label="allTime">
+                All Time
+              </ToggleButton>
+              <ToggleButton value="last_fiscal" aria-label="lastFiscalYr">
+                Last Fiscal Yr
+              </ToggleButton>
+              <ToggleButton value="last_calendar" aria-label="lastCalYr">
+                Last Cal Yr
+              </ToggleButton>
+              <ToggleButton value="last_90" aria-label="last90Days">
+                Last 90 Days
+              </ToggleButton>
+              <ToggleButton value="last_30" aria-label="last30Days">
+                Last 30 Days
+              </ToggleButton>
+            </ToggleButtonGroup>
           </Grid>
-        </Grid>
-        {errorMessage && (
-          <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
-            Error generating the report, please retry.
-          </Typography>
-        )}
-        <Grid sx={{ mt: 2, mb: 2 }}>
-          <ToggleButtonGroup
-            value={alignment}
-            exclusive
-            onChange={handleTimeInterval}
-            aria-label="time interval"
-            size="large"
-          >
-            <ToggleButton value="last_all" aria-label="allTime">
-              All Time
-            </ToggleButton>
-            <ToggleButton value="last_fiscal" aria-label="lastFiscalYr">
-              Last Fiscal Yr
-            </ToggleButton>
-            <ToggleButton value="last_calendar" aria-label="lastCalYr">
-              Last Cal Yr
-            </ToggleButton>
-            <ToggleButton value="last_90" aria-label="last90Days">
-              Last 90 Days
-            </ToggleButton>
-            <ToggleButton value="last_30" aria-label="last30Days">
-              Last 30 Days
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Grid>
 
-        <BasicTable
-          alignment={alignment}
-          report={report}
-          prevReport={prevReport}
-        />
+          <BasicTable
+            alignment={alignment}
+            report={report}
+            prevReport={prevReport}
+          />
 
-        {/* <Grid item xs={12}>
+          {/* <Grid item xs={12}>
           
         </Grid> */}
 
-        <Grid sx={{ mt: 4 }}>
-          <Stack direction="row" spacing={2}>
-            <Box
-              sx={{
-                boxShadow: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                p: 2,
-              }}
-            >
-              <Typography variant="h6" align="center">
-                Purpose Breakdown
-              </Typography>
-              <PieChart
-                series={purposeData}
-                width={400}
-                height={200}
+          <Grid sx={{ mt: 4, width: '100%' }}>
+            <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
+              <Box
                 sx={{
-                  [`& .${pieArcLabelClasses.root}`]: {
-                    fill: 'white',
-                    fontWeight: 'bold',
-                    fontSize: 11,
-                  },
+                  boxShadow: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  width: '100%',
                 }}
-              />
-            </Box>
-            <Box
-              sx={{
-                boxShadow: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                p: 2,
-              }}
-            >
-              <Typography variant="h6" align="center">
-                Donations over Time
-              </Typography>
-              <Typography variant="body2" align="center">
-                Donations are split into at most 10 equal time intervals.
-              </Typography>
-              <LineChart
-                xAxis={[
-                  {
-                    data: donationsTimeLabels,
-                    // valueFormatter: (value) =>
-                    //   // context.location === 'tick' ? 'code' : `May`,
-                    //   // 'may',
-                    //   value,
-                  },
-                ]}
-                series={[
-                  {
-                    data: donationByTime,
-                    valueFormatter: (value: number) => `$${value.toFixed(2)}`,
-                  },
-                ]}
-                width={500}
-                height={300}
-              />
-            </Box>
+              >
+                <Typography variant="h6" align="center">
+                  Purpose Breakdown
+                </Typography>
+                <PieChart
+                  series={purposeData}
+                  height={200}
+                  // width={800}
+                  sx={{
+                    [`& .${pieArcLabelClasses.root}`]: {
+                      fill: 'white',
+                      fontWeight: 'bold',
+                      fontSize: 11,
+                      // width: '500px',
+                    },
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  boxShadow: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                }}
+              >
+                <Typography variant="h6" align="center">
+                  Donations over Time
+                </Typography>
+                <Typography variant="body2" align="center">
+                  Donations are split into at most 10 equal time intervals.
+                </Typography>
+                <LineChart
+                  xAxis={[
+                    {
+                      data: donationsTimeLabels,
+                      // valueFormatter: (value) =>
+                      //   // context.location === 'tick' ? 'code' : `May`,
+                      //   // 'may',
+                      //   value,
+                    },
+                  ]}
+                  series={[
+                    {
+                      data: donationByTime,
+                      valueFormatter: (value: number) => `$${value.toFixed(2)}`,
+                    },
+                  ]}
+                  width={500}
+                  height={300}
+                />
+              </Box>
 
-            <Box
-              sx={{
-                boxShadow: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                p: 2,
-                mt: 4,
-              }}
+              <Box
+                sx={{
+                  boxShadow: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  mt: 4,
+                }}
+              >
+                <Typography variant="h6" align="center">
+                  Donation Breakdown
+                </Typography>
+                <BarChart
+                  xAxis={[
+                    {
+                      scaleType: 'band',
+                      data: donorGroupLabels,
+                    },
+                  ]}
+                  series={donorGroupData}
+                  width={500}
+                  height={300}
+                />
+              </Box>
+            </Stack>
+          </Grid>
+          <div id="hiddenDataForFileDownload" style={{ display: 'none' }}>
+            <Typography
+              variant="h3"
+              align="center"
+              style={{ marginBottom: '30px' }}
             >
-              <Typography variant="h6" align="center">
-                Donation Breakdown
-              </Typography>
-              <BarChart
-                xAxis={[
-                  {
-                    scaleType: 'band',
-                    data: donorGroupLabels,
-                  },
-                ]}
-                series={donorGroupData}
-                width={500}
-                height={300}
-              />
-            </Box>
-          </Stack>
+              All Donations
+            </Typography>
+            <DonationsTable alignment="all" />
+            <Typography
+              variant="h3"
+              align="center"
+              style={{ marginBottom: '30px', marginTop: '50px' }}
+            >
+              All Donors
+            </Typography>
+            <DonorsTable alignment="all" />
+          </div>
         </Grid>
-        <div id="hiddenDataForFileDownload" style={{ display: 'none' }}>
-          <Typography
-            variant="h3"
-            align="center"
-            style={{ marginBottom: '30px' }}
-          >
-            All Donations
-          </Typography>
-          <DonationsTable alignment="all" />
-          <Typography
-            variant="h3"
-            align="center"
-            style={{ marginBottom: '30px', marginTop: '50px' }}
-          >
-            All Donors
-          </Typography>
-          <DonorsTable alignment="all" />
-        </div>
-      </Grid>
 
-      <Modal
-        open={confirmationModalOpen}
-        onClose={handleConfirmationModalClose}
-        aria-labelledby="Confirmation Modal"
-        aria-describedby="Download or Share Report"
-      >
-        <Box sx={style}>
-          <Typography variant="h6" component="h2">
-            Do you want to download the report?
-          </Typography>
-          <Typography sx={{ mt: 2 }}>If so, click Confirm below.</Typography>
-          <Button onClick={handleConfirmationModalClose}>Cancel</Button>
-          <Button onClick={handleConfirmDownload}>Confirm</Button>
-        </Box>
-      </Modal>
-
-      <Modal
-        open={pastReportsModalOpen}
-        onClose={handlePastReportsModalClose}
-        aria-labelledby="Past Reports Modal"
-        aria-describedby="View Past Reports"
-      >
-        <Box
-          sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}
+        <Modal
+          open={confirmationModalOpen}
+          onClose={handleConfirmationModalClose}
+          aria-labelledby="Confirmation Modal"
+          aria-describedby="Download or Share Report"
         >
-          <Typography variant="h6" component="h2">
-            Past Reports
-          </Typography>
-          {renderPastReports()}
-          <Button onClick={handlePastReportsModalClose}>Close</Button>
-        </Box>
-      </Modal>
+          <Box sx={style}>
+            <Typography variant="h6" component="h2">
+              Do you want to download the report?
+            </Typography>
+            <Typography sx={{ mt: 2 }}>If so, click Confirm below.</Typography>
+            <Button onClick={handleConfirmationModalClose}>Cancel</Button>
+            <Button onClick={handleConfirmDownload}>Confirm</Button>
+          </Box>
+        </Modal>
+
+        <Modal
+          open={pastReportsModalOpen}
+          onClose={handlePastReportsModalClose}
+          aria-labelledby="Past Reports Modal"
+          aria-describedby="View Past Reports"
+        >
+          <Box
+            sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}
+          >
+            <Typography variant="h6" component="h2">
+              Past Reports
+            </Typography>
+            {renderPastReports()}
+            <Button onClick={handlePastReportsModalClose}>Close</Button>
+          </Box>
+        </Modal>
+      </div>
     </div>
   );
 }

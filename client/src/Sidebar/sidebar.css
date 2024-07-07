@@ -141,7 +141,7 @@
     transition: 0.3s;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1000px) {
     .sidewrapper {
         width: 80px;
     }

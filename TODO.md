@@ -15,3 +15,5 @@
 - Change Yes/No to checkmark
 - Dont look bad when 9+ unack
 - Add Max Content wrapper everywhere
+- prevent unclicking of tabbar
+- Center New Donation page with max content wrapper

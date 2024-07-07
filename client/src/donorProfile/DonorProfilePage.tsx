@@ -374,7 +374,7 @@ function DonorProfilePage() {
           >
             {numAck > 0 && (
               <Button
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/communications')}
                 style={{
                   marginLeft: '16px',
                   background: '#417FED',

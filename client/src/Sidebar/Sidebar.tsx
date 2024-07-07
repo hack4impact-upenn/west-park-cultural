@@ -77,7 +77,7 @@ function Sidebar(props: any) {
                             onClick={() => navto('/new-donation')}
                           >
                             <i className="fa-solid fa-plus" /> &nbsp;{' '}
-                            <span className="sidebartext">NewDonation</span>
+                            <span className="sidebartext">New Donation</span>
                           </div>
                           <div
                             className="sidebar-link"

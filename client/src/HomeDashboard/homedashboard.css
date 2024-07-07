@@ -8,6 +8,16 @@
     padding-bottom: 8px;
 }
 
+.max-width-wrapper-small {
+    width: 100%;
+    max-width: 800px;
+    margin:auto;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
 .home-dashboard {
     
 }

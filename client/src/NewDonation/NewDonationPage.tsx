@@ -11,6 +11,8 @@ import {
   InputLabel,
   Select,
   FormHelperText,
+  Alert,
+  Collapse,
 } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -148,12 +150,28 @@ function NewDonationPage() {
     setCampaignPurpose(null);
     setNotes('');
     setPaymentType('');
-    setSuccessMessage(true);
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    setAlertHelper('1Donation successfully added!');
+  };
+
+  useEffect(() => {
+    if (successMessage) {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      // setAlertHelper('1Donation successfully added!');
+    }
+  }, [successMessage]);
+
+  const [alert, setAlert] = useState('');
+  const setAlertHelper = (msg: string) => {
+    setAlert('');
+    setTimeout(() => {
+      setAlert(msg);
+    }, 100);
   };
 
   const handleSubmit = () => {
     if (checkValidInput()) {
-      setIsValidInput(true);
+      setAlert('');
       if (isNewDonator) {
         const newDonator = {
           contact_name: donator?.title,
@@ -165,7 +183,6 @@ function NewDonationPage() {
           last_donation_date: donationDate,
           type: determineDonorType(),
         };
-
         postData('donor/create', newDonator)
           .then((donorResponse) => {
             setDonator(donorResponse.data);
@@ -194,7 +211,6 @@ function NewDonationPage() {
                     type: donationType,
                     comments: notes,
                   };
-
                   postData('donation/new', newDonation)
                     .then((response2) => {
                       console.log(response2);
@@ -219,7 +235,6 @@ function NewDonationPage() {
                 type: donationType,
                 comments: notes,
               };
-
               postData('donation/new', newDonation)
                 .then((response2) => {
                   resetPage();
@@ -252,7 +267,6 @@ function NewDonationPage() {
               type: donationType,
               comments: notes,
             };
-
             postData('donation/new', newDonation)
               .then((response2) => {
                 resetPage();
@@ -291,7 +305,6 @@ function NewDonationPage() {
           type: donationType,
           comments: notes,
         };
-
         postData('donation/new', newDonation)
           .then((response) => {
             resetPage();
@@ -317,334 +330,367 @@ function NewDonationPage() {
           });
       }
     } else {
-      setIsValidInput(false);
-      setSuccessMessage(false);
+      setAlertHelper('0Please fill in and check all input fields!');
     }
   };
 
   return (
-    <Grid container sx={{ m: 3 }} spacing={2}>
-      <Grid item xs={12}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-          Register New Donation
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Box sx={{ width: '50%' }}>
-          <ToggleButtonGroup
-            value={donationType}
-            exclusive
-            onChange={handleDonationType}
-            aria-label="donation type"
-            size="large"
-            fullWidth
-          >
-            <ToggleButton value="donation" aria-label="donation">
-              Donation
-            </ToggleButton>
-            <ToggleButton value="sponsorship" aria-label="sponsorship">
-              Sponsorship
-            </ToggleButton>
-            <ToggleButton value="grant" aria-label="grant">
-              Grant
-            </ToggleButton>
-          </ToggleButtonGroup>
+    <div style={{ width: 'inherit' }} className="max-width-wrapper-small">
+      <Grid
+        container
+        sx={{
+          // marginLeft: '0px',
+          marginRight: '24px',
+          marginTop: '24px',
+          marginBottom: '24px',
+        }}
+        spacing={2}
+      >
+        <Box width="100%">
+          <Collapse in={alert !== ''}>
+            <Alert
+              sx={{ marginLeft: '16px' }}
+              severity={
+                // eslint-disable-next-line no-nested-ternary
+                alert.charAt(0) === '1'
+                  ? 'success'
+                  : alert.charAt(0) === '0'
+                  ? 'error'
+                  : 'info'
+              }
+              onClose={() => {
+                setAlertHelper('');
+              }}
+            >
+              {alert.substring(1)}
+            </Alert>
+          </Collapse>
         </Box>
-      </Grid>
-      {donationType === 'grant' && (
+
         <Grid item xs={12}>
-          <FormControl sx={{ width: '40%' }}>
-            <InputLabel required={donationType === 'grant'}>
-              Grant Year
-            </InputLabel>
-            <Select
-              value={grantYear}
-              label="Grant Year"
-              onChange={(event) => setGrantYear(event.target.value)}
-              required={donationType === 'grant'}
-            >
-              <MenuItem value="multi-year">Multi-Year</MenuItem>
-              <MenuItem value="single-year">Single-Year</MenuItem>
-            </Select>
-          </FormControl>
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+            Register New Donation
+          </Typography>
         </Grid>
-      )}
-      <Grid item xs={12}>
-        <TextField
-          id="outlined-number"
-          label="Donation Amount"
-          type="number"
-          value={donationAmount}
-          onChange={handleDonationAmountChange}
-          required
-          sx={{ width: '40%' }}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            value={donationDate}
-            label="Donation Date"
-            onChange={(newDonationDate) => setDonationDate(newDonationDate)}
-            sx={{ width: '40%' }}
+        <Grid item xs={12}>
+          <Box sx={{ width: '100%' }}>
+            <ToggleButtonGroup
+              value={donationType}
+              exclusive
+              onChange={handleDonationType}
+              aria-label="donation type"
+              size="large"
+              fullWidth
+            >
+              <ToggleButton value="donation" aria-label="donation">
+                Donation
+              </ToggleButton>
+              <ToggleButton value="sponsorship" aria-label="sponsorship">
+                Sponsorship
+              </ToggleButton>
+              <ToggleButton value="grant" aria-label="grant">
+                Grant
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        </Grid>
+        {donationType === 'grant' && (
+          <Grid item xs={12}>
+            <FormControl sx={{ width: '100%' }}>
+              <InputLabel required={donationType === 'grant'}>
+                Grant Year
+              </InputLabel>
+              <Select
+                value={grantYear}
+                label="Grant Year"
+                onChange={(event) => setGrantYear(event.target.value)}
+                required={donationType === 'grant'}
+              >
+                <MenuItem value="multi-year">Multi-Year</MenuItem>
+                <MenuItem value="single-year">Single-Year</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        )}
+        <Grid item xs={12}>
+          <TextField
+            id="outlined-number"
+            label="Donation Amount"
+            type="number"
+            value={donationAmount}
+            onChange={handleDonationAmountChange}
+            required
+            sx={{ width: '100%' }}
           />
-        </LocalizationProvider>
-      </Grid>
-      <Grid item xs={12}>
-        <Autocomplete
-          sx={{ width: '40%' }}
-          value={donator}
-          onChange={(event, newValue) => {
-            setIsNewDonator(false);
-            console.log(newValue);
-            if (typeof newValue === 'string') {
-              setDonator({
-                title: newValue,
-              });
-            } else if (newValue && newValue.inputValue) {
-              // Create a new value from the user input
-              setIsNewDonator(true);
-              setDonator({
-                title: newValue.inputValue,
-              });
-            } else {
-              setDonator(newValue);
-            }
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filterDonors(options, params);
-            const { inputValue } = params;
-            // Suggest the creation of a new value
-            const isExisting = options.some(
-              (option) => inputValue === option.contact_name,
-            );
-            if (inputValue !== '' && !isExisting) {
-              filtered.push({
-                inputValue,
-                contact_name: inputValue,
-                title: `Add "${inputValue}"`,
-              });
-            }
-            return filtered;
-          }}
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          id="donator-picker"
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          options={donorsData}
-          getOptionLabel={(option) => {
-            // Value selected with enter, right from the input
-            if (typeof option === 'string') {
-              return option;
-            }
-            // Add "xxx" option created dynamically
-            if (option.title) {
-              return option.title!;
-            }
-            // Regular option
-            return option.contact_name!;
-          }}
-          renderOption={(props, option) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <li {...props}>
-              {option.title ? option.title : option.contact_name}
-            </li>
-          )}
-          freeSolo
-          renderInput={(params) => (
-            <TextField
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              {...params}
-              label="Donator"
-              required
-              helperText="Search for a previous donater. If they are a new donater, a profile will be created automatically. All donaters must have unique names."
+        </Grid>
+        <Grid item xs={12}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              value={donationDate}
+              label="Donation Date*"
+              onChange={(newDonationDate) => setDonationDate(newDonationDate)}
+              sx={{ width: '100%' }}
             />
-          )}
-        />
-      </Grid>
-      {isNewDonator && (
-        <Grid item xs={12}>
-          <TextField
-            label="New Donator Email"
-            type="email"
-            value={newDonatorEmail}
-            onChange={handleNewDonatorEmailChange}
-            required={isNewDonator}
-            sx={{ width: '40%' }}
-          />
+          </LocalizationProvider>
         </Grid>
-      )}
-      {isNewDonator && (
         <Grid item xs={12}>
-          <FormControl sx={{ width: '40%' }}>
-            <InputLabel required={isNewDonator}>New Donator Group</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={newDonatorGroup}
-              label="New Donator Group"
-              onChange={handleNewDonatorGroupChange}
-              required={isNewDonator}
-            >
-              <MenuItem value="Individual">Individual</MenuItem>
-              <MenuItem value="Board Member">Board Member</MenuItem>
-              <MenuItem value="Foundation">Foundation</MenuItem>
-              <MenuItem value="Corporate">Corporate</MenuItem>
-              <MenuItem value="Gov/State">Gov/State</MenuItem>
-              <MenuItem value="Gov/Fed">Gov/Fed</MenuItem>
-              <MenuItem value="Gov/Municipal">Gov/Municipal</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      )}
-      {isNewDonator && (
-        <Grid item xs={12}>
-          <TextField
-            label="New Donator Phone"
-            type="phone"
-            value={newDonatorPhone}
-            required={isNewDonator}
-            onChange={handleNewDonatorPhoneChange}
-            sx={{ width: '40%' }}
-          />
-        </Grid>
-      )}
-      {isNewDonator && (
-        <Grid item xs={12}>
-          <TextField
-            label="New Donator Address"
-            type="text"
-            value={newDonatorAddress}
-            required={isNewDonator}
-            onChange={handleNewDonatorAddressChange}
-            sx={{ width: '40%' }}
-          />
-        </Grid>
-      )}
-      <Grid item xs={12}>
-        <Autocomplete
-          sx={{ width: '40%' }}
-          value={campaignPurpose}
-          onChange={(event, newValue) => {
-            setIsNewPurpose(false);
-            if (typeof newValue === 'string') {
-              setCampaignPurpose({
-                title: newValue,
-              });
-            } else if (newValue && newValue.inputValue) {
-              setIsNewPurpose(true);
-              setCampaignPurpose({
-                title: newValue.inputValue,
-              });
-            } else {
-              setCampaignPurpose(newValue);
-            }
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filterPurposes(options, params);
-
-            const { inputValue } = params;
-            // Suggest the creation of a new value
-            const isExisting = options.some(
-              (option) => inputValue === option.name,
-            );
-            if (inputValue !== '' && !isExisting) {
-              filtered.push({
-                inputValue,
-                name: inputValue,
-                title: `Add "${inputValue}"`,
-              });
-            }
-
-            return filtered;
-          }}
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          id="free-solo-with-text-demo"
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          options={purposesData}
-          getOptionLabel={(option) => {
-            // Value selected with enter, right from the input
-            if (typeof option === 'string') {
-              return option!;
-            }
-            // Add "xxx" option created dynamically
-            if (option.title) {
-              return option.title!;
-            }
-            // Regular option
-            return option.name!;
-          }}
-          renderOption={(props, option) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <li {...props}>{option.title ? option.title : option.name}</li>
-          )}
-          freeSolo
-          renderInput={(params) => (
-            <TextField
+          <Autocomplete
+            sx={{ width: '100%' }}
+            value={donator}
+            onChange={(event, newValue) => {
+              setIsNewDonator(false);
+              console.log(newValue);
+              if (typeof newValue === 'string') {
+                setDonator({
+                  title: newValue,
+                });
+              } else if (newValue && newValue.inputValue) {
+                // Create a new value from the user input
+                setIsNewDonator(true);
+                setDonator({
+                  title: newValue.inputValue,
+                });
+              } else {
+                setDonator(newValue);
+              }
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filterDonors(options, params);
+              const { inputValue } = params;
+              // Suggest the creation of a new value
+              const isExisting = options.some(
+                (option) => inputValue === option.contact_name,
+              );
+              if (inputValue !== '' && !isExisting) {
+                filtered.push({
+                  inputValue,
+                  contact_name: inputValue,
+                  title: `Add "${inputValue}"`,
+                });
+              }
+              return filtered;
+            }}
+            selectOnFocus
+            clearOnBlur
+            handleHomeEndKeys
+            id="donator-picker"
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            options={donorsData}
+            getOptionLabel={(option) => {
+              // Value selected with enter, right from the input
+              if (typeof option === 'string') {
+                return option;
+              }
+              // Add "xxx" option created dynamically
+              if (option.title) {
+                return option.title!;
+              }
+              // Regular option
+              return option.contact_name!;
+            }}
+            renderOption={(props, option) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
-              {...params}
-              label="Campaign / Purpose"
-              required
-              helperText="
+              <li {...props}>
+                {option.title ? option.title : option.contact_name}
+              </li>
+            )}
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...params}
+                label="Donator"
+                required
+                helperText="Search for a previous donater. If they are a new donater, a profile will be created automatically. All donaters must have unique names."
+              />
+            )}
+          />
+        </Grid>
+        {isNewDonator && (
+          <Grid item xs={12}>
+            <TextField
+              label="New Donator Email"
+              type="email"
+              value={newDonatorEmail}
+              onChange={handleNewDonatorEmailChange}
+              required={isNewDonator}
+              sx={{ width: '100%' }}
+            />
+          </Grid>
+        )}
+        {isNewDonator && (
+          <Grid item xs={12}>
+            <FormControl sx={{ width: '100%' }}>
+              <InputLabel required={isNewDonator}>New Donator Group</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={newDonatorGroup}
+                label="New Donator Group"
+                onChange={handleNewDonatorGroupChange}
+                required={isNewDonator}
+              >
+                <MenuItem value="Individual">Individual</MenuItem>
+                <MenuItem value="Board Member">Board Member</MenuItem>
+                <MenuItem value="Foundation">Foundation</MenuItem>
+                <MenuItem value="Corporate">Corporate</MenuItem>
+                <MenuItem value="Gov/State">Gov/State</MenuItem>
+                <MenuItem value="Gov/Fed">Gov/Fed</MenuItem>
+                <MenuItem value="Gov/Municipal">Gov/Municipal</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        )}
+        {isNewDonator && (
+          <Grid item xs={12}>
+            <TextField
+              label="New Donator Phone"
+              type="phone"
+              value={newDonatorPhone}
+              required={isNewDonator}
+              onChange={handleNewDonatorPhoneChange}
+              sx={{ width: '100%' }}
+            />
+          </Grid>
+        )}
+        {isNewDonator && (
+          <Grid item xs={12}>
+            <TextField
+              label="New Donator Address"
+              type="text"
+              value={newDonatorAddress}
+              required={isNewDonator}
+              onChange={handleNewDonatorAddressChange}
+              sx={{ width: '100%' }}
+            />
+          </Grid>
+        )}
+        <Grid item xs={12}>
+          <Autocomplete
+            sx={{ width: '100%' }}
+            value={campaignPurpose}
+            onChange={(event, newValue) => {
+              setIsNewPurpose(false);
+              if (typeof newValue === 'string') {
+                setCampaignPurpose({
+                  title: newValue,
+                });
+              } else if (newValue && newValue.inputValue) {
+                setIsNewPurpose(true);
+                setCampaignPurpose({
+                  title: newValue.inputValue,
+                });
+              } else {
+                setCampaignPurpose(newValue);
+              }
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filterPurposes(options, params);
+
+              const { inputValue } = params;
+              // Suggest the creation of a new value
+              const isExisting = options.some(
+                (option) => inputValue === option.name,
+              );
+              if (inputValue !== '' && !isExisting) {
+                filtered.push({
+                  inputValue,
+                  name: inputValue,
+                  title: `Add "${inputValue}"`,
+                });
+              }
+
+              return filtered;
+            }}
+            selectOnFocus
+            clearOnBlur
+            handleHomeEndKeys
+            id="free-solo-with-text-demo"
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            options={purposesData}
+            getOptionLabel={(option) => {
+              // Value selected with enter, right from the input
+              if (typeof option === 'string') {
+                return option!;
+              }
+              // Add "xxx" option created dynamically
+              if (option.title) {
+                return option.title!;
+              }
+              // Regular option
+              return option.name!;
+            }}
+            renderOption={(props, option) => (
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              <li {...props}>{option.title ? option.title : option.name}</li>
+            )}
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...params}
+                label="Campaign / Purpose"
+                required
+                helperText="
               Search for a campaign / purpose that already has donations, or type a
           new campaign. All campaigns must have unique names."
-            />
-          )}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          label="Notes"
-          type="text"
-          value={notes}
-          onChange={handleNotesChange}
-          multiline
-          sx={{ width: '40%' }}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <FormControl sx={{ width: '40%' }}>
-          <InputLabel>Payment Type</InputLabel>
-          <Select
-            value={paymentType}
-            label="Payment Type"
-            required
-            onChange={handlePaymentTypeChange}
-          >
-            <MenuItem value="mail check">Mail Check</MenuItem>
-            <MenuItem value="credit">Credit</MenuItem>
-            <MenuItem value="paypal">Paypal</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      {isValidInput === false && (
-        <Typography sx={{ color: 'error.main', ml: 2 }} variant="body2">
-          Please fill in and check all input fields
-        </Typography>
-      )}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Notes"
+            type="text"
+            value={notes}
+            onChange={handleNotesChange}
+            multiline
+            rows={4}
+            sx={{ width: '100%' }}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControl sx={{ width: '100%' }}>
+            <InputLabel>Payment Type*</InputLabel>
+            <Select
+              value={paymentType}
+              label="Payment Type"
+              required
+              onChange={handlePaymentTypeChange}
+            >
+              <MenuItem value="mail check">Mail Check</MenuItem>
+              <MenuItem value="credit">Credit</MenuItem>
+              <MenuItem value="paypal">Paypal</MenuItem>
+              <MenuItem value="other">Other</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        {isValidInput === false && (
+          <Typography sx={{ color: 'error.main', ml: 2 }} variant="body2">
+            Please fill in and check all input fields
+          </Typography>
+        )}
 
-      {successMessage && (
-        <Typography sx={{ color: 'blue', ml: 2 }} variant="body2">
-          Successfully registered the donation.
-        </Typography>
-      )}
-      <Grid item xs={12}>
-        <Button
-          variant="contained"
-          color="primary"
-          endIcon={<ArrowForwardIcon />}
-          onClick={handleSubmit}
-          sx={{ width: '40%' }}
-          size="large"
-          style={{ justifyContent: 'flex-start' }}
-        >
-          Register Donation
-        </Button>
+        {successMessage && (
+          <Typography sx={{ color: 'blue', ml: 2 }} variant="body2">
+            Successfully registered the donation.
+          </Typography>
+        )}
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            endIcon={<ArrowForwardIcon />}
+            onClick={handleSubmit}
+            sx={{ width: '100%' }}
+            size="large"
+            style={{ justifyContent: 'flex-start' }}
+          >
+            Register Donation
+          </Button>
+        </Grid>
       </Grid>
-    </Grid>
+    </div>
   );
 }
 
