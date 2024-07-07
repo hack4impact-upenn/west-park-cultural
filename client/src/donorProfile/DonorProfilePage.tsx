@@ -36,6 +36,7 @@ function DonorProfilePage() {
   const [confirmDisabled, setConfirmDisabled] = useState(true);
   const { donatorId } = useParams();
   const [numAck, setNumAck] = useState(0);
+  const [totalDonation, setTotalDonation] = useState(0);
 
   const donator = useData(`donor/id/${donatorId}`);
   const [donatorData, setDonatorData] = useState<IDonor | null>(null);
@@ -70,6 +71,10 @@ function DonorProfilePage() {
         donationsMade.data.filter((donation: any) => !donation.acknowledged)
           .length,
       );
+      const totalDonation = donationsMade.data.reduce((total, donation) => {
+        return total + donation.amount;
+      }, 0);
+      setTotalDonation(totalDonation); 
     }
   }, [donationsMade?.data]);
 
@@ -185,7 +190,7 @@ function DonorProfilePage() {
         <ProfileInfo donatorData={donatorData} />
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
           <DonorNoteBox donatorData={donatorData} />
-          <DateInfoBox donatorData={donatorData} />
+          <DateInfoBox donatorData={donatorData} totalAmount = {totalDonation}/>
         </Box>
       </Box>
 

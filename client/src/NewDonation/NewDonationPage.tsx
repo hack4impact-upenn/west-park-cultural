@@ -269,7 +269,8 @@ function NewDonationPage() {
           });
           
           if (donationDate?.isAfter(donator?.last_donation_date)) {
-            postData('donor/updateRecent', donationDate)
+            const data = { id: donator._id, last_donation_date: donationDate };
+            postData('donor/updateRecent', data)
             .then((response) => {
               console.log(response);
             })
@@ -299,7 +300,8 @@ function NewDonationPage() {
             });
           }
           if (donationDate?.isAfter(donator?.last_donation_date)) {
-            postData('donor/updateRecent', donationDate)
+            const data = { id: donator._id, last_donation_date: donationDate };
+            postData('donor/updateRecent', data)
             .then((response) => {
               console.log(response);
             })

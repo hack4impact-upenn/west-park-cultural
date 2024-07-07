@@ -65,7 +65,7 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
         overflow: 'auto',
         boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
         borderRadius: 2,
-        p: 2,
+        p: 3,
       }}
     >
       <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold' }}>

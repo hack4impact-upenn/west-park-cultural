@@ -116,6 +116,7 @@ function BasicTable({ alignment }: BasicTableProps) {
       },
     ];
   }
+  const navigator = useNavigate();
 
   const numUnacknowledged = donationsData.filter(
     (donation: any) => !donation.acknowledged,
@@ -147,27 +148,13 @@ function BasicTable({ alignment }: BasicTableProps) {
             unacknowledged {alignment}s.
           </p>
           <Button
-            onClick={() => {
-              console.log('');
-            }}
-            style={{
-              background: '#24a0ed',
-              color: 'white',
-              marginRight: '16px',
-              marginTop: '0px',
-              padding: '15px',
-              marginBottom: '0',
-            }}
+            onClick={() => navigator('/communications')}
             endIcon={<ArrowForwardIcon />}
             variant="contained"
             color="primary"
+            size="large"
           >
             Send them a message now{' '}
-            {/* <i
-              className="fa fa-arrow-right"
-              aria-hidden="true"
-              style={{ marginLeft: '10px' }}
-            /> */}
           </Button>
         </div>
       )}

@@ -5,9 +5,10 @@ import IDonor from '../util/types/donor';
 
 interface ProfileInfoProps {
   donatorData: IDonor | null;
+  totalAmount: number;
 }
 
-function DateInfoBox({ donatorData }: ProfileInfoProps) {
+function DateInfoBox({ donatorData, totalAmount }: ProfileInfoProps) {
   const formatDate = (time: Date | undefined | null | string): string => {
     if (time instanceof Date) {
       const year = time.getFullYear().toString();
@@ -30,7 +31,7 @@ function DateInfoBox({ donatorData }: ProfileInfoProps) {
       sx={{
         boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
         borderRadius: 2,
-        p: 2,
+        p: 3,
       }}
     >
       <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold' }}>
@@ -46,10 +47,10 @@ function DateInfoBox({ donatorData }: ProfileInfoProps) {
         {formatDate(donatorData?.last_donation_date)}
       </Typography>
       <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold' }}>
-        Last Communication
+        Total Donation
       </Typography>
       <Typography variant="body1" gutterBottom>
-        {formatDate(donatorData?.last_communication_date)}
+        ${totalAmount}
       </Typography>
     </Box>
   );

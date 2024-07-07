@@ -132,16 +132,16 @@ const updateDonorRecentDonation = async (
   res: express.Response,
   next: express.NextFunction,
 ) => {
-  const { id, date } = req.body;
+  const { id, last_donation_date } = req.body;
   if (!id) {
     next(ApiError.missingFields(['id']));
     return;
   }
-  if (!date) {
-    next(ApiError.missingFields(['date']));
+  if (!last_donation_date) {
+    next(ApiError.missingFields(['last_donation_date']));
     return;
   }
-  const donor = updateRecentDonationDate(id, date);
+  const donor = updateRecentDonationDate(id, last_donation_date);
   res.status(StatusCode.OK).send(donor);
 };
 
