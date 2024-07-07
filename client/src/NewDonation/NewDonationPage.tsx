@@ -267,27 +267,46 @@ function NewDonationPage() {
             // Handle the error here
             console.log(error);
           });
+          
+          if (donationDate?.isAfter(donator?.last_donation_date)) {
+            postData('donor/updateRecent', donationDate)
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          }
       } else {
-        const newDonation = {
-          donor_id: donator?._id,
-          date: donationDate?.format('YYYY-MM-DD'),
-          amount: donationAmount,
-          purpose_id: campaignPurpose?._id,
-          payment_type: paymentType,
-          type: donationType,
-          comments: notes,
-        };
+          const newDonation = {
+            donor_id: donator?._id,
+            date: donationDate?.format('YYYY-MM-DD'),
+            amount: donationAmount,
+            purpose_id: campaignPurpose?._id,
+            payment_type: paymentType,
+            type: donationType,
+            comments: notes,
+          };
 
-        postData('donation/new', newDonation)
-          .then((response) => {
-            resetPage();
-            console.log(response);
-          })
-          .catch((error) => {
-            // Handle the error here
-            console.log(error);
-          });
-      }
+          postData('donation/new', newDonation)
+            .then((response) => {
+              resetPage();
+              console.log(response);
+            })
+            .catch((error) => {
+              // Handle the error here
+              console.log(error);
+            });
+          }
+          if (donationDate?.isAfter(donator?.last_donation_date)) {
+            postData('donor/updateRecent', donationDate)
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          }
     } else {
       setIsValidInput(false);
       setSuccessMessage(false);

@@ -19,10 +19,20 @@ interface ProfileInfoProps {
 function DonorNoteBox({ donatorData }: ProfileInfoProps) {
   const [open, setOpen] = useState(false); // State to manage dialog visibility
   const [noteText, setNoteText] = useState<string>(''); // State to capture note text
+  const [editNoteText, setEditNoteText] = useState<string>(''); // State to capture note text
 
+  useEffect(() => {
+    if (donatorData) {
+      setNoteText(donatorData.note || ''); // Initialize noteText with donatorData.note or '' if null or undefined
+    } else {
+      setNoteText(''); // Reset noteText to '' when donatorData is null
+    }
+  }, [donatorData]);
+
+  
   const handleOpen = () => {
     if (donatorData != null) {
-      setNoteText(donatorData.note);
+      setEditNoteText(noteText);
     }
     setOpen(true);
   };
@@ -34,9 +44,10 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
   const handleSaveNote = () => {
     if (donatorData != null) {
       // eslint-disable-next-line no-underscore-dangle
-      const data = { id: donatorData._id, note: noteText };
+      const data = { id: donatorData._id, note: editNoteText };
       postData('donor/note', data)
         .then((response2) => {
+          setNoteText(editNoteText);
           console.log(response2);
         })
         .catch((error) => {
@@ -65,26 +76,26 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
         gutterBottom
         sx={{ maxHeight: 120, overflowY: 'auto', marginBottom: '10px' }}
       >
-        {donatorData?.note}
+        {noteText}
       </Typography>
-      <Button variant="outlined" onClick={handleOpen}>
+      <Button variant="outlined" onClick={handleOpen} >
         Take Note
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Take Note</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ p: 4 }}>
+          <Typography variant='h5' textAlign="center" sx={{mb: 2}}>Take Note</Typography>
           <TextField
             fullWidth
             multiline
             rows={4}
             variant="outlined"
             placeholder="Type your note here..."
-            value={noteText}
-            onChange={(e) => setNoteText(e.target.value)}
+            value={editNoteText}
+            onChange={(e) => setEditNoteText(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">
+          <Button onClick={handleClose} sx={{ color: 'gray'}}>
             Cancel
           </Button>
           <Button onClick={handleSaveNote} color="primary">

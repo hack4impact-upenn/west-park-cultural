@@ -157,6 +157,10 @@ function DonorProfilePage() {
     console.log();
   };
 
+  const goCommunication = () => {
+    navigate('/communications');
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       <Collapse in={alert !== ''}>
@@ -324,7 +328,7 @@ function DonorProfilePage() {
             </Box>
           </Box>
         </Popover>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={goCommunication}>
           Message
         </Button>
       </Box>

@@ -47,7 +47,6 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'background.paper',
-  border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -773,59 +772,60 @@ function ReportsPage() {
 
   return (
     <div id="report-content">
-      <Grid container sx={{ m: 3 }} spacing={2}>
-        <Grid item xs={8}>
+      <Grid  sx={{ m: 4 }} spacing={2}>
+      <Grid>
           <Typography variant="h4" gutterBottom>
             Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
           </Typography>
         </Grid>
-        <Grid item xs={2}>
-          {/* // SPACING ISSUE HERE */}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleConfirmationModalOpen}
-          >
-            Download / Share
-          </Button>
-        </Grid>
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={handlePastReportsModalOpen}
-          >
-            View Past Reports
-          </Button>
-        </Grid>
-        <Grid container direction="row" spacing={2}>
+        <Grid container direction="row" spacing={2} alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Button
-              variant="contained"
-              color="inherit"
-              onClick={handleLoadRecentReport}
-            >
-              View Recent Report
-            </Button>
+            <Box display="flex" gap={2}>
+              {viewingPastReport && (
+                <Button
+                  variant="contained"
+                  color="inherit"
+                  onClick={handleLoadRecentReport}
+                >
+                  View Recent Report
+                </Button>
+              )}
+              {!viewingPastReport && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => generateReport()}
+                >
+                  Generate New Report
+                </Button>
+              )}
+            </Box>
           </Grid>
-          {!viewingPastReport && (
-            <Grid item>
+          <Grid item>
+            <Box display="flex" gap={2}>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => generateReport()}
+                onClick={handleConfirmationModalOpen}
               >
-                Generate New Report
+                Download / Share
               </Button>
-            </Grid>
-          )}
+              <Button
+                variant="contained"
+                color="inherit"
+                onClick={handlePastReportsModalOpen}
+              >
+                View Past Reports
+              </Button>
+            </Box>
+          </Grid>
         </Grid>
         {errorMessage && (
           <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
             Error generating the report, please retry.
           </Typography>
         )}
-        <Grid item xs={12} sx={{ mb: 2 }}>
+         <Grid sx={{ mt: 2, mb: 2 }}>
           <ToggleButtonGroup
             value={alignment}
             exclusive
@@ -861,9 +861,9 @@ function ReportsPage() {
           
         </Grid> */}
 
-        <Grid item xs={12}>
+        <Grid sx={{ mt: 4 }} >
           <Stack direction="row" spacing={2}>
-            <Box>
+            <Box sx={{ boxShadow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
               <Typography variant="h6" align="center">
                 Purpose Breakdown
               </Typography>
@@ -880,7 +880,7 @@ function ReportsPage() {
                 }}
               />
             </Box>
-            <Box>
+            <Box sx={{ boxShadow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
               <Typography variant="h6" align="center">
                 Donations over Time
               </Typography>
@@ -907,7 +907,8 @@ function ReportsPage() {
                 height={300}
               />
             </Box>
-            <Box>
+
+            <Box sx={{ boxShadow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2, mt: 4 }}>
               <Typography variant="h6" align="center">
                 Donation Breakdown
               </Typography>
@@ -968,7 +969,7 @@ function ReportsPage() {
         aria-describedby="View Past Reports"
       >
         <Box
-          sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}
+          sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto',  }}
         >
           <Typography variant="h6" component="h2">
             Past Reports

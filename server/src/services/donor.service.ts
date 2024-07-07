@@ -54,6 +54,20 @@ const updateNote = async (id: string, note: string) => {
   }
 };
 
+const updateRecentDonationDate = async (id: string, date: Date) => {
+  try {
+    const donor = await Donor.findOneAndUpdate(
+      { _id: id },
+      { $set: { [`last_donation_date`]: date } }, 
+      { new: true },
+    ).exec();
+    return donor;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export {
   getAllDonors,
   getAllDonorsTypeDonor,
@@ -63,4 +77,5 @@ export {
   getDonorById,
   editDonorById,
   updateNote,
+  updateRecentDonationDate,
 };

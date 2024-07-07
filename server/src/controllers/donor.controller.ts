@@ -13,6 +13,7 @@ import {
   editDonorById,
   getDonorById,
   updateNote,
+  updateRecentDonationDate,
 } from '../services/donor.service';
 
 const getAllDonorsController = async (
@@ -126,6 +127,24 @@ const editDonor = async (
     });
 };
 
+const updateDonorRecentDonation = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  const { id, date } = req.body;
+  if (!id) {
+    next(ApiError.missingFields(['id']));
+    return;
+  }
+  if (!date) {
+    next(ApiError.missingFields(['date']));
+    return;
+  }
+  const donor = updateRecentDonationDate(id, date);
+  res.status(StatusCode.OK).send(donor);
+};
+
 const updateDonorNote = async (
   req: express.Request,
   res: express.Response,
@@ -152,4 +171,5 @@ export {
   getDonorByIdController,
   editDonor,
   updateDonorNote,
+  updateDonorRecentDonation,
 };

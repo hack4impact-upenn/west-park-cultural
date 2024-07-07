@@ -68,7 +68,7 @@ function DonationHistoryTable({ donorId }: BasicTableProps) {
       ),
       more: (
         <div style={{ width: '100%', display: 'flex' }}>
-          <a href={`/donationInfo/${donation._id}`}>More Info</a>
+          <a href={`/donationInfo/${donation._id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>More Info</a>
         </div>
       ),
     });
