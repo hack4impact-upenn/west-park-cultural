@@ -8,6 +8,7 @@ const createReports = async (reports: IReports) => {
   return result;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getReportsByDate = async (date: Date) => {
   // const reports = await Reports.findById(id).exec();
   // return reports;

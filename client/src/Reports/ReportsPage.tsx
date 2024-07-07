@@ -146,7 +146,10 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
         ),
         createData(
           'Top Donor',
-          <a href={`/donationInfo/${data.top_donator?.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff'  }} >
+          <a
+            href={`/donationInfo/${data.top_donator?.donor_id}`}
+            style={{ textDecoration: 'none', color: '#0883ff' }}
+          >
             {data.top_donator?.donor_name}
           </a>,
           false,
@@ -204,7 +207,10 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
       ),
       createData(
         'Top Donor',
-        <a href={`/donor-profile/${data.top_donator?.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff' }}>
+        <a
+          href={`/donor-profile/${data.top_donator?.donor_id}`}
+          style={{ textDecoration: 'none', color: '#0883ff' }}
+        >
           {data.top_donator?.donor_name}
         </a>,
         true,
@@ -216,11 +222,17 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
       createData(
         'Largest Donation',
         <span>
-          <a href={`/donor-profile/${data.top_donator?.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff' }}>
+          <a
+            href={`/donor-profile/${data.top_donator?.donor_id}`}
+            style={{ textDecoration: 'none', color: '#0883ff' }}
+          >
             {data.top_donator?.donor_name}
           </a>
           (
-          <a href={`/donationInfo/${data.largest_donation?.donation_id}`}  style={{ textDecoration: 'none', color: '#0883ff' }}>
+          <a
+            href={`/donationInfo/${data.largest_donation?.donation_id}`}
+            style={{ textDecoration: 'none', color: '#0883ff' }}
+          >
             ${data.largest_donation?.amount}
           </a>
           )
@@ -772,13 +784,19 @@ function ReportsPage() {
 
   return (
     <div id="report-content">
-      <Grid  sx={{ m: 4 }} spacing={2}>
-      <Grid>
+      <Grid sx={{ m: 4 }} spacing={2}>
+        <Grid>
           <Typography variant="h4" gutterBottom>
             Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
           </Typography>
         </Grid>
-        <Grid container direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+        <Grid
+          container
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          justifyContent="space-between"
+        >
           <Grid item>
             <Box display="flex" gap={2}>
               {viewingPastReport && (
@@ -825,7 +843,7 @@ function ReportsPage() {
             Error generating the report, please retry.
           </Typography>
         )}
-         <Grid sx={{ mt: 2, mb: 2 }}>
+        <Grid sx={{ mt: 2, mb: 2 }}>
           <ToggleButtonGroup
             value={alignment}
             exclusive
@@ -861,9 +879,17 @@ function ReportsPage() {
           
         </Grid> */}
 
-        <Grid sx={{ mt: 4 }} >
+        <Grid sx={{ mt: 4 }}>
           <Stack direction="row" spacing={2}>
-            <Box sx={{ boxShadow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
+            <Box
+              sx={{
+                boxShadow: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                p: 2,
+              }}
+            >
               <Typography variant="h6" align="center">
                 Purpose Breakdown
               </Typography>
@@ -880,7 +906,15 @@ function ReportsPage() {
                 }}
               />
             </Box>
-            <Box sx={{ boxShadow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
+            <Box
+              sx={{
+                boxShadow: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                p: 2,
+              }}
+            >
               <Typography variant="h6" align="center">
                 Donations over Time
               </Typography>
@@ -908,7 +942,16 @@ function ReportsPage() {
               />
             </Box>
 
-            <Box sx={{ boxShadow: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2, mt: 4 }}>
+            <Box
+              sx={{
+                boxShadow: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                p: 2,
+                mt: 4,
+              }}
+            >
               <Typography variant="h6" align="center">
                 Donation Breakdown
               </Typography>
@@ -969,7 +1012,7 @@ function ReportsPage() {
         aria-describedby="View Past Reports"
       >
         <Box
-          sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto',  }}
+          sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}
         >
           <Typography variant="h6" component="h2">
             Past Reports

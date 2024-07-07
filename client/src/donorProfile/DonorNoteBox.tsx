@@ -29,7 +29,6 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
     }
   }, [donatorData]);
 
-  
   const handleOpen = () => {
     if (donatorData != null) {
       setEditNoteText(noteText);
@@ -78,12 +77,14 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
       >
         {noteText}
       </Typography>
-      <Button variant="outlined" onClick={handleOpen} >
+      <Button variant="outlined" onClick={handleOpen}>
         Take Note
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent sx={{ p: 4 }}>
-          <Typography variant='h5' textAlign="center" sx={{mb: 2}}>Take Note</Typography>
+          <Typography variant="h5" textAlign="center" sx={{ mb: 2 }}>
+            Take Note
+          </Typography>
           <TextField
             fullWidth
             multiline
@@ -95,7 +96,7 @@ function DonorNoteBox({ donatorData }: ProfileInfoProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} sx={{ color: 'gray'}}>
+          <Button onClick={handleClose} sx={{ color: 'gray' }}>
             Cancel
           </Button>
           <Button onClick={handleSaveNote} color="primary">

@@ -71,11 +71,14 @@ function BasicTable({ alignment }: BasicTableProps) {
   if (last !== LAST_DEFAULT) {
     // eslint-disable-next-line no-underscore-dangle
     lastElement = (
-      <a href={`/donationInfo/${lastDonation._id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>
+      <a
+        // eslint-disable-next-line no-underscore-dangle
+        href={`/donationInfo/${lastDonation._id}`}
+        style={{ textDecoration: 'none', color: '#0883ff' }}
+      >
         {last}
       </a>
     );
-  
   }
 
   const ninetyDaysAgo = new Date();
@@ -178,7 +181,7 @@ function HomeDashboard() {
 
   const goReport = () => {
     navigator('/reports');
-  }
+  };
 
   return (
     <div className="max-width-wrapper">

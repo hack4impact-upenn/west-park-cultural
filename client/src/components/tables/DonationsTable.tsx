@@ -62,7 +62,10 @@ function DonationsTable({ alignment }: BasicTableProps) {
       date: new Date(donation.date).toISOString().split('T')[0],
       amount: donation.amount,
       donor_id: (
-        <a href={`/donor-profile/${donation.donor_id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>
+        <a
+          href={`/donor-profile/${donation.donor_id}`}
+          style={{ textDecoration: 'none', color: '#0883ff' }}
+        >
           {donation.donor_name}
         </a>
       ),
@@ -85,7 +88,12 @@ function DonationsTable({ alignment }: BasicTableProps) {
         <div
           style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
         >
-          <a href={`donationInfo/${donation._id}`} style={{ textDecoration: 'none', color: '#0883ff'  }}>View</a>
+          <a
+            href={`donationInfo/${donation._id}`}
+            style={{ textDecoration: 'none', color: '#0883ff' }}
+          >
+            View
+          </a>
         </div>
       ),
     });

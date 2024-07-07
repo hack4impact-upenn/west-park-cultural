@@ -132,11 +132,13 @@ const updateDonorRecentDonation = async (
   res: express.Response,
   next: express.NextFunction,
 ) => {
+  // eslint-disable-next-line camelcase
   const { id, last_donation_date } = req.body;
   if (!id) {
     next(ApiError.missingFields(['id']));
     return;
   }
+  // eslint-disable-next-line camelcase
   if (!last_donation_date) {
     next(ApiError.missingFields(['last_donation_date']));
     return;

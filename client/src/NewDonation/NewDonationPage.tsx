@@ -267,48 +267,55 @@ function NewDonationPage() {
             // Handle the error here
             console.log(error);
           });
-          
-          if (donationDate?.isAfter(donator?.last_donation_date)) {
-            const data = { id: donator._id, last_donation_date: donationDate };
-            postData('donor/updateRecent', data)
+        // TODO: check this
+        // eslint-disable-next-line camelcase
+        const last_donate_date_fix: any = donator?.last_donation_date;
+        if (donationDate?.isAfter(last_donate_date_fix)) {
+          if (!donator) return;
+          const data = { id: donator._id, last_donation_date: donationDate };
+          postData('donor/updateRecent', data)
             .then((response) => {
               console.log(response);
             })
             .catch((error) => {
               console.log(error);
             });
-          }
+        }
       } else {
-          const newDonation = {
-            donor_id: donator?._id,
-            date: donationDate?.format('YYYY-MM-DD'),
-            amount: donationAmount,
-            purpose_id: campaignPurpose?._id,
-            payment_type: paymentType,
-            type: donationType,
-            comments: notes,
-          };
+        const newDonation = {
+          donor_id: donator?._id,
+          date: donationDate?.format('YYYY-MM-DD'),
+          amount: donationAmount,
+          purpose_id: campaignPurpose?._id,
+          payment_type: paymentType,
+          type: donationType,
+          comments: notes,
+        };
 
-          postData('donation/new', newDonation)
-            .then((response) => {
-              resetPage();
-              console.log(response);
-            })
-            .catch((error) => {
-              // Handle the error here
-              console.log(error);
-            });
-          }
-          if (donationDate?.isAfter(donator?.last_donation_date)) {
-            const data = { id: donator._id, last_donation_date: donationDate };
-            postData('donor/updateRecent', data)
-            .then((response) => {
-              console.log(response);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          }
+        postData('donation/new', newDonation)
+          .then((response) => {
+            resetPage();
+            console.log(response);
+          })
+          .catch((error) => {
+            // Handle the error here
+            console.log(error);
+          });
+      }
+      // TODO: check this
+      // eslint-disable-next-line camelcase
+      const last_donate_date_fix: any = donator?.last_donation_date;
+      if (donationDate?.isAfter(last_donate_date_fix)) {
+        if (!donator) return;
+        const data = { id: donator._id, last_donation_date: donationDate };
+        postData('donor/updateRecent', data)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     } else {
       setIsValidInput(false);
       setSuccessMessage(false);
