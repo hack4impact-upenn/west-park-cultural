@@ -62,7 +62,6 @@ const updateGroupDonorsAPI = (selectedGroup: Group, donorIds: string[]) => {
 };
 
 export default function AddEditGroupsModal({ open, onClose }: any) {
-  // const [open, setOpen] = React.useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedDonors, setSelectedDonors] = useState<Donor[]>([]);
@@ -107,7 +106,7 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
     const data = group?.data || [];
     setGroups(data);
   }, [group]);
-  
+
   const handleAddDonor = () => {
     const donor = unselectedDonors.find(
       (d) => d.contact_name === selectedDonorName,
@@ -126,9 +125,7 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
 
   const handleSubmit = () => {
     if (selectedGroup) {
-      // console.log(selectedGroup);
       const donorIds = selectedDonors.map((donor) => donor._id);
-
       updateGroupDonorsAPI(selectedGroup, donorIds) // update group
         .then(() => {
           setSelectedDonorName(''); // Reset selected donor value after submit
@@ -158,7 +155,6 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
         });
     }
   };
-
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
