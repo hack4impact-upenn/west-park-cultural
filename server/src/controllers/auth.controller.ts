@@ -47,8 +47,8 @@ const login = async (
       failureMessage: true,
     },
     // Callback function defined by passport strategy in configPassport.ts
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (err, user, info) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    (err: Error, user: IUser | undefined, info: any) => {
       if (err) {
         next(ApiError.internal('Failed to authenticate user.'));
         return;
