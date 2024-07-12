@@ -41,8 +41,8 @@ async function resolve(promise: Promise<any>) {
 /**
  * To UPDATE DURING DEPLOYMENT USING ENVIRONMENT VARIABLES
  */
-const BACKENDURL = process.env.PUBLIC_URL
-  ? process.env.PUBLIC_URL
+const BACKENDURL = process.env.REACT_APP_BACKEND_URL
+  ? process.env.REACT_APP_BACKEND_URL
   : 'http://localhost:4000';
 
 const URLPREFIX = `${BACKENDURL}/api`;
