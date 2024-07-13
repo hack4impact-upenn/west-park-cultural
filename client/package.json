@@ -2,7 +2,7 @@
   "name": "client",
   "version": "1.0.0",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node index.js",
     "client": "yarn start",
     "clean": "rm -rf node_modules",
     "dev": "echo \"Please cd into the root directory to run dev \" && exit 1",
