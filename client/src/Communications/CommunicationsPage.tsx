@@ -26,7 +26,7 @@ import AddEditGroupsModal from '../components/AddEditGroupsModal';
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import IDonation from '../util/types/donation';
-import { useData } from '../util/api';
+import { useData, getData } from '../util/api';
 import PopupPage from '../Popup/PopupPage';
 
 const BACKENDURL = process.env.PUBLIC_URL
@@ -118,9 +118,12 @@ function CommunicationsPage() {
       );
       const tempWithDonorInfo = await Promise.all(
         temp.map(async (donation: any) => {
-          const donorInfoResponse = await axios.get(
-            `${BACKENDURL}/api/donor/id/${donation.donor_id}`,
+          const donorInfoResponse = await getData(
+            `donor/id/${donation.donor_id}`,
           );
+          //  await axios.get(
+          //   `${BACKENDURL}/api/donor/id/${donation.donor_id}`,
+          // );
           if (!donorInfoResponse) {
             return;
           }
