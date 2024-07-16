@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import IDonor from '../util/types/donor';
-import { useData } from '../util/api';
+import { getData, useData } from '../util/api';
 
 interface BasicDonationStat {
   amount: number;
@@ -58,9 +58,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
     const fetchDonor = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `http://localhost:4000/api/donor/id/${donorID}`,
-        );
+        const res = await getData(`donor/id/${donorID}`);
         setDonorData(res.data);
       } catch (error) {
         console.error('Failed to fetch donor:', error);
@@ -77,9 +75,7 @@ function PopupPage({ open, onClose, donorID }: PopupPageProps) {
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:4000/api/donation/donor/${donorID}`,
-        );
+        const res = await getData(`donation/donor/${donorID}`);
         setDonationsData(res.data);
       } catch (error) {
         console.error('Failed to fetch donation:', error);

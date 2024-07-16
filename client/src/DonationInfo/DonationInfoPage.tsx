@@ -143,9 +143,7 @@ function DonationInfoPage() {
       setDonationData(donation.data);
       if (donation.data.donor_id) {
         try {
-          const res = await axios.get(
-            `http://localhost:4000/api/donor/id/${donation.data.donor_id}`,
-          );
+          const res = await getData(`donor/id/${donation.data.donor_id}`);
           setDonorName(res.data.contact_name);
           setDonator(res.data);
         } catch (error) {
@@ -155,9 +153,7 @@ function DonationInfoPage() {
 
       if (donation.data.purpose_id) {
         try {
-          const res = await axios.get(
-            `http://localhost:4000/api/purpose/${donation.data.purpose_id}`,
-          );
+          const res = await getData(`purpose/${donation.data.purpose_id}`);
           setPurpose(res.data.name);
           setCampaignPurpose(res.data);
         } catch (error) {

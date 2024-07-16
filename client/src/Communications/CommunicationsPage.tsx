@@ -29,10 +29,6 @@ import IDonation from '../util/types/donation';
 import { useData, getData } from '../util/api';
 import PopupPage from '../Popup/PopupPage';
 
-const BACKENDURL = process.env.PUBLIC_URL
-  ? process.env.PUBLIC_URL
-  : 'http://localhost:4000';
-
 const modalStyle = {
   position: 'absolute',
   top: '50%',
