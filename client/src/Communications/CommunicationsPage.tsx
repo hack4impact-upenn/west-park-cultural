@@ -74,6 +74,7 @@ interface DonorInfo {
 function CommunicationsPage() {
   const [unackDonoModalOpen, setUnackDonoModalOpen] = React.useState(false);
   const [editGroupModalOpen, setEditGroupModalOpen] = React.useState(false);
+  const [didSendModalOpen, setDidSendModalOpen] = React.useState(false);
   const [unacknowledgedDonations, setUnacknowledgedDonations] = useState<any[]>(
     [],
   );
@@ -112,7 +113,6 @@ function CommunicationsPage() {
 
   const handleUnackDonoModalOpen = async () => {
     try {
-      console.log('opened');
       const temp = donations.filter(
         (donation: IDonation) => !donation.acknowledged,
       );
@@ -153,6 +153,10 @@ function CommunicationsPage() {
 
   const handlePopupClose = () => {
     setOpenPopup(false);
+  };
+
+  const handleDidSendModalClose = () => {
+    setDidSendModalOpen(false);
   };
 
   // Define a function to extract the correct ID
@@ -234,6 +238,11 @@ function CommunicationsPage() {
     navigator.clipboard.writeText(emailAsPasteFormat).then(
       function () {
         console.log('Async: Copying to clipboard was successful!');
+        setTimeout(() => {
+          if (emailAsPasteFormat.length > 0) {
+            setDidSendModalOpen(true);
+          }
+        }, 0);
       },
       function (err) {
         console.error('Async: Could not copy text: ', err);
@@ -288,6 +297,11 @@ function CommunicationsPage() {
   const handleViewDonor = (donorID: string) => {
     setSelectedDonorID(donorID);
     setOpenPopup(true);
+  };
+
+  const handleEmailsSent = () => {
+    setDidSendModalOpen(false);
+    setRows([]);
   };
 
   return (
@@ -521,6 +535,47 @@ function CommunicationsPage() {
               </Box>
             ))}
             <Button onClick={handleUnackDonoModalClose}>Close</Button>
+          </Box>
+        </Modal>
+
+        <Modal
+          open={didSendModalOpen}
+          onClose={handleDidSendModalClose}
+          aria-labelledby="Email Unacknowledged Donations Modal"
+          aria-describedby="Email Unacknowledged Donations Modal"
+        >
+          <Box sx={modalStyle}>
+            <Typography variant="h6" component="h6">
+              Emails copied Successfully. Did you send the emails?
+            </Typography>
+
+            <p>
+              If you sent the message to the copied emaisl, click the button
+              below to log the communication.
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={handleDidSendModalClose}
+                style={{ marginRight: '10px' }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleEmailsSent}
+              >
+                Emails Sent
+              </Button>
+            </div>
           </Box>
         </Modal>
       </Box>
