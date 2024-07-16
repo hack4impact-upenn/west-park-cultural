@@ -4,10 +4,10 @@
 import 'dotenv/config';
 import SGmail, { MailDataRequired } from '@sendgrid/mail';
 
-const appName = 'Boilerplate'; // Replace with a relevant project name
+const appName = 'West Park Cultural Donation Management System'; // Replace with a relevant project name
 const senderName = 'Hack4Impact UPenn'; // Replace with a relevant project sender
-const baseUrl = 'http://localhost:3000'; // TODO: figure out better place to put this
-
+// const baseUrl = 'http://localhost:3000'; // TODO: figure out better place to put this
+const baseUrl = 'https://west-park-cultural-0d318cb0ac65.herokuapp.com/';
 // eslint-disable-next-line no-useless-concat
 SGmail.setApiKey(`${process.env.SENDGRID_API_KEY}`);
 
@@ -27,7 +27,7 @@ const emailResetPasswordLink = async (email: string, token: string) => {
     to: email,
     subject: 'Link to Reset Password',
     html:
-      `<p>You are receiving this because you (or someone else) have requested ` +
+      `<p>You are receiving this because you requested ` +
       `the reset of your account password for ${appName}. Please visit this ` +
       `<a href=${resetLink}>link</a> ` +
       `within an hour of receiving this email to successfully reset your password </p>` +

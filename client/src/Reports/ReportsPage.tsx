@@ -353,12 +353,12 @@ function ReportsPage() {
     setErrorMessage(false);
     const now = dayjs();
     const lastFiscalYrReportData = getReportForDateRange(
-      dayjs().startOf('year').subtract(1, 'year'),
-      dayjs().startOf('year'),
+      dayjs().month(6).startOf('month'),
+      now,
     );
     const lastCalYrReportData = getReportForDateRange(
-      dayjs().startOf('year').subtract(1, 'year'),
-      dayjs().endOf('year').subtract(1, 'year'),
+      dayjs().startOf('year'),
+      now,
     );
     const last90DaysReportData = getReportForDateRange(
       now.subtract(90, 'days'),
@@ -454,11 +454,24 @@ function ReportsPage() {
           return donationDate.isAfter(reportDate.subtract(90, 'days'));
         }
         if (alignment === 'last_calendar') {
-          return donationDate.isAfter(reportDate.subtract(1, 'year'));
+          return donationDate.isSame(reportDate, 'year');
         }
+
         if (alignment === 'last_fiscal') {
-          return donationDate.isAfter(
-            reportDate.subtract(1, 'year').startOf('year'),
+          const fiscalYearStart =
+            reportDate.month() >= 6
+              ? reportDate.startOf('year').month(6).startOf('month') // July 1st of the same year
+              : reportDate
+                  .startOf('year')
+                  .subtract(1, 'year')
+                  .month(6)
+                  .startOf('month'); // July 1st of the previous year
+
+          const fiscalYearEnd = fiscalYearStart.add(1, 'year');
+
+          return (
+            donationDate.isAfter(fiscalYearStart) &&
+            donationDate.isBefore(fiscalYearEnd)
           );
         }
         return false;
@@ -856,10 +869,10 @@ function ReportsPage() {
                 All Time
               </ToggleButton>
               <ToggleButton value="last_fiscal" aria-label="lastFiscalYr">
-                Last Fiscal Yr
+                Current Fiscal Yr
               </ToggleButton>
               <ToggleButton value="last_calendar" aria-label="lastCalYr">
-                Last Cal Yr
+                Current Cal Yr
               </ToggleButton>
               <ToggleButton value="last_90" aria-label="last90Days">
                 Last 90 Days
