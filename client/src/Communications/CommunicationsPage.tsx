@@ -549,7 +549,7 @@ function CommunicationsPage() {
             </Typography>
 
             <p>
-              If you sent the message to the copied emaisl, click the button
+              If you sent the message to the copied emails, click the button
               below to log the communication.
             </p>
 

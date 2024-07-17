@@ -152,3 +152,20 @@ TODO: Remove Console.logs
 TOOD: Move Logout button to at most height of window
 TODO: enter to login
 TODO: Get rid of old routes
+TODO: Show Notes for Donation + Edit Feature
+TODO: Update Report to be fiscal year + add date range feature
+TODO: Finish Confirm Communication
+TODO: Add "Ack" btn to add email automaticlaly
+TODO: Add Table for Donations to Ack
+TODO: Fix Modal UI
+TODOO: "Add All Btn" to Email unack
+TODO: Add Notes When You Create New Donor
+TODO: Fix UI ON report Page
+TODO: Add Donor Emails to Reports Page on Printout
+TODO: update website to show average donation by month
+TODO: Fix double click
+TODO: Make Graph, use data from report
+TODO: Fix Average Donation (Fiscal) in Communications Page
+TODO: Make preview not editable in comms page for "search donors"
+TODO: make groups update automatically after you make a new group
+TODO: Confirmation on Password Reset

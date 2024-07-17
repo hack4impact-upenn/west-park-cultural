@@ -7,7 +7,7 @@ import SGmail, { MailDataRequired } from '@sendgrid/mail';
 const appName = 'West Park Cultural Donation Management System'; // Replace with a relevant project name
 const senderName = 'Hack4Impact UPenn'; // Replace with a relevant project sender
 // const baseUrl = 'http://localhost:3000'; // TODO: figure out better place to put this
-const baseUrl = 'https://west-park-cultural-0d318cb0ac65.herokuapp.com/';
+const baseUrl = 'https://west-park-cultural-0d318cb0ac65.herokuapp.com';
 // eslint-disable-next-line no-useless-concat
 SGmail.setApiKey(`${process.env.SENDGRID_API_KEY}`);
 

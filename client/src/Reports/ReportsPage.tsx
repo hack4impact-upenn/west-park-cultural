@@ -227,7 +227,7 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
             style={{ textDecoration: 'none', color: '#0883ff' }}
           >
             {data.top_donator?.donor_name}
-          </a>
+          </a>{' '}
           (
           <a
             href={`/donationInfo/${data.largest_donation?.donation_id}`}
