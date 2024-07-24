@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -15,17 +14,13 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import Box from '@mui/material/Box';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { Typography } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { match } from 'assert';
-import { postData, putData, useData } from '../../util/api';
+import {  useData } from '../../util/api';
 
 interface SearchDonorsButtonProps {
   onConfirm: (filteredDonors: DonorInfo[]) => void;

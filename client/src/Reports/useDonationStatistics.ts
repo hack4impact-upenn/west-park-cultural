@@ -33,10 +33,9 @@ const useDonationStatistics = () => {
   };
 
   const getReportForDateRange = (
-    startDate: dayjs.Dayjs,
-    endDate: dayjs.Dayjs,
+    filteredData: IDonation[],
   ) => {
-    const filteredData = filterDonationsByDateRange(startDate, endDate);
+    // const filteredData = filterDonationsByDateRange(startDate, endDate);
 
     if (filteredData.length > 0 && donorsData.length > 0) {
       const total_donated = filteredData.reduce(

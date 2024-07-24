@@ -62,7 +62,7 @@ function FilteringTable({
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [filterVisible, setFilterVisible] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(showAllRows ? 1000000 : 10);
+  const [rowsPerPage, setRowsPerPage] = useState(showAllRows ? 25 : 10);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRows, setFilteredRows] = useState<Row[]>([]);
 

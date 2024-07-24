@@ -27,8 +27,8 @@ import {
   BarChart,
   pieArcLabelClasses,
 } from '@mui/x-charts';
+import FormControl from '@mui/material/FormControl';
 import { ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
-import dayjs from 'dayjs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import html2canvas from 'html2canvas';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -39,6 +39,10 @@ import IReports from '../util/types/reports';
 import IDonation from '../util/types/donation';
 import DonationsTable from '../components/tables/DonationsTable';
 import DonorsTable from '../components/tables/DonorsTable';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const style = {
   position: 'absolute',
@@ -63,8 +67,26 @@ function createData(
 
 interface BasicTableProps {
   alignment: string;
-  report: IReports | undefined;
+  report: ReportData | undefined;
   prevReport: IReports | undefined;
+}
+
+interface ReportData {
+  total_donated: number | null;
+  total_donations: number | null;
+  average_donations: number | null;
+  average_donations_per_person: number | null;
+  top_donator: {
+    amount: number | null;
+    donor_name: string | null;
+    donor_id: string | null;
+  } | null;
+  largest_donation: {
+    amount: number | null;
+    donation_id: string | null;
+    donor_name: string | null;
+    donor_id: string | null;
+  } | null;
 }
 
 const getDifference = (newValue: number | null, oldValue: number | null) => {
@@ -98,7 +120,8 @@ function BasicTable({ alignment, report, prevReport }: BasicTableProps) {
     }
   };
 
-  const data = getReportData(report, alignment);
+  // const data = getReportData(report, alignment);
+  const data = report;
   const prevData = getReportData(prevReport, alignment);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -307,26 +330,42 @@ function ReportsPage() {
   const { getReportForDateRange } = useDonationStatistics();
 
   const [alignment, setAlignment] = useState('last_all');
-  const [report, setReport] = useState<IReports | undefined>();
+  const [report, setReport] = useState<ReportData | undefined>();
   const [prevReport, setPrevReport] = useState<IReports | undefined>(undefined);
   const [allReports, setAllReports] = useState<IReports[]>([]);
   const [errorMessage, setErrorMessage] = useState(false);
-  const [viewingPastReport, setViewingPastReport] = useState(false);
+  const [donations, setDonations] = useState<IDonation[]>([]);
   const [confirmationModalOpen, setConfirmationModalOpen] =
     React.useState(false);
   const handleConfirmationModalOpen = () => setConfirmationModalOpen(true);
   const handleConfirmationModalClose = () => setConfirmationModalOpen(false);
-  const [pastReportsModalOpen, setPastReportsModalOpen] = React.useState(false);
-  const handlePastReportsModalOpen = () => setPastReportsModalOpen(true);
-  const handlePastReportsModalClose = () => setPastReportsModalOpen(false);
-  const handleViewingPastReportsOpen = () => setViewingPastReport(true);
-  const handleViewingPastReportsClose = () => setViewingPastReport(false);
+  const [startTimePeriod, setStartTimePeriod] = React.useState<Dayjs | null>(dayjs('1999-09-09'));
+  const [endTimePeriod, setEndTimePeriod] = React.useState<Dayjs | null>(
+    dayjs(),
+  );
+  const [timefilteredDonations, setTimefilteredDonations] = React.useState<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    IDonation[]
+  >([]);
+
+  const allDonations = useData('donation/all');
+  const allPurposes = useData('purpose/all');
+  const allDonors = useData('donor/all');
   const reports = useData('reports/all');
 
   useEffect(() => {
     const data = reports?.data || [];
     setAllReports(data);
   }, [reports]);
+  
+  useEffect(() => {
+    if (allDonations?.data) {
+        const data: IDonation[] = allDonations.data as IDonation[];
+        setDonations(data);
+        // You will see the updated donations in the next effect
+        setAlignment('last_all');
+    }
+}, [allDonations]);
 
   const handleTimeInterval = (
     event: React.MouseEvent<HTMLElement>,
@@ -336,127 +375,26 @@ function ReportsPage() {
   };
 
   useEffect(() => {
-    if (allReports && allReports.length > 0) {
-      const sortedReports = allReports.sort(
-        (a, b) =>
-          new Date(b.date_generated).getTime() -
-          new Date(a.date_generated).getTime(),
-      );
-      const mostRecentReport = sortedReports[0];
-      const secondMostRecentReport = sortedReports[1] || null;
-      setReport(mostRecentReport);
-      setPrevReport(secondMostRecentReport);
-    }
-  }, [allReports]);
+    updateTimeInterval();
+  }, [alignment, donations]);
 
-  const generateReport = () => {
-    setErrorMessage(false);
-    const now = dayjs();
-    const lastFiscalYrReportData = getReportForDateRange(
-      dayjs().month(6).startOf('month'),
-      now,
-    );
-    const lastCalYrReportData = getReportForDateRange(
-      dayjs().startOf('year'),
-      now,
-    );
-    const last90DaysReportData = getReportForDateRange(
-      now.subtract(90, 'days'),
-      now,
-    );
-    const last30DaysReportData = getReportForDateRange(
-      now.subtract(30, 'days'),
-      now,
-    );
-    const allReportData = getReportForDateRange(dayjs('1960-01-01'), now);
-
-    if (
-      allReportData ||
-      last30DaysReportData ||
-      last90DaysReportData ||
-      lastCalYrReportData ||
-      lastFiscalYrReportData
-    ) {
-      const newReportData = {
-        last_fiscal: lastFiscalYrReportData,
-        last_calendar: lastCalYrReportData,
-        last_90: last90DaysReportData,
-        last_30: last30DaysReportData,
-        last_all: allReportData,
-      };
-
-      postData('reports/create', newReportData)
-        .then((response) => {
-          // console.log(response);
-          setPrevReport(report);
-          setReport(response.data);
-          setAllReports((prevAllReports) => [...prevAllReports, response.data]);
-        })
-        .catch((error) => {
-          // console.log(error);
-        });
-    } else {
-      setErrorMessage(true);
-      console.log('could not make a report');
-    }
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const handleViewReport = (report: IReports) => {
-    setReport(report);
-    setPrevReport(
-      allReports.find(
-        (r) =>
-          new Date(r.date_generated).getTime() <
-          new Date(report.date_generated).getTime(),
-      ) || undefined,
-    );
-    handlePastReportsModalClose();
-    handleViewingPastReportsOpen();
-  };
-
-  const handleLoadRecentReport = () => {
-    const sortedReports = allReports.sort(
-      (a, b) =>
-        new Date(b.date_generated).getTime() -
-        new Date(a.date_generated).getTime(),
-    );
-    const mostRecentReport = sortedReports[0];
-    const secondMostRecentReport = sortedReports[1] || null;
-    setReport(mostRecentReport);
-    setPrevReport(secondMostRecentReport);
-    handleViewingPastReportsClose();
-  };
-
-  const allDonations = useData('donation/all');
-  const allPurposes = useData('purpose/all');
-  const allDonors = useData('donor/all');
-
-  const [timefilteredDonations, setTimefilteredDonations] = React.useState<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    IDonation[]
-  >([]);
-
-  React.useEffect(() => {
-    if (allDonations?.data) {
-      // console.log('allDonations', allDonations.data);
-      const donations = allDonations.data;
+  const updateTimeInterval = () => {
+    if (donations) {
       const filteredDonations = donations.filter((donation: any) => {
         const donationDate = dayjs(donation.date);
-        const reportDate = dayjs(report?.date_generated);
+        const reportDate = dayjs(); //today
         if (alignment === 'last_all') {
-          return true;
+          setStartTimePeriod(dayjs('1999-09-09'));
         }
         if (alignment === 'last_30') {
-          return donationDate.isAfter(reportDate.subtract(30, 'days'));
+          setStartTimePeriod(dayjs().subtract(30, 'days'));
         }
         if (alignment === 'last_90') {
-          return donationDate.isAfter(reportDate.subtract(90, 'days'));
+          setStartTimePeriod(dayjs().subtract(90, 'days'));
         }
         if (alignment === 'last_calendar') {
-          return donationDate.isSame(reportDate, 'year');
+          setStartTimePeriod(dayjs().startOf('year'));
         }
-
         if (alignment === 'last_fiscal') {
           const fiscalYearStart =
             reportDate.month() >= 6
@@ -466,8 +404,10 @@ function ReportsPage() {
                   .subtract(1, 'year')
                   .month(6)
                   .startOf('month'); // July 1st of the previous year
-
+        
           const fiscalYearEnd = fiscalYearStart.add(1, 'year');
+          setStartTimePeriod(fiscalYearStart);
+          setEndTimePeriod(fiscalYearEnd);
 
           return (
             donationDate.isAfter(fiscalYearStart) &&
@@ -476,9 +416,52 @@ function ReportsPage() {
         }
         return false;
       });
+
       setTimefilteredDonations(filteredDonations);
     }
-  }, [alignment, allDonations, report]);
+  }
+
+  const generateReport = () => {
+    setErrorMessage(false);
+    let loadReport;
+    loadReport = getReportForDateRange(
+      timefilteredDonations,
+    );
+
+    if (
+      loadReport
+    ) {
+      setReport(loadReport as ReportData); 
+    } else {
+      setErrorMessage(true);
+    }
+  };
+
+  React.useEffect(() => {
+    if (donations) {
+      if (endTimePeriod?.isAfter(startTimePeriod)) {
+        const filteredDonations = donations.filter((donation: IDonation) => {
+          const donationDate = dayjs(donation.date);
+          const matchesTimePeriod =
+          (donationDate.isAfter(startTimePeriod) ||
+            donationDate.isSame(startTimePeriod)) &&
+          (donationDate.isBefore(endTimePeriod) ||
+            donationDate.isSame(endTimePeriod));
+          return matchesTimePeriod;
+        });
+        setTimefilteredDonations(filteredDonations);
+      }
+      else {
+        setErrorMessage(true);
+      }
+    }
+  }, [startTimePeriod, endTimePeriod]);
+
+  React.useEffect(() => {
+    if (timefilteredDonations) {
+      generateReport();
+    }
+  }, [timefilteredDonations]);  
 
   const [purposeData, setPurposeData] = React.useState<any[]>([
     {
@@ -500,7 +483,6 @@ function ReportsPage() {
   }
 
   const genDonorGroupData = () => {
-    // console.log(timefilteredDonations);
     if (!timefilteredDonations || !allDonors?.data) return;
 
     const donations: IDonation[] = timefilteredDonations as IDonation[];
@@ -573,60 +555,24 @@ function ReportsPage() {
 
   const genDonationByTimeData = () => {
     if (!timefilteredDonations) return;
-    {
-      const donoData: IDonation[] = timefilteredDonations;
-      const timeseriesdata: number[] = [];
-      const timeserieslabels: number[] = [];
+  
+    const donoData: IDonation[] = timefilteredDonations;
+    const timeseriesdata: number[] = Array(12).fill(0); // Array to hold the total donations for each month
+    const timeseriescounts: number[] = Array(12).fill(0); // Array to hold the count of donations for each month
+    const timeserieslabels: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  
+    donoData.forEach((donation: { date: string | number | Date; amount: number }) => {
+      const donationDate = new Date(donation.date);
+      const month = donationDate.getMonth(); // getMonth() returns 0 for January, 1 for February, and so on
+      timeseriesdata[month] += donation.amount;
+      timeseriescounts[month] += 1;
+    });
+  
+    const averageDonations = timeseriesdata.map((total, index) => total / (timeseriescounts[index] || 1)); // Calculate average donations for each month
 
-      // Sort donations by date
-      const sortedData = donoData.sort(
-        (
-          a: { date: string | number | Date },
-          b: { date: string | number | Date },
-        ) => {
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        },
-      );
-      // console.log(sortedData);
-      if (sortedData.length > 0) {
-        const startDate = new Date(sortedData[0].date);
-        const endDate = new Date(sortedData[sortedData.length - 1].date);
-        const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
-        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-        // Determine the number of groups (at most 10)
-        const numGroups = Math.min(10, sortedData.length);
-        const groupSize = Math.ceil(diffDays / numGroups);
-
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < numGroups; i++) {
-          const groupStartDate = new Date(
-            startDate.getTime() + i * groupSize * 24 * 60 * 60 * 1000,
-          );
-          const groupEndDate = new Date(
-            groupStartDate.getTime() + groupSize * 24 * 60 * 60 * 1000,
-          );
-
-          let total = 0;
-          sortedData.forEach(
-            (donation: { date: string | number | Date; amount: number }) => {
-              const donationDate = new Date(donation.date);
-              if (
-                donationDate >= groupStartDate &&
-                donationDate < groupEndDate
-              ) {
-                total += donation.amount;
-              }
-            },
-          );
-          timeseriesdata.push(total);
-          timeserieslabels.push(i + 1);
-        }
-        setDonationByTime(timeseriesdata);
-        setDonationsTimeLabels(timeserieslabels);
-      }
-    }
-  };
+    setDonationByTime(averageDonations);
+    setDonationsTimeLabels(timeserieslabels);
+  };  
 
   const genPurposeData = () => {
     const purpose_to_id_map: any = {};
@@ -683,38 +629,6 @@ function ReportsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report, allDonations, allPurposes, alignment, timefilteredDonations]);
 
-  const renderPastReports = () => {
-    if (allReports.length === 0) {
-      return <Typography sx={{ mt: 2 }}>No past reports available.</Typography>;
-    }
-
-    return (
-      <TableContainer component={Paper} sx={{ maxHeight: 300 }}>
-        <Table stickyHeader aria-label="past reports table">
-          <TableBody>
-            {allReports.map((report, index) => (
-              // eslint-disable-next-line no-underscore-dangle
-              <TableRow key={report._id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  {dayjs(report.date_generated).format('MM/DD/YYYY')}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleViewReport(report)}
-                  >
-                    View Report
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
 
   const downloadPDF = () => {
     // eslint-disable-next-line new-cap
@@ -797,66 +711,13 @@ function ReportsPage() {
 
   return (
     <div className="max-width-wrapper">
-      <div id="report-content" style={{ width: '100%' }}>
+      <div id="report-content" style={{ width: '90%' }}>
         <Grid sx={{ m: 4, width: '100%' }} spacing={2}>
           <Grid>
             <Typography variant="h4" gutterBottom>
-              Report on {dayjs(report?.date_generated).format('MM/DD/YYYY')}
+              Report on {dayjs().format('MM/DD/YYYY')}
             </Typography>
           </Grid>
-          <Grid
-            container
-            direction="row"
-            spacing={2}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Grid item>
-              <Box display="flex" gap={2}>
-                {viewingPastReport && (
-                  <Button
-                    variant="contained"
-                    color="inherit"
-                    onClick={handleLoadRecentReport}
-                  >
-                    View Recent Report
-                  </Button>
-                )}
-                {!viewingPastReport && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => generateReport()}
-                  >
-                    Generate New Report
-                  </Button>
-                )}
-              </Box>
-            </Grid>
-            <Grid item>
-              <Box display="flex" gap={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleConfirmationModalOpen}
-                >
-                  Download / Share
-                </Button>
-                <Button
-                  variant="contained"
-                  color="inherit"
-                  onClick={handlePastReportsModalOpen}
-                >
-                  View Past Reports
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-          {errorMessage && (
-            <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
-              Error generating the report, please retry.
-            </Typography>
-          )}
           <Grid sx={{ mt: 2, mb: 2 }}>
             <ToggleButtonGroup
               value={alignment}
@@ -883,16 +744,56 @@ function ReportsPage() {
             </ToggleButtonGroup>
           </Grid>
 
+          <Box sx={{ marginBottom: 1 }}>
+            <FormControl fullWidth>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start Time Period"
+                  value={startTimePeriod}
+                  onChange={(newValue) => setStartTimePeriod(newValue)}
+                  sx={{ marginBottom: 1 }}
+                />
+                <DatePicker
+                  label="End Time Period"
+                  value={endTimePeriod}
+                  onChange={(newValue) => setEndTimePeriod(newValue)}
+                />
+              </LocalizationProvider>
+            </FormControl>
+          </Box>
+
           <BasicTable
             alignment={alignment}
             report={report}
             prevReport={prevReport}
           />
-
-          {/* <Grid item xs={12}>
           
-        </Grid> */}
+          {errorMessage && (
+            <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
+            Loading report...
+            </Typography>
+          )}
 
+          <Grid
+            container
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ marginTop: 1 }} 
+          >
+            <Grid item>
+              <Box display="flex" gap={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleConfirmationModalOpen}
+                >
+                  Download / Share
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
           <Grid sx={{ mt: 4, width: '100%' }}>
             <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
               <Box
@@ -931,33 +832,33 @@ function ReportsPage() {
                   p: 2,
                 }}
               >
-                <Typography variant="h6" align="center">
-                  Donations over Time
-                </Typography>
-                <Typography variant="body2" align="center">
-                  Donations are split into at most 10 equal time intervals.
-                </Typography>
-                <LineChart
-                  xAxis={[
-                    {
-                      data: donationsTimeLabels,
-                      // valueFormatter: (value) =>
-                      //   // context.location === 'tick' ? 'code' : `May`,
-                      //   // 'may',
-                      //   value,
+              <Typography variant="h6" align="center">
+                Average Donations by Month
+              </Typography>
+              <Typography variant="body2" align="center">
+                Average amount of donation per month.
+              </Typography>
+              <LineChart
+                xAxis={[
+                  {
+                    data: donationsTimeLabels,
+                  },
+                ]}
+                series={[
+                  {
+                    data: donationByTime,
+                    valueFormatter: (value: number) => {
+                      if (isNaN(value)) {
+                        return '$0.00'; // Handle NaN values
+                      }
+                      return `$${value.toFixed(2)}`; // Format the number to two decimal places
                     },
-                  ]}
-                  series={[
-                    {
-                      data: donationByTime,
-                      valueFormatter: (value: number) => `$${value.toFixed(2)}`,
-                    },
-                  ]}
-                  width={500}
-                  height={300}
-                />
+                  },
+                ]}
+                width={500}
+                height={300}
+              />
               </Box>
-
               <Box
                 sx={{
                   boxShadow: 2,
@@ -1018,23 +919,6 @@ function ReportsPage() {
             <Typography sx={{ mt: 2 }}>If so, click Confirm below.</Typography>
             <Button onClick={handleConfirmationModalClose}>Cancel</Button>
             <Button onClick={handleConfirmDownload}>Confirm</Button>
-          </Box>
-        </Modal>
-
-        <Modal
-          open={pastReportsModalOpen}
-          onClose={handlePastReportsModalClose}
-          aria-labelledby="Past Reports Modal"
-          aria-describedby="View Past Reports"
-        >
-          <Box
-            sx={{ ...style, width: '80%', maxHeight: '80vh', overflow: 'auto' }}
-          >
-            <Typography variant="h6" component="h2">
-              Past Reports
-            </Typography>
-            {renderPastReports()}
-            <Button onClick={handlePastReportsModalClose}>Close</Button>
           </Box>
         </Modal>
       </div>
