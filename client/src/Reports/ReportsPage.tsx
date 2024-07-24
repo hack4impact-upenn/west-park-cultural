@@ -374,15 +374,11 @@ function ReportsPage() {
     setAlignment(newTimeInterval);
   };
 
-  useEffect(() => {
-    updateTimeInterval();
-  }, [alignment, donations]);
-
   const updateTimeInterval = () => {
     if (donations) {
       const filteredDonations = donations.filter((donation: any) => {
         const donationDate = dayjs(donation.date);
-        const reportDate = dayjs(); //today
+        const reportDate = dayjs();
         if (alignment === 'last_all') {
           setStartTimePeriod(dayjs('1999-09-09'));
         }
@@ -421,10 +417,14 @@ function ReportsPage() {
     }
   }
 
+
+  useEffect(() => {
+    updateTimeInterval();
+  }, [alignment, donations, updateTimeInterval]);
+
   const generateReport = () => {
     setErrorMessage(false);
-    let loadReport;
-    loadReport = getReportForDateRange(
+    const loadReport = getReportForDateRange(
       timefilteredDonations,
     );
 
@@ -455,13 +455,13 @@ function ReportsPage() {
         setErrorMessage(true);
       }
     }
-  }, [startTimePeriod, endTimePeriod]);
+  }, [startTimePeriod, endTimePeriod, donations]);
 
   React.useEffect(() => {
     if (timefilteredDonations) {
       generateReport();
     }
-  }, [timefilteredDonations]);  
+  }, [timefilteredDonations, generateReport]);  
 
   const [purposeData, setPurposeData] = React.useState<any[]>([
     {
