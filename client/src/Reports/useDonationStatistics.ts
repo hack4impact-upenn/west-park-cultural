@@ -32,9 +32,7 @@ const useDonationStatistics = () => {
     });
   };
 
-  const getReportForDateRange = (
-    filteredData: IDonation[],
-  ) => {
+  const getReportForDateRange = (filteredData: IDonation[]) => {
     if (filteredData.length > 0 && donorsData.length > 0) {
       const total_donated = filteredData.reduce(
         (total, donation) => total + donation.amount,
