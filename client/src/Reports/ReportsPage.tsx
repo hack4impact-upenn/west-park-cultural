@@ -31,6 +31,10 @@ import FormControl from '@mui/material/FormControl';
 import { ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import html2canvas from 'html2canvas';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import jsPDF from 'jspdf';
 import { useData, postData } from '../util/api';
@@ -39,10 +43,6 @@ import IReports from '../util/types/reports';
 import IDonation from '../util/types/donation';
 import DonationsTable from '../components/tables/DonationsTable';
 import DonorsTable from '../components/tables/DonorsTable';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs, { Dayjs } from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const style = {
   position: 'absolute',
@@ -339,7 +339,9 @@ function ReportsPage() {
     React.useState(false);
   const handleConfirmationModalOpen = () => setConfirmationModalOpen(true);
   const handleConfirmationModalClose = () => setConfirmationModalOpen(false);
-  const [startTimePeriod, setStartTimePeriod] = React.useState<Dayjs | null>(dayjs('1999-09-09'));
+  const [startTimePeriod, setStartTimePeriod] = React.useState<Dayjs | null>(
+    dayjs('1999-09-09'),
+  );
   const [endTimePeriod, setEndTimePeriod] = React.useState<Dayjs | null>(
     dayjs(),
   );
@@ -357,15 +359,15 @@ function ReportsPage() {
     const data = reports?.data || [];
     setAllReports(data);
   }, [reports]);
-  
+
   useEffect(() => {
     if (allDonations?.data) {
-        const data: IDonation[] = allDonations.data as IDonation[];
-        setDonations(data);
-        // You will see the updated donations in the next effect
-        setAlignment('last_all');
+      const data: IDonation[] = allDonations.data as IDonation[];
+      setDonations(data);
+      // You will see the updated donations in the next effect
+      setAlignment('last_all');
     }
-}, [allDonations]);
+  }, [allDonations]);
 
   const handleTimeInterval = (
     event: React.MouseEvent<HTMLElement>,
@@ -374,15 +376,11 @@ function ReportsPage() {
     setAlignment(newTimeInterval);
   };
 
-  useEffect(() => {
-    updateTimeInterval();
-  }, [alignment, donations]);
-
   const updateTimeInterval = () => {
     if (donations) {
       const filteredDonations = donations.filter((donation: any) => {
         const donationDate = dayjs(donation.date);
-        const reportDate = dayjs(); //today
+        const reportDate = dayjs();
         if (alignment === 'last_all') {
           setStartTimePeriod(dayjs('1999-09-09'));
         }
@@ -404,7 +402,7 @@ function ReportsPage() {
                   .subtract(1, 'year')
                   .month(6)
                   .startOf('month'); // July 1st of the previous year
-        
+
           const fiscalYearEnd = fiscalYearStart.add(1, 'year');
           setStartTimePeriod(fiscalYearStart);
           setEndTimePeriod(fiscalYearEnd);
@@ -419,19 +417,19 @@ function ReportsPage() {
 
       setTimefilteredDonations(filteredDonations);
     }
-  }
+  };
+
+  useEffect(() => {
+    updateTimeInterval();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alignment, donations]);
 
   const generateReport = () => {
     setErrorMessage(false);
-    let loadReport;
-    loadReport = getReportForDateRange(
-      timefilteredDonations,
-    );
+    const loadReport = getReportForDateRange(timefilteredDonations);
 
-    if (
-      loadReport
-    ) {
-      setReport(loadReport as ReportData); 
+    if (loadReport) {
+      setReport(loadReport as ReportData);
     } else {
       setErrorMessage(true);
     }
@@ -443,25 +441,26 @@ function ReportsPage() {
         const filteredDonations = donations.filter((donation: IDonation) => {
           const donationDate = dayjs(donation.date);
           const matchesTimePeriod =
-          (donationDate.isAfter(startTimePeriod) ||
-            donationDate.isSame(startTimePeriod)) &&
-          (donationDate.isBefore(endTimePeriod) ||
-            donationDate.isSame(endTimePeriod));
+            (donationDate.isAfter(startTimePeriod) ||
+              donationDate.isSame(startTimePeriod)) &&
+            (donationDate.isBefore(endTimePeriod) ||
+              donationDate.isSame(endTimePeriod));
           return matchesTimePeriod;
         });
         setTimefilteredDonations(filteredDonations);
-      }
-      else {
+      } else {
         setErrorMessage(true);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startTimePeriod, endTimePeriod]);
 
   React.useEffect(() => {
     if (timefilteredDonations) {
       generateReport();
     }
-  }, [timefilteredDonations]);  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timefilteredDonations]);
 
   const [purposeData, setPurposeData] = React.useState<any[]>([
     {
@@ -555,24 +554,26 @@ function ReportsPage() {
 
   const genDonationByTimeData = () => {
     if (!timefilteredDonations) return;
-  
+
     const donoData: IDonation[] = timefilteredDonations;
     const timeseriesdata: number[] = Array(12).fill(0); // Array to hold the total donations for each month
     const timeseriescounts: number[] = Array(12).fill(0); // Array to hold the count of donations for each month
     const timeserieslabels: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  
-    donoData.forEach((donation: { date: string | number | Date; amount: number }) => {
-      const donationDate = new Date(donation.date);
-      const month = donationDate.getMonth(); // getMonth() returns 0 for January, 1 for February, and so on
-      timeseriesdata[month] += donation.amount;
-      timeseriescounts[month] += 1;
-    });
-  
-    const averageDonations = timeseriesdata.map((total, index) => total / (timeseriescounts[index] || 1)); // Calculate average donations for each month
+    donoData.forEach(
+      (donation: { date: string | number | Date; amount: number }) => {
+        const donationDate = new Date(donation.date);
+        const month = donationDate.getMonth(); // getMonth() returns 0 for January, 1 for February, and so on
+        timeseriesdata[month] += donation.amount;
+        timeseriescounts[month] += 1;
+      },
+    );
 
+    const averageDonations = timeseriesdata.map(
+      (total, index) => total / (timeseriescounts[index] || 1),
+    );
     setDonationByTime(averageDonations);
     setDonationsTimeLabels(timeserieslabels);
-  };  
+  };
 
   const genPurposeData = () => {
     const purpose_to_id_map: any = {};
@@ -628,7 +629,6 @@ function ReportsPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [report, allDonations, allPurposes, alignment, timefilteredDonations]);
-
 
   const downloadPDF = () => {
     // eslint-disable-next-line new-cap
@@ -767,10 +767,10 @@ function ReportsPage() {
             report={report}
             prevReport={prevReport}
           />
-          
+
           {errorMessage && (
             <Typography sx={{ color: 'red', ml: 2 }} variant="body2">
-            Loading report...
+              Loading report...
             </Typography>
           )}
 
@@ -780,7 +780,7 @@ function ReportsPage() {
             spacing={2}
             alignItems="center"
             justifyContent="space-between"
-            sx={{ marginTop: 1 }} 
+            sx={{ marginTop: 1 }}
           >
             <Grid item>
               <Box display="flex" gap={2}>
@@ -832,32 +832,32 @@ function ReportsPage() {
                   p: 2,
                 }}
               >
-              <Typography variant="h6" align="center">
-                Average Donations by Month
-              </Typography>
-              <Typography variant="body2" align="center">
-                Average amount of donation per month.
-              </Typography>
-              <LineChart
-                xAxis={[
-                  {
-                    data: donationsTimeLabels,
-                  },
-                ]}
-                series={[
-                  {
-                    data: donationByTime,
-                    valueFormatter: (value: number) => {
-                      if (isNaN(value)) {
-                        return '$0.00'; // Handle NaN values
-                      }
-                      return `$${value.toFixed(2)}`; // Format the number to two decimal places
+                <Typography variant="h6" align="center">
+                  Average Donations by Month
+                </Typography>
+                <Typography variant="body2" align="center">
+                  Average amount of donation per month.
+                </Typography>
+                <LineChart
+                  xAxis={[
+                    {
+                      data: donationsTimeLabels,
                     },
-                  },
-                ]}
-                width={500}
-                height={300}
-              />
+                  ]}
+                  series={[
+                    {
+                      data: donationByTime,
+                      valueFormatter: (value: number) => {
+                        if (Number.isNaN(value)) {
+                          return '$0.00'; // Handle NaN values
+                        }
+                        return `$${value.toFixed(2)}`; // Format the number to two decimal places
+                      },
+                    },
+                  ]}
+                  width={500}
+                  height={300}
+                />
               </Box>
               <Box
                 sx={{
