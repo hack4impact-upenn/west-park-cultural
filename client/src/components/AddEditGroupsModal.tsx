@@ -138,7 +138,24 @@ export default function AddEditGroupsModal({ open, onClose, onAddNewGroup, }: an
   };
 
   const handleAddNewGroup = (newGroup: Group) => {
-    onAddNewGroup({ newGroup });
+    if (newGroup) {
+      const newData = {
+        group_name: newGroup.group_name,
+        date_created: new Date(),
+        donor_ids: [],
+      };
+
+      postData('group/create', newData)
+        .then((response) => {
+          const responseData = response.data
+          setGroups((prevGroups) => [...prevGroups, responseData]);
+          setSelectedGroup(responseData);
+          onAddNewGroup({ responseData });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (

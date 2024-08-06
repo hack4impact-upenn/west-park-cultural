@@ -313,22 +313,7 @@ function CommunicationsPage() {
   };
 
   const handleAddNewGroup = (newGroup: any) => {
-    if (newGroup) {
-      const newData = {
-        group_name: newGroup.group_name,
-        date_created: new Date(),
-        donor_ids: [],
-      };
-
-      postData('group/create', newData)
-        .then((response) => {
-          setGroups((prevGroups) => [...prevGroups, response.data]);
-          setSelectedGroup(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    setGroups((prevGroups) => [...prevGroups, newGroup.responseData]);
   };
 
   return (
