@@ -60,8 +60,8 @@ const updateGroupDonorsAPI = (selectedGroup: Group, donorIds: string[]) => {
 
   return postData('group/edit', updatedGroup);
 };
-
-export default function AddEditGroupsModal({ open, onClose }: any) {
+// prettier-ignore
+export default function AddEditGroupsModal({ open, onClose, onAddNewGroup, }: any) {
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedDonors, setSelectedDonors] = useState<Donor[]>([]);
@@ -138,22 +138,7 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
   };
 
   const handleAddNewGroup = (newGroup: Group) => {
-    if (newGroup) {
-      const newData = {
-        group_name: newGroup.group_name,
-        date_created: new Date(),
-        donor_ids: [],
-      };
-
-      postData('group/create', newData)
-        .then((response) => {
-          setGroups((prevGroups) => [...prevGroups, response.data]);
-          setSelectedGroup(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    onAddNewGroup({ newGroup });
   };
 
   return (
@@ -173,13 +158,11 @@ export default function AddEditGroupsModal({ open, onClose }: any) {
           value={selectedGroup}
           onChange={(event, newValue) => {
             setIsNewGroup(false);
-            // console.log(newValue);
             if (typeof newValue === 'string') {
               setSelectedGroup({
                 group_name: newValue,
               });
             } else if (newValue && newValue.inputValue) {
-              // Create a new value from the user input
               setIsNewGroup(true);
               handleAddNewGroup(newValue);
             } else {

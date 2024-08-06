@@ -42,9 +42,9 @@ function NewDonationPage() {
   const [donator, setDonator] = useState<DonorType | null>(null);
   const [isNewDonator, setIsNewDonator] = useState(false);
   const [isNewPurpose, setIsNewPurpose] = useState(false);
-  const [newDonatorEmail, setNewDonatorEmail] = useState('');
-  const [newDonatorPhone, setNewDonatorPhone] = useState('');
-  const [newDonatorAddress, setNewDonatorAddress] = useState('');
+  const [newDonatorEmail, setNewDonatorEmail] = useState('N/A');
+  const [newDonatorPhone, setNewDonatorPhone] = useState('N/A');
+  const [newDonatorAddress, setNewDonatorAddress] = useState('N/A');
   const [newDonatorGroup, setNewDonatorGroup] = useState('');
   const [isValidInput, setIsValidInput] = useState(true);
   const [campaignPurpose, setCampaignPurpose] = useState<PurposeType | null>(
@@ -513,7 +513,6 @@ function NewDonationPage() {
               type="email"
               value={newDonatorEmail}
               onChange={handleNewDonatorEmailChange}
-              required={isNewDonator}
               sx={{ width: '100%' }}
             />
           </Grid>
@@ -547,7 +546,6 @@ function NewDonationPage() {
               label="New Donator Phone"
               type="phone"
               value={newDonatorPhone}
-              required={isNewDonator}
               onChange={handleNewDonatorPhoneChange}
               sx={{ width: '100%' }}
             />
@@ -559,7 +557,6 @@ function NewDonationPage() {
               label="New Donator Address"
               type="text"
               value={newDonatorAddress}
-              required={isNewDonator}
               onChange={handleNewDonatorAddressChange}
               sx={{ width: '100%' }}
             />

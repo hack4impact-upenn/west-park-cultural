@@ -26,8 +26,17 @@ import AddEditGroupsModal from '../components/AddEditGroupsModal';
 import IDonor from '../util/types/donor';
 import IGroup from '../util/types/group';
 import IDonation from '../util/types/donation';
-import { useData, getData } from '../util/api';
+import { useData, getData, postData } from '../util/api';
 import PopupPage from '../Popup/PopupPage';
+
+interface Group {
+  _id?: string;
+  title?: string;
+  inputValue?: string;
+  group_name?: string;
+  date_created?: Date;
+  donor_ids?: string[];
+}
 
 const modalStyle = {
   position: 'absolute',
@@ -303,6 +312,25 @@ function CommunicationsPage() {
     setRows([]);
   };
 
+  const handleAddNewGroup = (newGroup: any) => {
+    if (newGroup) {
+      const newData = {
+        group_name: newGroup.group_name,
+        date_created: new Date(),
+        donor_ids: [],
+      };
+
+      postData('group/create', newData)
+        .then((response) => {
+          setGroups((prevGroups) => [...prevGroups, response.data]);
+          setSelectedGroup(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
   return (
     <div className="max-width-wrapper">
       <Box paddingTop={2} paddingLeft={4} marginBottom={2}>
@@ -376,6 +404,7 @@ function CommunicationsPage() {
           <AddEditGroupsModal
             open={editGroupModalOpen}
             onClose={handleGroupModalClose}
+            onAddNewGroup={handleAddNewGroup}
           />
           <PopupPage
             open={openPopup}
