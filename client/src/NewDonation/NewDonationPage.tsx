@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import { Navigate, NavigateFunction, useNavigate } from 'react-router-dom';
@@ -52,6 +53,7 @@ function NewDonationPage() {
   );
   const [notes, setNotes] = useState('');
   const [paymentType, setPaymentType] = useState('');
+  const [otherPaymentType, setOtherPaymentType] = useState('');
 
   const donors = useData('donor/all');
   const [donorsData, setDonorsData] = useState<DonorType[]>([]);
@@ -65,6 +67,7 @@ function NewDonationPage() {
 
   useEffect(() => {
     const data = purposes?.data || [];
+    // console.log(data);
     setPurposesData(data);
   }, [purposes]);
 
@@ -191,7 +194,7 @@ function NewDonationPage() {
               donorResponse.data,
             ]);
             if (isNewPurpose) {
-              const newPurpose = {
+              const newPurpose : PurposeType = {
                 name: campaignPurpose?.title,
                 date_created: new Date(),
               };
@@ -207,13 +210,13 @@ function NewDonationPage() {
                     date: donationDate?.format('YYYY-MM-DD'),
                     amount: donationAmount,
                     purpose_id: response1.data._id,
-                    payment_type: paymentType,
+                    payment_type: paymentType === 'other' ? otherPaymentType : paymentType,
                     type: donationType,
                     comments: notes,
                   };
                   postData('donation/new', newDonation)
                     .then((response2) => {
-                      console.log(response2);
+                      setPurposesData((prevPurposesData) => [...prevPurposesData, newPurpose]);
                       resetPage();
                     })
                     .catch((error) => {
@@ -231,7 +234,7 @@ function NewDonationPage() {
                 date: donationDate?.format('YYYY-MM-DD'),
                 amount: donationAmount,
                 purpose_id: campaignPurpose?._id,
-                payment_type: paymentType,
+                payment_type: paymentType === 'other' ? otherPaymentType : paymentType, 
                 type: donationType,
                 comments: notes,
               };
@@ -251,7 +254,7 @@ function NewDonationPage() {
             console.log(error);
           });
       } else if (isNewPurpose) {
-        const newPurpose = {
+        const newPurpose : PurposeType = {
           name: campaignPurpose?.title,
           date_created: new Date(),
         };
@@ -263,12 +266,13 @@ function NewDonationPage() {
               date: donationDate?.format('YYYY-MM-DD'),
               amount: donationAmount,
               purpose_id: response1.data._id,
-              payment_type: paymentType,
+              payment_type: paymentType === 'other' ? otherPaymentType : paymentType,
               type: donationType,
               comments: notes,
             };
             postData('donation/new', newDonation)
               .then((response2) => {
+                setPurposesData((prevPurposesData) => [...prevPurposesData, newPurpose]);
                 resetPage();
                 // console.log(response2);
               })
@@ -301,7 +305,7 @@ function NewDonationPage() {
           date: donationDate?.format('YYYY-MM-DD'),
           amount: donationAmount,
           purpose_id: campaignPurpose?._id,
-          payment_type: paymentType,
+          payment_type: paymentType === 'other' ? otherPaymentType : paymentType,
           type: donationType,
           comments: notes,
         };
@@ -653,15 +657,29 @@ function NewDonationPage() {
               value={paymentType}
               label="Payment Type"
               required
-              onChange={handlePaymentTypeChange}
+              onChange={(e) => {
+                handlePaymentTypeChange(e);
+                setOtherPaymentType('');
+              }}
             >
-              <MenuItem value="mail check">Mail Check</MenuItem>
-              <MenuItem value="credit">Credit</MenuItem>
-              <MenuItem value="paypal">Paypal</MenuItem>
+              <MenuItem value="check">Check</MenuItem>
+              <MenuItem value="credit card">Credit Card</MenuItem>
               <MenuItem value="other">Other</MenuItem>
             </Select>
           </FormControl>
         </Grid>
+        {paymentType === 'other' && (
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Specify Other Payment Type"
+              value={otherPaymentType}
+              onChange={(e) => setOtherPaymentType(e.target.value)}
+              required
+            />
+          </Grid>
+        )}
+
         {isValidInput === false && (
           <Typography sx={{ color: 'error.main', ml: 2 }} variant="body2">
             Please fill in and check all input fields

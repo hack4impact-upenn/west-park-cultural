@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable */
 /* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import {
@@ -116,6 +117,7 @@ function DonationInfoPage() {
   );
   const [notes, setNotes] = useState('');
   const [paymentType, setPaymentType] = useState('');
+  const [otherPaymentType, setOtherPaymentType] = useState('');
   const [acknowledged, setAcknowledge] = useState(false);
 
   const [alert, setAlert] = useState('');
@@ -299,7 +301,7 @@ function DonationInfoPage() {
       date: donationDate?.format('YYYY-MM-DD'),
       amount: donationAmount,
       purpose_id: campaignPurpose?._id,
-      payment_type: paymentType,
+      payment_type: paymentType === 'other' ? otherPaymentType : paymentType,
       type: donationType,
       comments: notes,
       acknowledged,
@@ -783,19 +785,35 @@ function DonationInfoPage() {
             </Grid>
             <Grid item xs={12}>
               <FormControl sx={{ width: '40%' }}>
-                <InputLabel>Payment Type</InputLabel>
+                <InputLabel>Payment Type*</InputLabel>
                 <Select
                   value={paymentType}
                   label="Payment Type"
-                  onChange={handlePaymentTypeChange}
+                  required
+                  onChange={(e) => {
+                    handlePaymentTypeChange(e);
+                    setOtherPaymentType('');
+                  }}
                 >
-                  <MenuItem value="mail check">Mail Check</MenuItem>
-                  <MenuItem value="credit">Credit</MenuItem>
-                  <MenuItem value="paypal">Paypal</MenuItem>
+                  <MenuItem value="check">Check</MenuItem>
+                  <MenuItem value="credit card">Credit Card</MenuItem>
                   <MenuItem value="other">Other</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
+            {paymentType === 'other' && (
+              <Grid item xs={12}>
+                <FormControl sx={{ width: '40%' }}>
+                <TextField
+                  fullWidth
+                  label="Specify Other Payment Type"
+                  value={otherPaymentType}
+                  onChange={(e) => setOtherPaymentType(e.target.value)}
+                  required
+                />
+                </FormControl>
+              </Grid>
+            )}
             <Grid item xs={12}>
               <FormControl sx={{ width: '40%' }}>
                 <InputLabel>Acknowledged</InputLabel>

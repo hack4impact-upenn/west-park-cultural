@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-alert */
 /* eslint-disable import/no-unresolved */
+/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import {
   Typography,
@@ -474,7 +475,10 @@ function ReportsPage() {
   );
 
   const [donorGroupLabels, setDonorGroupLabels] = React.useState<any[]>([]);
+  const [barCampaignData, setBarCampaignData] = React.useState<any[]>([]);
   const [donorGroupData, setDonorGroupData] = React.useState<any[]>([]);
+  const [fundraiserData, setFundraiserData] = React.useState<any[]>([]);
+  const [fundraiserRawData, setFundraiserRawData] = React.useState<any[]>([]);
 
   interface SumByType {
     type: string;
@@ -577,35 +581,74 @@ function ReportsPage() {
 
   const genPurposeData = () => {
     const purpose_to_id_map: any = {};
+    const fundraiserPurposes: any = {};
+
     if (!(allPurposes?.data && allDonations?.data)) return;
     allPurposes.data.forEach((purpose: { _id: string; name: any }) => {
       // eslint-disable-next-line no-underscore-dangle
       purpose_to_id_map[purpose._id] = purpose.name;
+
+      if (purpose.name.toLowerCase().includes('fundraiser')) {
+        fundraiserPurposes[purpose._id] = purpose.name;
+      }
     });
 
     const donationData: IDonation[] = timefilteredDonations;
     let index = 0;
     const purpose_to_count_map: any = {};
+    const purpose_to_number_map: any = {};
+    const fundraiserCountMap: any = {}; 
+    const fundraiserAmountMap: any = {}; 
+
     donationData.forEach((donation: { purpose_id: any; amount: number }) => {
       if (donation.purpose_id in purpose_to_count_map) {
         purpose_to_count_map[donation.purpose_id] += donation.amount;
+        purpose_to_number_map[donation.purpose_id] += 1;
       } else {
         purpose_to_count_map[donation.purpose_id] = donation.amount;
+        purpose_to_number_map[donation.purpose_id] = 1;
+      }
+
+      if (donation.purpose_id in fundraiserPurposes) {
+        if (donation.purpose_id in fundraiserAmountMap) {
+          fundraiserAmountMap[donation.purpose_id] += donation.amount;
+          fundraiserCountMap[donation.purpose_id] += 1;
+        } else {
+          fundraiserAmountMap[donation.purpose_id] = donation.amount;
+          fundraiserCountMap[donation.purpose_id] = 1;
+        }
       }
     });
 
     const data: any[] = [];
+    const fundraiserData: any[] = []; 
     const keys = Object.keys(purpose_to_count_map);
+    const campaignLabelsSet: Set<string> = new Set();
+
     keys.forEach((key) => {
+      campaignLabelsSet.add(purpose_to_id_map[key]);
       data.push({
         id: index,
         label: purpose_to_id_map[key],
         value: purpose_to_count_map[key],
+        count: purpose_to_number_map[key],
         purpose_id: key,
       });
+
+      if (key in fundraiserPurposes) {
+        fundraiserData.push({
+          id: index,
+          label: purpose_to_id_map[key],
+          value: fundraiserAmountMap[key],
+          count: fundraiserCountMap[key],
+        });
+      }
+      
       index += 1;
     });
-
+    setBarCampaignData(data);
+    
+  
     const series = [
       {
         arcLabel: (item: any) => `$${item.value.toFixed(2)}`,
@@ -614,7 +657,21 @@ function ReportsPage() {
         valueFormatter: (value: any) => `$${value.value.toFixed(2)}`,
       },
     ];
-
+    setFundraiserRawData(fundraiserData);
+    
+    if (fundraiserData.length > 0) {
+      const fundraiserSeries = [
+        {
+          arcLabel: (item: any) => `$${item.value.toFixed(2)}`,
+          arcLabelMinAngle: 20,
+          data: fundraiserData, // Fix key name to "data"
+          valueFormatter: (value: any) => `$${value.value.toFixed(2)}`,
+        },
+      ];
+      setFundraiserData(fundraiserSeries);
+    } else {
+      setFundraiserData([]);
+    }
     setPurposeData(series);
   };
 
@@ -807,12 +864,17 @@ function ReportsPage() {
                 }}
               >
                 <Typography variant="h6" align="center">
-                  Purpose Breakdown
+                  Donation Breakdown
                 </Typography>
                 <PieChart
                   series={purposeData}
                   height={200}
                   // width={800}
+                  slotProps={{
+                    legend: {
+                      hidden: false
+                    },
+                  }}
                   sx={{
                     [`& .${pieArcLabelClasses.root}`]: {
                       fill: 'white',
@@ -822,6 +884,51 @@ function ReportsPage() {
                     },
                   }}
                 />
+              </Box>
+
+              <Box
+                sx={{
+                  boxShadow: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  width: '100%',
+                }}
+              >
+                <Typography variant="h6" align="center">
+                  Fundraiser Breakdown
+                </Typography>
+                {fundraiserRawData.length > 0 ? (
+                <BarChart
+                  width={500}
+                  height={300}
+                  series={[
+                    { data: fundraiserRawData.map((item) => item.count), label: 'count', id: 'count' },
+                  ]}
+                  xAxis={[{ data: fundraiserRawData.map((item) => item.label), scaleType: 'band' }]}
+                />
+              ) : (
+                <Typography variant="body2" align="center">
+                  Loading data...
+                </Typography>
+              )}
+
+              {fundraiserRawData.length > 0 ? (
+                <BarChart
+                  width={500}
+                  height={300}
+                  series={[
+                    { data: fundraiserRawData.map((item) => item.value), label: 'amount ($)', id: 'amount' },
+                  ]}
+                  xAxis={[{ data: fundraiserRawData.map((item) => item.label), scaleType: 'band' }]}
+                />
+              ) : (
+                <Typography variant="body2" align="center">
+                  Loading data...
+                </Typography>
+              )}
+              
               </Box>
               <Box
                 sx={{
@@ -848,8 +955,8 @@ function ReportsPage() {
                     {
                       data: donationByTime,
                       valueFormatter: (value: number) => {
-                        if (Number.isNaN(value)) {
-                          return '$0.00'; // Handle NaN values
+                        if (!value || Number.isNaN(value)) {
+                          return '$0.00'; // Handle undefined, null, or NaN values
                         }
                         return `$${value.toFixed(2)}`; // Format the number to two decimal places
                       },
@@ -870,7 +977,7 @@ function ReportsPage() {
                 }}
               >
                 <Typography variant="h6" align="center">
-                  Donation Breakdown
+                  Type Breakdown
                 </Typography>
                 <BarChart
                   xAxis={[
@@ -884,6 +991,50 @@ function ReportsPage() {
                   height={300}
                 />
               </Box>
+              <Box
+                sx={{
+                  boxShadow: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  mt: 4,
+                }}
+              >
+                <Typography variant="h6" align="center">
+                  Donations by Campaigns ($)
+                </Typography>
+                {barCampaignData.length > 0 ? (
+                <BarChart
+                  width={500}
+                  height={300}
+                  series={[
+                    { data: barCampaignData.map((item) => item.value), label: 'amount ($)', id: '$' },
+                  ]}
+                  xAxis={[{ data: barCampaignData.map((item) => item.label), scaleType: 'band' }]}
+                />
+              ) : (
+                <Typography variant="body2" align="center">
+                  Loading data...
+                </Typography>
+              )}
+
+{barCampaignData.length > 0 ? (
+                <BarChart
+                  width={500}
+                  height={300}
+                  series={[
+                    { data: barCampaignData.map((item) => item.count), label: 'count', id: 'count' },
+                  ]}
+                  xAxis={[{ data: barCampaignData.map((item) => item.label), scaleType: 'band' }]}
+                />
+              ) : (
+                <Typography variant="body2" align="center">
+                  Loading data...
+                </Typography>
+              )}
+              </Box>
+
             </Stack>
           </Grid>
           <div id="hiddenDataForFileDownload" style={{ display: 'none' }}>

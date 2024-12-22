@@ -8,7 +8,7 @@ const DonationSchema = new mongoose.Schema({
   },
   payment_type: {
     type: String,
-    enum: ['mail check', 'credit', 'paypal', 'other'],
+    // enum: ['check', 'credit card', 'other'],
     required: true,
   },
   grant_year: {
