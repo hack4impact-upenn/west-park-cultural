@@ -658,6 +658,7 @@ function ReportsPage() {
       },
     ];
     setFundraiserRawData(fundraiserData);
+    // console.log(fundraiserData);
     
     if (fundraiserData.length > 0) {
       const fundraiserSeries = [
@@ -673,6 +674,7 @@ function ReportsPage() {
       setFundraiserData([]);
     }
     setPurposeData(series);
+    // console.log(series);
   };
 
   React.useEffect(() => {
@@ -853,38 +855,35 @@ function ReportsPage() {
           </Grid>
           <Grid sx={{ mt: 4, width: '100%' }}>
             <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
-              <Box
-                sx={{
-                  boxShadow: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  p: 2,
-                  width: '100%',
-                }}
-              >
-                <Typography variant="h6" align="center">
-                  Donation Breakdown
-                </Typography>
-                <PieChart
-                  series={purposeData}
-                  height={200}
-                  // width={800}
-                  slotProps={{
-                    legend: {
-                      hidden: false
-                    },
-                  }}
-                  sx={{
-                    [`& .${pieArcLabelClasses.root}`]: {
-                      fill: 'white',
-                      fontWeight: 'bold',
-                      fontSize: 11,
-                      // width: '500px',
-                    },
-                  }}
-                />
-              </Box>
+            <Box
+  sx={{
+    boxShadow: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    p: 2, // Padding for internal spacing
+    width: '100%',
+    height: 'auto' // Adjust height dynamically based on content
+  }}
+>
+  <Typography variant="h6" align="center" sx={{ mb: 2 }}>
+    Donation Breakdown
+  </Typography>
+  <PieChart
+    series={purposeData}
+    height={300} // Slightly increased height for better layout
+    slotProps={{ legend: { hidden: true } }}
+    sx={{
+      [`& .${pieArcLabelClasses.root}`]: {
+        fill: 'white',
+        fontWeight: 'bold',
+        fontSize: 11,
+      },
+    }}
+  />
+</Box>
+
 
               <Box
                 sx={{
@@ -1073,6 +1072,8 @@ function ReportsPage() {
           </Box>
         </Modal>
       </div>
+
+      
     </div>
   );
 }
