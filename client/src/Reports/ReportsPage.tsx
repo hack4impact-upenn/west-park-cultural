@@ -22,12 +22,8 @@ import {
 } from '@mui/material';
 // TODO: check if fixed
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {
-  PieChart,
-  LineChart,
-  BarChart,
-  pieArcLabelClasses,
-} from '@mui/x-charts';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import FormControl from '@mui/material/FormControl';
 import { ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -870,16 +866,47 @@ function ReportsPage() {
   <Typography variant="h6" align="center" sx={{ mb: 2 }}>
     Donation Breakdown
   </Typography>
-  <PieChart
-    series={purposeData}
-    height={300} // Slightly increased height for better layout
-    slotProps={{ legend: { hidden: true } }}
-    sx={{
-      [`& .${pieArcLabelClasses.root}`]: {
-        fill: 'white',
-        fontWeight: 'bold',
-        fontSize: 11,
+  <HighchartsReact
+    highcharts={Highcharts}
+    options={{
+      chart: {
+        type: 'pie',
+        height: 450
       },
+      title: {
+        text: ''
+      },
+      plotOptions: {
+        pie: {
+          size: '80%',
+          showInLegend: true,
+          dataLabels: {
+            enabled: true,
+            format: '${name}',
+            style: {
+              color: 'black'
+            }
+          }
+        }
+      },
+      legend: {
+        align: 'right',
+        verticalAlign: 'middle',
+        layout: 'vertical',
+        labelFormat: '{name}: ${y:,.2f}',
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1,
+        padding: 10,
+        width: 200
+      },
+      series: [{
+        name: 'Donations',
+        colorByPoint: true,
+        data: purposeData[0]?.data.map((item: any) => ({
+          name: item.label,
+          y: item.value
+        })) || []
+      }]
     }}
   />
 </Box>
@@ -899,34 +926,67 @@ function ReportsPage() {
                   Fundraiser Breakdown
                 </Typography>
                 {fundraiserRawData.length > 0 ? (
-                <BarChart
-                  width={500}
-                  height={300}
-                  series={[
-                    { data: fundraiserRawData.map((item) => item.count), label: 'count', id: 'count' },
-                  ]}
-                  xAxis={[{ data: fundraiserRawData.map((item) => item.label), scaleType: 'band' }]}
-                />
-              ) : (
-                <Typography variant="body2" align="center">
-                  Loading data...
-                </Typography>
-              )}
-
-              {fundraiserRawData.length > 0 ? (
-                <BarChart
-                  width={500}
-                  height={300}
-                  series={[
-                    { data: fundraiserRawData.map((item) => item.value), label: 'amount ($)', id: 'amount' },
-                  ]}
-                  xAxis={[{ data: fundraiserRawData.map((item) => item.label), scaleType: 'band' }]}
-                />
-              ) : (
-                <Typography variant="body2" align="center">
-                  Loading data...
-                </Typography>
-              )}
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={{
+                      chart: {
+                        type: 'column',
+                        height: 600
+                      },
+                      title: {
+                        text: ''
+                      },
+                      xAxis: {
+                        categories: fundraiserRawData.map(item => item.label),
+                        crosshair: true
+                      },
+                      yAxis: [{
+                        title: {
+                          text: 'Count'
+                        }
+                      }, {
+                        title: {
+                          text: 'Amount ($)'
+                        },
+                        opposite: true
+                      }],
+                      tooltip: {
+                        shared: true
+                      },
+                      legend: {
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemStyle: {
+                          fontSize: '12px',
+                          fontWeight: 'normal'
+                        },
+                        backgroundColor: '#FFFFFF',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        padding: 10
+                      },
+                      series: [{
+                        name: 'Count',
+                        data: fundraiserRawData.map(item => item.count),
+                        yAxis: 0,
+                        color: '#7cb5ec'
+                      }, {
+                        name: 'Amount ($)',
+                        data: fundraiserRawData.map(item => item.value),
+                        yAxis: 1,
+                        color: '#434348',
+                        tooltip: {
+                          valuePrefix: '$'
+                        }
+                      }]
+                    }}
+                  />
+                ) : (
+                  <Typography variant="body2" align="center">
+                    Data is unavailable.
+                  </Typography>
+                )}
               
               </Box>
               <Box
@@ -944,25 +1004,63 @@ function ReportsPage() {
                 <Typography variant="body2" align="center">
                   Average amount of donation per month.
                 </Typography>
-                <LineChart
-                  xAxis={[
-                    {
-                      data: donationsTimeLabels,
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={{
+                    chart: {
+                      type: 'line',
+                      height: 300,
+                      width: 500
                     },
-                  ]}
-                  series={[
-                    {
-                      data: donationByTime,
-                      valueFormatter: (value: number) => {
-                        if (!value || Number.isNaN(value)) {
-                          return '$0.00'; // Handle undefined, null, or NaN values
-                        }
-                        return `$${value.toFixed(2)}`; // Format the number to two decimal places
+                    title: {
+                      text: ''
+                    },
+                    xAxis: {
+                      categories: donationsTimeLabels.map(month => 
+                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1]
+                      ),
+                      title: {
+                        text: 'Month'
+                      }
+                    },
+                    yAxis: {
+                      title: {
+                        text: 'Average Donation Amount ($)'
                       },
+                      labels: {
+                        formatter: function(this: any): string {
+                          return '$' + (this.value as number).toFixed(2);
+                        }
+                      }
                     },
-                  ]}
-                  width={500}
-                  height={300}
+                    tooltip: {
+                      formatter: function(this: any): string {
+                        return '<b>' + this.x + '</b><br/>Average: $' + (this.y as number).toFixed(2);
+                      }
+                    },
+                    legend: {
+                      align: 'center',
+                      verticalAlign: 'bottom',
+                      layout: 'horizontal',
+                      itemStyle: {
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                      },
+                      backgroundColor: '#FFFFFF',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      padding: 10
+                    },
+                    series: [{
+                      name: 'Average Donation',
+                      data: donationByTime.map(value => value || 0),
+                      color: '#2f7ed8',
+                      marker: {
+                        enabled: true,
+                        radius: 4
+                      }
+                    }]
+                  }}
                 />
               </Box>
               <Box
@@ -978,16 +1076,65 @@ function ReportsPage() {
                 <Typography variant="h6" align="center">
                   Type Breakdown
                 </Typography>
-                <BarChart
-                  xAxis={[
-                    {
-                      scaleType: 'band',
-                      data: donorGroupLabels,
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={{
+                    chart: {
+                      type: 'column',
+                      height: 300,
+                      width: 500
                     },
-                  ]}
-                  series={donorGroupData}
-                  width={500}
-                  height={300}
+                    title: {
+                      text: ''
+                    },
+                    xAxis: {
+                      categories: donorGroupLabels,
+                      crosshair: true
+                    },
+                    yAxis: {
+                      title: {
+                        text: 'Amount ($)'
+                      },
+                      labels: {
+                        formatter: function(this: any): string {
+                          return '$' + (this.value as number).toFixed(2);
+                        }
+                      }
+                    },
+                    tooltip: {
+                      shared: true,
+                      formatter: function(this: any): string {
+                        return '<b>' + this.x + '</b><br/>' +
+                          this.points?.map((point: any) => 
+                            point.series.name + ': $' + point.y.toFixed(2)
+                          ).join('<br/>');
+                      }
+                    },
+                    legend: {
+                      align: 'center',
+                      verticalAlign: 'bottom',
+                      layout: 'horizontal',
+                      itemStyle: {
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                      },
+                      backgroundColor: '#FFFFFF',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      padding: 10
+                    },
+                    plotOptions: {
+                      column: {
+                        grouping: true,
+                        shadow: false
+                      }
+                    },
+                    series: donorGroupData.map((item, index) => ({
+                      name: item.label,
+                      data: item.data,
+                      color: Highcharts.getOptions().colors![index % (Highcharts.getOptions().colors?.length || 1)]
+                    }))
+                  }}
                 />
               </Box>
               <Box
@@ -1004,34 +1151,73 @@ function ReportsPage() {
                   Donations by Campaigns ($)
                 </Typography>
                 {barCampaignData.length > 0 ? (
-                <BarChart
-                  width={500}
-                  height={300}
-                  series={[
-                    { data: barCampaignData.map((item) => item.value), label: 'amount ($)', id: '$' },
-                  ]}
-                  xAxis={[{ data: barCampaignData.map((item) => item.label), scaleType: 'band' }]}
-                />
-              ) : (
-                <Typography variant="body2" align="center">
-                  Loading data...
-                </Typography>
-              )}
-
-{barCampaignData.length > 0 ? (
-                <BarChart
-                  width={500}
-                  height={300}
-                  series={[
-                    { data: barCampaignData.map((item) => item.count), label: 'count', id: 'count' },
-                  ]}
-                  xAxis={[{ data: barCampaignData.map((item) => item.label), scaleType: 'band' }]}
-                />
-              ) : (
-                <Typography variant="body2" align="center">
-                  Loading data...
-                </Typography>
-              )}
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={{
+                      chart: {
+                        type: 'column',
+                        height: 600
+                      },
+                      title: {
+                        text: ''
+                      },
+                      xAxis: {
+                        categories: barCampaignData.map(item => item.label),
+                        crosshair: true
+                      },
+                      yAxis: [{
+                        title: {
+                          text: 'Amount ($)'
+                        }
+                      }, {
+                        title: {
+                          text: 'Count'
+                        },
+                        opposite: true
+                      }],
+                      tooltip: {
+                        shared: true
+                      },
+                      legend: {
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal',
+                        itemStyle: {
+                          fontSize: '12px',
+                          fontWeight: 'normal'
+                        },
+                        backgroundColor: '#FFFFFF',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        padding: 10
+                      },
+                      plotOptions: {
+                        column: {
+                          grouping: true,
+                          shadow: false
+                        }
+                      },
+                      series: [{
+                        name: 'Amount',
+                        data: barCampaignData.map(item => item.value),
+                        yAxis: 0,
+                        color: '#2f7ed8',
+                        tooltip: {
+                          valuePrefix: '$'
+                        }
+                      }, {
+                        name: 'Count',
+                        data: barCampaignData.map(item => item.count),
+                        yAxis: 1,
+                        color: '#90ed7d'
+                      }]
+                    }}
+                  />
+                ) : (
+                  <Typography variant="body2" align="center">
+                    Loading data...
+                  </Typography>
+                )}
               </Box>
 
             </Stack>

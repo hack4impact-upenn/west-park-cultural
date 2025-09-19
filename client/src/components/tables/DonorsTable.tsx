@@ -44,6 +44,11 @@ function DonorsTable({ alignment }: BasicTableProps) {
     const lastCom = donor.last_communication_date
       ? new Date(donor.last_communication_date).toISOString().split('T')[0]
       : 'N/A';
+    // Format dates consistently
+    const lastDonationDate = donor.last_donation_date
+      ? new Date(donor.last_donation_date).toISOString().split('T')[0]
+      : 'N/A';
+
     rows.push({
       id: index + 1,
       contact_name: (
@@ -54,11 +59,11 @@ function DonorsTable({ alignment }: BasicTableProps) {
           {donor.contact_name}
         </a>
       ),
-      donor_group: donor.donor_group,
-      last_donation_date: new Date(donor.last_donation_date)
-        .toISOString()
-        .split('T')[0],
+      donor_group: donor.donor_group || 'N/A',
+      date: lastDonationDate, // Add date field for filtering
+      last_donation_date: lastDonationDate,
       last_communication_date: lastCom,
+      donor_name: donor.contact_name, // Add searchable field
     });
   });
 

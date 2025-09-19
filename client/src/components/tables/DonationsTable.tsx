@@ -7,9 +7,10 @@ import FilteringTable from './FilteringTable';
 
 interface BasicTableProps {
   alignment: string;
+  onFilteredDataChange?: (data: any[]) => void;
 }
 
-function DonationsTable({ alignment }: BasicTableProps) {
+function DonationsTable({ alignment, onFilteredDataChange }: BasicTableProps) {
   const donors = useData('donor/all');
   const donations = useData('donation/all');
   const purposes = useData('purpose/all');
@@ -40,9 +41,22 @@ function DonationsTable({ alignment }: BasicTableProps) {
         donor_name: donorIdToName.get(donation.donor_id),
         purpose_name:
           purposeIdToName.get(donation.purpose_id) || 'No Purpose (General)',
-      }));
+      }))
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime(),
+      ); // Sort by date, newest first
     setDonationsData(filteredData);
-  }, [donations?.data, donors?.data, alignment]);
+    if (onFilteredDataChange) {
+      onFilteredDataChange(filteredData);
+    }
+  }, [
+    donations?.data,
+    donors?.data,
+    purposes?.data,
+    alignment,
+    onFilteredDataChange,
+  ]);
 
   // columns: <Date>, <Amount>, <Donor>, <Payment Type>, <Purpose>
   const columns = [
@@ -50,7 +64,7 @@ function DonationsTable({ alignment }: BasicTableProps) {
     { id: 'amount', label: 'Amount' },
     { id: 'donor_id', label: 'Donor' },
     { id: 'payment_type', label: 'Payment Type' },
-    { id: 'purpose_id', label: 'Purpose' },
+    { id: 'purpose_name', label: 'Purpose' },
     { id: 'acknowledged', label: 'Acknowledged' },
     { id: 'more', label: 'More Information' },
   ];
@@ -70,7 +84,8 @@ function DonationsTable({ alignment }: BasicTableProps) {
         </a>
       ),
       payment_type: donation.payment_type,
-      purpose_id: <span>{donation.purpose_name}</span>,
+      purpose_id: donation.purpose_id, // Keep the raw ID for filtering
+      purpose_name: <span>{donation.purpose_name}</span>, // Display name in a separate column
       acknowledged: (
         <span
           style={{
@@ -104,6 +119,7 @@ function DonationsTable({ alignment }: BasicTableProps) {
       columns={columns}
       rows={rows}
       showAll={alignment === 'all'}
+      onFilteredDataChange={onFilteredDataChange}
     />
   );
 }

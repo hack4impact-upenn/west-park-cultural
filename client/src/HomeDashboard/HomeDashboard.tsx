@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Typography,
   Box,
@@ -14,126 +14,112 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useAppDispatch } from '../util/redux/hooks';
-import { postData, useData } from '../util/api';
+import { postData } from '../util/api';
 import DonationsTable from '../components/tables/DonationsTable';
 import './homedashboard.css';
 
-interface BasicTableProps {
-  alignment: string;
+interface DonationData {
+  amount: number;
+  date: string;
+  type: string;
+  _id: string;
+  id: string;
+  acknowledged?: boolean;
 }
 
-function BasicTable({ alignment }: BasicTableProps) {
-  let customRows: { label: string; value: any }[] = [];
-  const donations = useData('donation/all');
-  const [donationsData, setDonationsData] = useState<any>([]);
-  const navigate = useNavigate();
+interface BasicTableProps {
+  alignment: string;
+  filteredData?: DonationData[];
+}
 
-  useEffect(() => {
-    // if not logged in, go to /login
+function BasicTable({ alignment, filteredData = [] }: BasicTableProps) {
+  let customRows: { label: string; value: string | JSX.Element }[] = [];
+  const navigate = useNavigate();
+  const checkAuth = React.useCallback(() => {
     postData('auth/isLoggedIn').then((res) => {
-      // if (res.status === 401) {
       if (!(res && res?.data && res.data.loggedIn)) {
         navigate('/login');
       }
     });
-  });
+  }, [navigate]);
 
   useEffect(() => {
-    const data = donations?.data || [];
-    const filteredData = data.filter(
-      (donation: any) => donation.type === alignment,
-    );
-    setDonationsData(filteredData);
-  }, [donations?.data, alignment]);
+    checkAuth();
+  }, [checkAuth]);
 
-  // calculate summary stats
-  const totalDonated = donationsData.reduce(
-    (total: number, donation: any) => total + donation.amount,
-    0,
-  );
-  const sortedDonationsData = [...donationsData].sort(
-    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
-  const lastDonation =
-    sortedDonationsData.length > 0 ? sortedDonationsData[0] : null;
-  const lastDate = lastDonation ? new Date(lastDonation.date) : null;
-  const LAST_DEFAULT = 'N/A';
-  let last = LAST_DEFAULT;
+  // Memoize expensive calculations
+  const { totalDonated, averageDonation, maxDonationElement } =
+    React.useMemo(() => {
+      const total = filteredData.reduce(
+        (sum: number, donation: DonationData) => sum + donation.amount,
+        0,
+      );
 
-  if (lastDate) {
-    const currentDate = new Date();
-    const timeDifference = currentDate.getTime() - lastDate.getTime();
-    const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+      const average = filteredData.length > 0 ? total / filteredData.length : 0;
 
-    if (daysDifference > 30) {
-      const day = lastDate.getDate();
-      const month = lastDate.toLocaleString('default', { month: 'long' });
-      const year = lastDate.getFullYear();
-      last = `${month} ${day}, ${year}`;
-    } else if (daysDifference > 0) {
-      last = `${daysDifference} days ago`;
-    } else {
-      const hoursDifference = Math.floor(timeDifference / (1000 * 3600));
-      last = `${hoursDifference} hours ago`;
-    }
-  }
-  let lastElement = <span>{last}</span>;
-  if (last !== LAST_DEFAULT) {
-    // eslint-disable-next-line no-underscore-dangle
-    lastElement = (
-      <a
-        // eslint-disable-next-line no-underscore-dangle
-        href={`/donationInfo/${lastDonation._id}`}
-        style={{ textDecoration: 'none', color: '#0883ff' }}
-      >
-        {last}
-      </a>
-    );
-  }
+      const maxAmount =
+        filteredData.length > 0
+          ? Math.max(...filteredData.map((donation) => donation.amount))
+          : 0;
 
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-  const donatedInLast90Days = donationsData.reduce(
-    (total: number, donation: any) => {
-      const donationDate = new Date(donation.date);
-      return donationDate >= ninetyDaysAgo ? total + donation.amount : total;
-    },
-    0,
-  );
+      const maxItem = filteredData.find(
+        (donation) => donation.amount === maxAmount,
+      );
+
+      const maxElement = maxItem ? (
+        <a
+          href={`/donationInfo/${maxItem.id}`}
+          style={{ textDecoration: 'none', color: '#0883ff' }}
+        >
+          ${maxAmount.toLocaleString()}
+        </a>
+      ) : (
+        <span>N/A</span>
+      );
+
+      return {
+        totalDonated: total,
+        averageDonation: average,
+        maxDonationElement: maxElement,
+      };
+    }, [filteredData]);
 
   if (alignment === 'donation') {
     customRows = [
       { label: 'Total Donated', value: `$${totalDonated.toLocaleString()}` },
-      { label: 'Last Donation', value: lastElement },
       {
-        label: 'Donated in last 90 Days',
-        value: `$${donatedInLast90Days.toLocaleString()}`,
+        label: 'Average Donation',
+        value: `$${averageDonation.toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        })}`,
       },
+      { label: 'Highest Donation', value: maxDonationElement },
     ];
   } else if (alignment === 'sponsorship') {
     customRows = [
       { label: 'Total Sponsored', value: `$${totalDonated.toLocaleString()}` },
-      { label: 'Last Sponsorship', value: lastElement },
       {
-        label: 'Sponsored in last 90 Days',
-        value: `$${donatedInLast90Days.toLocaleString()}`,
+        label: 'Average Sponsorship',
+        value: `$${averageDonation.toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        })}`,
       },
+      { label: 'Highest Sponsorship', value: maxDonationElement },
     ];
   } else if (alignment === 'grant') {
     customRows = [
       { label: 'Total Granted', value: `$${totalDonated.toLocaleString()}` },
-      { label: 'Last Grant', value: lastElement },
       {
-        label: 'Granted in last 90 Days',
-        value: `$${donatedInLast90Days.toLocaleString()}`,
+        label: 'Average Grant',
+        value: `$${averageDonation.toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        })}`,
       },
+      { label: 'Highest Grant', value: maxDonationElement },
     ];
   }
-  const navigator = useNavigate();
-
-  const numUnacknowledged = donationsData.filter(
-    (donation: any) => !donation.acknowledged,
+  const numUnacknowledged = filteredData.filter(
+    (donation: DonationData) => !donation.acknowledged,
   ).length;
 
   return (
@@ -162,13 +148,13 @@ function BasicTable({ alignment }: BasicTableProps) {
             unacknowledged {alignment}s.
           </p>
           <Button
-            onClick={() => navigator('/communications')}
+            onClick={() => navigate('/communications')}
             endIcon={<ArrowForwardIcon />}
             variant="contained"
             color="primary"
             size="large"
           >
-            Send them a message now{' '}
+            Send them a message now
           </Button>
         </div>
       )}
@@ -177,22 +163,25 @@ function BasicTable({ alignment }: BasicTableProps) {
 }
 
 function HomeDashboard() {
-  const dispatch = useAppDispatch();
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const [alignment, setAlignment] = React.useState('donation'); // Default value for alignment
+  const [filteredTableData, setFilteredTableData] = React.useState<
+    DonationData[]
+  >([]);
 
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
-  ) => {
-    if (newAlignment) {
-      setAlignment(newAlignment);
-    }
-  };
+  const handleChange = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+      if (newAlignment) {
+        setAlignment(newAlignment);
+        setFilteredTableData([]); // Reset filtered data when alignment changes
+      }
+    },
+    [setAlignment, setFilteredTableData],
+  );
 
-  const goReport = () => {
-    navigator('/reports');
-  };
+  const goReport = React.useCallback(() => {
+    navigate('/reports');
+  }, [navigate]);
 
   return (
     <div className="max-width-wrapper">
@@ -212,9 +201,7 @@ function HomeDashboard() {
           </ToggleButtonGroup>
 
           <Button
-            onClick={() => {
-              goReport();
-            }}
+            onClick={goReport}
             style={{
               background: 'grey',
               color: 'white',
@@ -240,13 +227,16 @@ function HomeDashboard() {
         </Box>
 
         {/* Render the BasicTable component with the alignment prop */}
-        <BasicTable alignment={alignment} />
+        <BasicTable alignment={alignment} filteredData={filteredTableData} />
 
         <Box width="100%" marginBottom={10} marginTop={5}>
           <Typography variant="h4" gutterBottom>
             {alignment.charAt(0).toUpperCase() + alignment.slice(1)}s
           </Typography>
-          <DonationsTable alignment={alignment} />
+          <DonationsTable
+            alignment={alignment}
+            onFilteredDataChange={setFilteredTableData}
+          />
         </Box>
       </div>
     </div>

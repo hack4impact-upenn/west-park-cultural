@@ -17,9 +17,18 @@ function DonationHistoryTable({ donorId }: BasicTableProps) {
   const donorIdToName: Map<string, string> = new Map();
   const purposeIdToName: Map<string, string> = new Map();
   useEffect(() => {
-    const donorData = donors?.data || [];
-    const data = donations?.data || [];
-    const purposeData = purposes?.data || [];
+    // Wait for all data to be loaded
+    if (!donors?.data || !donations?.data || !purposes?.data) {
+      return;
+    }
+
+    const { data: donorData } = donors;
+    const { data } = donations;
+    const { data: purposeData } = purposes;
+
+    // Clear and rebuild maps
+    donorIdToName.clear();
+    purposeIdToName.clear();
 
     donorData.forEach((donor: any) => {
       // eslint-disable-next-line no-underscore-dangle
@@ -30,16 +39,24 @@ function DonationHistoryTable({ donorId }: BasicTableProps) {
       // eslint-disable-next-line no-underscore-dangle
       purposeIdToName.set(purpose._id, purpose.name);
     });
+
     const filteredData = data
       .filter((donation: any) => donation.donor_id === donorId)
-      .map((donation: any) => ({
-        ...donation,
-        donor_name: donorIdToName.get(donation.donor_id),
-        purpose_name:
-          purposeIdToName.get(donation.purpose_id) || 'No Purpose (General)',
-      }));
+      .map((donation: any) => {
+        const purposeName = purposeIdToName.get(donation.purpose_id);
+
+        return {
+          ...donation,
+          donor_name: donorIdToName.get(donation.donor_id),
+          purpose_name: purposeName || 'No Purpose (General)',
+        };
+      })
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime(),
+      ); // Sort by date, newest first
     setDonationsData(filteredData);
-  }, [donations?.data, donors?.data, donorId]);
+  }, [donations?.data, donors?.data, purposes?.data, donorId]);
 
   // columns: <Date>, <Amount>, <Donor>, <Payment Type>, <Purpose>
   const columns = [
@@ -79,7 +96,7 @@ function DonationHistoryTable({ donorId }: BasicTableProps) {
     });
   });
 
-  return <FilteringTable columns={columns} rows={rows} />;
+  return <FilteringTable columns={columns} rows={rows} hideSearch />;
 }
 
 export default DonationHistoryTable;

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -12,17 +13,13 @@ import {
   Select,
   MenuItem,
   Button,
-  IconButton,
-  Input,
   SelectChangeEvent,
-  Link,
   Grid,
   Popover,
   Box,
+  Chip,
 } from '@mui/material';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import Chip from '@mui/material/Chip';
-import { getData, useData } from '../../util/api';
+import { useData } from '../../util/api';
 import './table.css';
 
 interface Column {
@@ -30,50 +27,151 @@ interface Column {
   label: string;
 }
 
-// interface Row {
-//   [key: string]: number | string;
-//   date: string;
-//   amount: number;
-//   donor_id: string;
-//   payment_type: string;
-//   purpose_id: string;
-// }
+// FIX 1: Added `id` to the Row interface for use as a unique key in React.
 interface Row {
-  [key: string]: number | string;
+  id: string | number; // For unique key prop
   contact_name: string;
   donor_group: number;
   last_donation_date: string;
   last_communication_date: string;
+  date?: string; // Assuming 'date' is present for filtering
+  purpose_id?: string;
+  [key: string]: string | number | undefined; // Allow additional string/number properties
 }
+
 interface FilteringTableProps {
   columns: Column[];
   rows: Row[];
   showAll?: boolean;
+  hideSearch?: boolean;
+  onFilteredDataChange?: (data: Row[]) => void;
 }
 
 function FilteringTable({
   columns: initialColumns,
   rows: initialRows,
   showAll: showAllRows,
+  hideSearch = false,
+  onFilteredDataChange,
 }: FilteringTableProps) {
-  const [rows, setRows] = useState<Row[]>(initialRows);
-  const [columns, setColumns] = useState<Column[]>(initialColumns);
-  const [filterType, setFilterType] = useState('calendar');
+  // FIX 2: Correctly defined `searchTerm` state variable.
+  const [searchTerm, setSearchTerm] = useState('');
+  const [columns] = useState<Column[]>(initialColumns);
+  const [filterType, setFilterType] = useState('all');
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [filterVisible, setFilterVisible] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(showAllRows ? 25 : 10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredRows, setFilteredRows] = useState<Row[]>([]);
+  const [filteredRows, setFilteredRows] = useState<Row[]>(initialRows);
+  const [purposes, setPurposesFilter] = useState<string[]>([]);
+  const [availablePurposes, setAvailablePurposes] = useState<
+    Array<{ _id: string; name: string }>
+  >([]);
+  const purposesData = useData('purpose/all');
+
+  // Centralized filtering logic in a function
+  const applyFilters = React.useCallback(
+    (immediate = false) => {
+      // Only apply filters immediately if immediate is true or if removing all filters
+      if (!immediate && filterType !== 'all' && purposes.length > 0) {
+        return;
+      }
+      let filteredData = [...initialRows];
+
+      // Apply search filter
+      if (searchTerm.trim() !== '') {
+        filteredData = filteredData.filter((row) =>
+          row.contact_name
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()),
+        );
+      }
+
+      // Apply date filter
+      if (filterType !== 'all') {
+        filteredData = filteredData.filter((row) => {
+          if (!row.date) return false;
+          const donationDate = new Date(row.date as string);
+          const now = new Date();
+
+          switch (filterType) {
+            case 'calendar': {
+              const startOfYear = new Date(filterYear, 0, 1);
+              const endOfYear = new Date(filterYear, 11, 31);
+              return donationDate >= startOfYear && donationDate <= endOfYear;
+            }
+            case 'fiscal': {
+              const fiscalYearStart = new Date(filterYear, 6, 1); // July 1st
+              const fiscalYearEnd = new Date(filterYear + 1, 5, 30); // June 30th
+              return (
+                donationDate >= fiscalYearStart && donationDate <= fiscalYearEnd
+              );
+            }
+            case 'thirty': {
+              const thirtyDaysAgo = new Date(now);
+              thirtyDaysAgo.setDate(now.getDate() - 30);
+              return donationDate >= thirtyDaysAgo;
+            }
+            case 'ninty': {
+              const ninetyDaysAgo = new Date(now);
+              ninetyDaysAgo.setDate(now.getDate() - 90);
+              return donationDate >= ninetyDaysAgo;
+            }
+            // NOTE: 'custom' case can be added here
+            default:
+              return true;
+          }
+        });
+      }
+
+      // Apply purpose filter
+      if (purposes.length > 0) {
+        filteredData = filteredData.filter((row) => {
+          const rowPurposeId = row.purpose_id as string;
+          return purposes.includes(rowPurposeId);
+        });
+      }
+
+      setFilteredRows(filteredData);
+      setPage(0); // Reset to the first page whenever filters change
+
+      if (onFilteredDataChange) {
+        onFilteredDataChange(filteredData);
+      }
+    },
+    [
+      searchTerm,
+      filterType,
+      filterYear,
+      purposes,
+      initialRows,
+      onFilteredDataChange,
+    ],
+  );
+
+  // Initialize filtered data and handle filter changes
+  useEffect(() => {
+    if (filterType === 'all' && purposes.length === 0) {
+      applyFilters(true);
+    }
+  }, [filterType, purposes, applyFilters]);
 
   const handleFilterTypeChange = (event: SelectChangeEvent<string>) => {
-    setFilterType(event.target.value);
+    const newFilterType = event.target.value;
+    setFilterType(newFilterType);
+    if (newFilterType === 'all') {
+      applyFilters(true);
+    }
   };
 
   const handleFilterYearChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setFilterYear(parseInt(event.target.value, 10));
+    const year = parseInt(event.target.value, 10);
+    if (!Number.isNaN(year)) {
+      setFilterYear(year);
+    }
   };
 
   const toggleFilterVisible = () => {
@@ -91,50 +189,17 @@ function FilteringTable({
     setPage(0);
   };
 
-  const filterRows = (searchedRows: Row[]) => {
-    // Then apply the year filter
-    const filteredRowsCur = searchedRows.filter((row) => {
-      const date = new Date(row.date as string);
-      const year = date.getFullYear();
-      const month = date.getMonth();
+  // FIX 4: Simplified the search handler to only update state.
+  // The useEffect handles the actual filtering.
+  const handleSearchChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    [],
+  );
 
-      if (filterType === 'calendar') {
-        return year === filterYear;
-      }
-      // fiscal year
-      return (
-        (month >= 6 && year === filterYear) ||
-        (month < 6 && year - 1 === filterYear)
-      );
-    });
-    setFilteredRows(searchedRows);
-  };
-
-  function searchRows() {
-    // Apply the search filter first
-    const searchedRows = initialRows.filter((row) => {
-      // Convert all row values to string and lowercase, then check if they include the search term
-      return Object.values(row).some((value) =>
-        value.toString().toLowerCase().includes(searchTerm),
-      );
-    });
-    filterRows(searchedRows);
-  }
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value.toLowerCase());
-    setPage(0); // Reset to the first page when the search term changes
-    searchRows();
-  };
-
-  useEffect(() => {
-    searchRows();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialRows, rows]);
-
-  useEffect(() => {
-    setRows(initialRows);
-  }, [initialRows]);
+  // Unused state removed: `setRows` was not needed as `initialRows` is the source of truth.
+  // Redundant callbacks removed: `filterRows` and `searchRows` are replaced by the central `useEffect`.
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
@@ -150,12 +215,37 @@ function FilteringTable({
     toggleFilterVisible();
   };
 
-  const [purposes, setPurposesFilter] = React.useState<string[]>([]);
-  const hanldlePurposesChange = (event: SelectChangeEvent<typeof purposes>) => {
+  useEffect(() => {
+    if (purposesData?.data) {
+      setAvailablePurposes(purposesData.data);
+    }
+  }, [purposesData?.data]);
+
+  const getFilterLabel = () => {
+    switch (filterType) {
+      case 'calendar':
+        return `Calendar Year: ${filterYear}`;
+      case 'fiscal':
+        return `Fiscal Year: ${filterYear}`;
+      case 'thirty':
+        return 'Last 30 Days';
+      case 'ninty':
+        return 'Last 90 Days';
+      default:
+        return 'All Time'; // Fallback label
+    }
+  };
+
+  // FIX 5: Corrected typo in function name.
+  const handlePurposesChange = (event: SelectChangeEvent<typeof purposes>) => {
     const {
       target: { value },
     } = event;
-    setPurposesFilter(typeof value === 'string' ? value.split(',') : value);
+    const newPurposes = typeof value === 'string' ? value.split(',') : value;
+    setPurposesFilter(newPurposes);
+    if (newPurposes.length === 0) {
+      applyFilters(true);
+    }
   };
 
   return (
@@ -169,19 +259,59 @@ function FilteringTable({
         padding: '20px',
       }}
     >
-      <TextField
-        label="Search"
-        variant="outlined"
-        onChange={handleSearchChange}
-        style={{ margin: '10px', width: `calc(100% / 4` }}
-      />
-      <IconButton
-        onClick={openPopover}
-        style={{ margin: '20px' }}
-        aria-describedby="filterBtn"
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          marginBottom: 2,
+        }}
       >
-        <FilterAltIcon />
-      </IconButton>
+        {!hideSearch && (
+          <TextField
+            label="Search by donor name"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            style={{ width: `calc(100% / 4` }}
+          />
+        )}
+        <Button
+          onClick={openPopover}
+          aria-describedby="filterBtn"
+          variant="outlined"
+        >
+          Filter Donation
+        </Button>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {filterType !== 'all' && (
+            <Chip
+              label={getFilterLabel()}
+              onDelete={() => {
+                setFilterType('all');
+                applyFilters(true);
+              }}
+              color="primary"
+              variant="outlined"
+            />
+          )}
+          {purposes.map((purposeId) => {
+            const purpose = availablePurposes.find((p) => p._id === purposeId);
+            return (
+              <Chip
+                key={purposeId}
+                label={`Purpose: ${purpose ? purpose.name : purposeId}`}
+                onDelete={() => {
+                  setPurposesFilter(purposes.filter((id) => id !== purposeId));
+                  applyFilters(true);
+                }}
+                color="primary"
+                variant="outlined"
+              />
+            );
+          })}
+        </Box>
+      </Box>
       {filterVisible && (
         <Popover
           open={filterVisible}
@@ -196,6 +326,7 @@ function FilteringTable({
           <div className="filtersWrapper">
             <span className="filterwrapperTitle">Filter Donations</span>
             <Grid container spacing={2}>
+              {/* Date Filter Section */}
               <Grid item xs={6}>
                 <div className="filterParent">
                   <span className="filterHeader">Date</span>
@@ -213,70 +344,71 @@ function FilteringTable({
                     </Select>
                     <TextField
                       label="Year"
+                      type="number"
                       value={filterYear}
                       onChange={handleFilterYearChange}
                       style={{ marginLeft: '10px' }}
+                      disabled={!['calendar', 'fiscal'].includes(filterType)}
                     />
                   </div>
                 </div>
               </Grid>
+              {/* Amount Filter Section (UI Only) */}
               <Grid item xs={6}>
                 <div className="filterParent">
                   <div className="filterHeader">Amount</div>
-                  <Grid container spacing={8}>
+                  <Grid container spacing={1}>
                     <Grid item xs={4}>
                       <Select defaultValue="all" className="fitlerSelect">
                         <MenuItem value="all">All Amounts</MenuItem>
                         <MenuItem value="between">Between</MenuItem>
-                        <MenuItem value="between">More than</MenuItem>
-                        <MenuItem value="between">Less than</MenuItem>
+                        <MenuItem value="more">More than</MenuItem>
+                        <MenuItem value="less">Less than</MenuItem>
                       </Select>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={8}>
                       <div className="rangeParent">
-                        <TextField
-                          label="Min"
-                          onChange={handleFilterYearChange}
-                          className="rangeInput"
-                        />
-                        <div className="dash">{}</div>
-                        <TextField
-                          label="Max"
-                          onChange={handleFilterYearChange}
-                          className="rangeInput"
-                        />
+                        {/* FIX 6: Removed incorrect onChange handlers. These need their own state and logic. */}
+                        <TextField label="Min" className="rangeInput" />
+                        <div className="dash">-</div>
+                        <TextField label="Max" className="rangeInput" />
                       </div>
                     </Grid>
                   </Grid>
                 </div>
               </Grid>
-              <Grid item xs={4}>
+              {/* Purpose Filter Section */}
+              <Grid item xs={12}>
                 <div className="filterParent">
                   <div className="filterHeader">Purpose</div>
-                  <Grid container spacing={8}>
-                    <Grid item xs={12}>
-                      <Select
-                        className="filterChooseMultiple"
-                        multiple
-                        onChange={hanldlePurposesChange}
-                        value={purposes}
-                        renderValue={(selected) => (
-                          <Box
-                            sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
-                          >
-                            {selected.map((value: any) => (
-                              <Chip key={value} label={value} />
-                            ))}
-                          </Box>
-                        )}
-                      >
-                        <MenuItem value="all">All Purposes</MenuItem>
-                        <MenuItem value="between">Between</MenuItem>
-                        <MenuItem value="between">More than</MenuItem>
-                        <MenuItem value="between">Less than</MenuItem>
-                      </Select>
-                    </Grid>
-                  </Grid>
+                  <Select
+                    className="filterChooseMultiple"
+                    multiple
+                    fullWidth
+                    onChange={handlePurposesChange}
+                    value={purposes}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((purposeId: string) => {
+                          const purpose = availablePurposes.find(
+                            (p) => p._id === purposeId,
+                          );
+                          return (
+                            <Chip
+                              key={purposeId}
+                              label={purpose ? purpose.name : purposeId}
+                            />
+                          );
+                        })}
+                      </Box>
+                    )}
+                  >
+                    {availablePurposes.map((purpose) => (
+                      <MenuItem key={purpose._id} value={purpose._id}>
+                        {purpose.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </div>
               </Grid>
             </Grid>
@@ -287,22 +419,30 @@ function FilteringTable({
                 marginTop: '20px',
               }}
             >
-              <Button variant="outlined">Cancel</Button>
-              <Button variant="contained" color="primary">
-                Confirm
+              <Button variant="outlined" onClick={closePopover}>
+                Cancel
+              </Button>
+              {/* FIX 7: The "Apply" button now just closes the popover.
+                  The useEffect applies filters automatically as they are changed. */}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  applyFilters();
+                  closePopover();
+                }}
+              >
+                Apply Filters
               </Button>
             </Box>
           </div>
         </Popover>
       )}
-      {initialRows.length === 0 && (
-        <div
-          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-        >
-          <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>No Results</div>
-        </div>
-      )}
-      {initialRows.length > 0 && (
+      {initialRows.length === 0 ? (
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ fontSize: '2rem', fontWeight: 'bold' }}>No Results</Box>
+        </Box>
+      ) : (
         <Table>
           <TableHead>
             <TableRow>
