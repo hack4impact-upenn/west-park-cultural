@@ -390,25 +390,17 @@ function ReportsPage() {
         if (alignment === 'last_calendar') {
           setStartTimePeriod(dayjs().startOf('year'));
         }
-        if (alignment === 'last_fiscal') {
-          const fiscalYearStart =
-            reportDate.month() >= 6
-              ? reportDate.startOf('year').month(6).startOf('month') // July 1st of the same year
-              : reportDate
-                  .startOf('year')
-                  .subtract(1, 'year')
-                  .month(6)
-                  .startOf('month'); // July 1st of the previous year
+          if (alignment === 'last_fiscal') {
+            // Set fiscal year: July 1st of current year to June 30th of next year
+            const fiscalYearStart = reportDate.clone().startOf('year').month(6).startOf('month'); // July 1st
+            const fiscalYearEnd = fiscalYearStart.clone().add(1, 'year').subtract(1, 'day'); // June 30th next year
+            
+            setStartTimePeriod(fiscalYearStart);
+            setEndTimePeriod(fiscalYearEnd);
 
-          const fiscalYearEnd = fiscalYearStart.add(1, 'year');
-          setStartTimePeriod(fiscalYearStart);
-          setEndTimePeriod(fiscalYearEnd);
-
-          return (
-            donationDate.isAfter(fiscalYearStart) &&
-            donationDate.isBefore(fiscalYearEnd)
-          );
-        }
+            return (donationDate.isAfter(fiscalYearStart) || donationDate.isSame(fiscalYearStart)) && 
+                   (donationDate.isBefore(fiscalYearEnd) || donationDate.isSame(fiscalYearEnd));
+          }
         return false;
       });
 
