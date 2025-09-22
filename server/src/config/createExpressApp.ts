@@ -41,6 +41,7 @@ const createExpressApp = (sessionStore: MongoStore): express.Express => {
   // Use express-session to maintain sessions
   app.use(
     session({
+      name: 'session',
       secret: process.env.COOKIE_SECRET || 'SHOULD_DEFINE_COOKIE_SECRET',
       resave: false, // don't save session if unmodified
       saveUninitialized: false, // don't create session until something stored
@@ -48,12 +49,12 @@ const createExpressApp = (sessionStore: MongoStore): express.Express => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
       },
-    }),
+    }) as unknown as express.RequestHandler,
   );
 
   // Init passport on every route call and allow it to use "express-session"
-  app.use(passport.initialize());
-  app.use(passport.session());
+  app.use(passport.initialize() as unknown as express.RequestHandler);
+  app.use(passport.session() as unknown as express.RequestHandler);
 
   // Inits routers listed in routers.ts file
   routers.forEach((entry) => app.use(entry.prefix, entry.router));

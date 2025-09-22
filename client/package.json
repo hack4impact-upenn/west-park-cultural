@@ -41,6 +41,7 @@
     "@mui/x-date-pickers": "^6.19.6",
     "@mui/x-date-pickers-pro": "^7.1.1",
     "@reduxjs/toolkit": "^1.8.1",
+    "@types/highcharts": "^7.0.0",
     "axios": "^1.1.2",
     "dayjs": "^1.11.10",
     "highcharts": "^12.4.0",
