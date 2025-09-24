@@ -72,20 +72,23 @@ function FilteringTable({
   // Centralized filtering logic in a function
   const applyFilters = React.useCallback(
     (immediate = false) => {
-      // Only apply filters immediately if immediate is true or if removing all filters
+      let filteredData = [...initialRows];
+
+      // Always apply filters, but handle 'all' case explicitly
       if (!immediate && filterType !== 'all' && purposes.length > 0) {
+        // For non-immediate filters, wait for explicit apply
         return;
       }
-      let filteredData = [...initialRows];
 
       // Apply search filter
       if (searchTerm.trim() !== '') {
-        filteredData = filteredData.filter((row) =>
-          row.contact_name
+        filteredData = filteredData.filter((row) => {
+          const searchableText = row.donor_name || row.contact_name || '';
+          return searchableText
             .toString()
             .toLowerCase()
-            .includes(searchTerm.toLowerCase()),
-        );
+            .includes(searchTerm.toLowerCase());
+        });
       }
 
       // Apply date filter
@@ -102,8 +105,8 @@ function FilteringTable({
               return donationDate >= startOfYear && donationDate <= endOfYear;
             }
             case 'fiscal': {
-              const fiscalYearStart = new Date(filterYear, 6, 1); // July 1st
-              const fiscalYearEnd = new Date(filterYear + 1, 5, 30); // June 30th
+              const fiscalYearStart = new Date(filterYear - 1, 6, 1); // July 1st of previous year
+              const fiscalYearEnd = new Date(filterYear, 5, 30); // June 30th of current year
               return (
                 donationDate >= fiscalYearStart && donationDate <= fiscalYearEnd
               );
@@ -134,7 +137,10 @@ function FilteringTable({
       }
 
       setFilteredRows(filteredData);
-      setPage(0); // Reset to the first page whenever filters change
+      // Only reset page when filters actually change the data
+      if (filteredData.length !== filteredRows.length) {
+        setPage(0);
+      }
 
       if (onFilteredDataChange) {
         onFilteredDataChange(filteredData);
@@ -147,6 +153,7 @@ function FilteringTable({
       purposes,
       initialRows,
       onFilteredDataChange,
+      filteredRows.length,
     ],
   );
 
@@ -194,8 +201,9 @@ function FilteringTable({
   const handleSearchChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearchTerm(event.target.value);
+      applyFilters(true);
     },
-    [],
+    [applyFilters],
   );
 
   // Unused state removed: `setRows` was not needed as `initialRows` is the source of truth.

@@ -72,7 +72,7 @@ function DonationsTable({ alignment, onFilteredDataChange }: BasicTableProps) {
   const rows: any = [];
   donationsData.forEach((donation: any, index: number) => {
     rows.push({
-      id: index + 1,
+      id: donation._id, // Use the actual donation ID instead of index
       date: new Date(donation.date).toISOString().split('T')[0],
       amount: donation.amount,
       donor_id: (

@@ -391,9 +391,9 @@ function ReportsPage() {
           setStartTimePeriod(dayjs().startOf('year'));
         }
           if (alignment === 'last_fiscal') {
-            // Set fiscal year: July 1st of current year to June 30th of next year
-            const fiscalYearStart = reportDate.clone().startOf('year').month(6).startOf('month'); // July 1st
-            const fiscalYearEnd = fiscalYearStart.clone().add(1, 'year').subtract(1, 'day'); // June 30th next year
+            // Set fiscal year: July 1st of previous year to June 30th of current year
+            const fiscalYearStart = reportDate.clone().subtract(1, 'year').month(6).startOf('month'); // July 1st of previous year
+            const fiscalYearEnd = reportDate.clone().month(5).endOf('month'); // June 30th of current year
             
             setStartTimePeriod(fiscalYearStart);
             setEndTimePeriod(fiscalYearEnd);
