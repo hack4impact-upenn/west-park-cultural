@@ -75,6 +75,7 @@ function DonationsTable({ alignment, onFilteredDataChange }: BasicTableProps) {
       id: donation._id, // Use the actual donation ID instead of index
       date: new Date(donation.date).toISOString().split('T')[0],
       amount: donation.amount,
+      contact_name: donation.donor_name, // Add plain text version for searching
       donor_id: (
         <a
           href={`/donor-profile/${donation.donor_id}`}

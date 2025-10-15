@@ -21,10 +21,17 @@ function DonorsTable({ alignment }: BasicTableProps) {
       (e: any) => e.type === alignment || alignment === 'all',
     );
     const uniquePeople = new Set(filteredDonations.map((e: any) => e.donor_id));
-    const filteredDonors = donorData.filter((e: any) =>
-      // eslint-disable-next-line dot-notation
-      uniquePeople.has(e['_id']),
-    );
+    const filteredDonors = donorData
+      .filter((e: any) => uniquePeople.has(e._id))
+      .sort((a: any, b: any) => {
+        // Handle cases where dates might be null/undefined
+        if (!a.last_donation_date) return 1; // Push null dates to the end
+        if (!b.last_donation_date) return -1;
+        return (
+          new Date(b.last_donation_date).getTime() -
+          new Date(a.last_donation_date).getTime()
+        );
+      });
     setDonorsData(filteredDonors);
   }, [donors?.data, alignment, donations?.data]);
 

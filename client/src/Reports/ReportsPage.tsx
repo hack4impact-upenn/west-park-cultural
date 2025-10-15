@@ -375,33 +375,39 @@ function ReportsPage() {
 
   const updateTimeInterval = () => {
     if (donations) {
+      let startDate: dayjs.Dayjs = dayjs();
+      let endDate: dayjs.Dayjs = dayjs();
+      
+      switch (alignment) {
+        case 'last_all':
+          startDate = dayjs('1999-09-09');
+          break;
+        case 'last_30':
+          startDate = dayjs().subtract(30, 'days');
+          break;
+        case 'last_90':
+          startDate = dayjs().subtract(90, 'days');
+          break;
+        case 'last_calendar':
+          startDate = dayjs().startOf('year');
+          break;
+        case 'last_fiscal': {
+          // July 1st of previous year to June 30th of current year
+          startDate = dayjs().month(6).startOf('month').subtract(1, 'year');
+          endDate = dayjs().month(5).endOf('month');
+          break;
+        }
+        default:
+          startDate = dayjs('1999-09-09');
+      }
+
+      setStartTimePeriod(startDate);
+      setEndTimePeriod(endDate);
+
       const filteredDonations = donations.filter((donation: any) => {
         const donationDate = dayjs(donation.date);
-        const reportDate = dayjs();
-        if (alignment === 'last_all') {
-          setStartTimePeriod(dayjs('1999-09-09'));
-        }
-        if (alignment === 'last_30') {
-          setStartTimePeriod(dayjs().subtract(30, 'days'));
-        }
-        if (alignment === 'last_90') {
-          setStartTimePeriod(dayjs().subtract(90, 'days'));
-        }
-        if (alignment === 'last_calendar') {
-          setStartTimePeriod(dayjs().startOf('year'));
-        }
-          if (alignment === 'last_fiscal') {
-            // Set fiscal year: July 1st of previous year to June 30th of current year
-            const fiscalYearStart = reportDate.clone().subtract(1, 'year').month(6).startOf('month'); // July 1st of previous year
-            const fiscalYearEnd = reportDate.clone().month(5).endOf('month'); // June 30th of current year
-            
-            setStartTimePeriod(fiscalYearStart);
-            setEndTimePeriod(fiscalYearEnd);
-
-            return (donationDate.isAfter(fiscalYearStart) || donationDate.isSame(fiscalYearStart)) && 
-                   (donationDate.isBefore(fiscalYearEnd) || donationDate.isSame(fiscalYearEnd));
-          }
-        return false;
+        return (donationDate.isAfter(startDate) || donationDate.isSame(startDate)) && 
+               (donationDate.isBefore(endDate) || donationDate.isSame(endDate));
       });
 
       setTimefilteredDonations(filteredDonations);

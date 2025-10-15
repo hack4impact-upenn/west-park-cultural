@@ -34,23 +34,41 @@ const useDonationStatistics = () => {
 
   const getReportForDateRange = (filteredData: IDonation[]) => {
     if (filteredData.length > 0 && donorsData.length > 0) {
-      const total_donated = filteredData.reduce(
-        (total, donation) => total + donation.amount,
-        0,
+      // Use a more precise calculation for monetary values
+      const total_donated = Number(
+        filteredData
+          .reduce((total, donation) => total + Number(donation.amount), 0)
+          .toFixed(2),
       );
+
       const total_donations = filteredData.length;
+
+      // Calculate averages with proper rounding
       const average_donations =
         total_donations === 0
           ? 0
-          : parseFloat((total_donated / total_donations).toFixed(2));
+          : Number(
+              (
+                Math.round((total_donated / total_donations) * 100) / 100
+              ).toFixed(2),
+            );
+
       const average_donations_per_person =
         donorsData.length === 0
           ? 0
-          : parseFloat((total_donated / donorsData.length).toFixed(2));
+          : Number(
+              (
+                Math.round((total_donated / donorsData.length) * 100) / 100
+              ).toFixed(2),
+            );
 
+      // Calculate donor totals with proper precision
       const donorTotals = filteredData.reduce((acc, donation) => {
-        acc[donation.donor_id] =
-          (acc[donation.donor_id] || 0) + donation.amount;
+        acc[donation.donor_id] = Number(
+          (
+            Number(acc[donation.donor_id] || 0) + Number(donation.amount)
+          ).toFixed(2),
+        );
         return acc;
       }, {} as { [key: string]: number });
 
